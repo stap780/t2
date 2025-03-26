@@ -88,7 +88,7 @@ accessories:
       clear:
         # POSTGRES_USER: POSTGRES_USER
         POSTGRES_DB: t2_production
-      secret:
+      # secret:
         # - POSTGRES_PASSWORD
     files:
       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
