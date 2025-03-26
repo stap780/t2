@@ -1,30 +1,22 @@
-# Name of your application. Used to uniquely configure containers.
 service: t2
 
-# Name of the container image.
 image: panaet780/t2
 
-# Deploy to these servers.
 servers:
   web:
-    - 185.119.57.16
+    hosts:
+      - 185.119.57.16
   # job:
   #   hosts:
   #     - 192.168.0.1
   #   cmd: bin/jobs
 
-# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
-# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
-#
-# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
   host: teletri.ru
 
 # Credentials for your image host.
 registry:
-  # Specify the registry server, if you're not using Docker Hub
-  # server: registry.digitalocean.com / ghcr.io / ...
   username: panaet780
 
   # Always use an access token rather than real password when possible.
@@ -85,26 +77,12 @@ builder:
   arch: amd64
   args:
     RUBY_VERSION: 3.2.2
-  # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
-  # remote: ssh://docker@docker-builder-server
-  #
-  # # Pass arguments and secrets to the Docker build process
-  # args:
-  #   RUBY_VERSION: ruby-3.2.2
-  # secrets:
-  #   - GITHUB_TOKEN
-  #   - RAILS_MASTER_KEY
-
-# Use a different ssh user than root
-# ssh:
-#   user: app
 
 # Use accessory services (secrets come from .kamal/secrets).
 accessories:
   db:
     image: postgres:15
     host: teletri.ru
-    # Change to 3306 to expose port to the world instead of just local network.
     port: "127.0.0.1:5432:5432"
     env:
       clear:
@@ -116,9 +94,3 @@ accessories:
       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
     directories:
       - data:/var/lib/postgresql/data
-#   redis:
-#     image: redis:7.0
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
