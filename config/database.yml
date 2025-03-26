@@ -69,8 +69,8 @@ production:
     <<: *default
     host: t2-db
     database: t2_production
-    username: <%= ENV["POSTGRES_USER"] %>
-    password: <%= ENV["POSTGRES_PASSWORD"] %>
+    username: 'postgres'
+    password: 't2123'
   cache:
     <<: *primary_production
     database: t2_production_cache
