@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS 't2_production';
+CREATE DATABASE IF NOT EXISTS 't2_production_cache';
+CREATE DATABASE IF NOT EXISTS 't2_production_queue';
+CREATE DATABASE IF NOT EXISTS 't2_production_cable';
