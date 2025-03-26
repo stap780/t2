@@ -67,6 +67,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
+    host: t2-db
     database: t2_production
     username: <%= ENV["POSTGRES_USER"] %>
     password: <%= ENV["POSTGRES_PASSWORD"] %>
