@@ -33,6 +33,7 @@ env:
     - AWS_REGION
     - AWS_BUCKET
     - DATABASE_URL
+    - QUEUE_DATABASE_URL
     - POSTGRES_PASSWORD
     - POSTGRES_USER
     - POSTGRES_DB
@@ -90,6 +91,22 @@ accessories:
       clear:
         POSTGRES_USER: postgres
         POSTGRES_DB: t2_production
+        DB_HOST: 127.0.0.1
+        DB_PORT: 5432
+      secret:
+        - POSTGRES_PASSWORD
+    files:
+      - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
+    directories:
+      - data:/var/lib/postgresql/data
+  queue:
+    image: postgres:15
+    host: 185.119.57.16
+    port: '127.0.0.1:5433:5432'
+    env:
+      clear:
+        POSTGRES_USER: postgres
+        POSTGRES_DB: t2_production_queue
         DB_HOST: 127.0.0.1
         DB_PORT: 5432
       secret:

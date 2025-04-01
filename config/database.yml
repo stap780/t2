@@ -27,6 +27,7 @@ production:
   queue:
     <<: *primary_production
     database: t2_production_queue
+    url: QUEUE_DATABASE_URL
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
