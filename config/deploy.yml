@@ -1,4 +1,3 @@
-<% require "dotenv"; Dotenv.load(".env") %>
 service: t2
 
 image: panaet780/t2

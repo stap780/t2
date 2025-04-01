@@ -18,7 +18,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    url: <%= ENV['DATABASE_URL'] %>
+    url: postgres://postgres:t2123@t2-postgres:5432/t2_production
     database: t2_production
   cache:
     <<: *primary_production
