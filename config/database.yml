@@ -4,47 +4,32 @@ default: &default
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-# sqlite: &sqlite
-#   adapter: sqlite3
-#   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-#   timeout: 5000
-
 development:
   primary:
     <<: *default
     database: t2_development
-  # cable:
-  #   <<: *sqlite
-  #   database: storage/t2_development_cable.sqlite3
-  #   migrations_paths: db/cable_migrate
 
 test:
   primary:
     <<: *default
     database: t2_test
-  # cable:
-  #     <<: *sqlite
-  #     database: storage/t2_test_cable.sqlite3
-  #     migrations_paths: db/cable_migrate
-
 production:
   primary: &primary_production
     <<: *default
-    url: postgres://postgres:t2123@t2-postgres:5432/t2_production
+    # url: postgres://postgres:t2123@t2-postgres:5432/t2_production
     database: t2_production
-  # cable:
-  #   <<: *sqlite
-  #   database: /data/t2_production_cable.sqlite3
-  #   migrations_paths: db/cable_migrate
-  # cache:
-  #   <<: *primary_production
-  #   database: t2_production_cache
-  #   migrations_paths: db/cache_migrate
-  # queue:
-  #   <<: *primary_production
-  #   database: t2_production_queue
-  #   # url: QUEUE_DATABASE_URL
-  #   migrations_paths: db/queue_migrate
+    username: <%= ENV["POSTGRES_USER"] %>
+    password: <%= ENV["POSTGRES_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
+  cache:
+    <<: *primary_production
+    database: t2_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: t2_production_queue
+    # url: QUEUE_DATABASE_URL
+    migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
     database: t2_production_cable
