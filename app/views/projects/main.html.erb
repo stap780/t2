@@ -1,30 +1,34 @@
-<div class="container mt-5">
-  <h1 class="text-center mb-4">Welcome to Our Apple Products Showcase</h1>
-  
-  <div id="productSlider" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="https://via.placeholder.com/800x400?text=Apple+Product+1" class="d-block w-100" alt="Apple Product 1">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>Apple Product 1</h5>
-          <p>Experience the innovation of Apple.</p>
-        </div>
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+    <form action="/login" method="post" class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input type="email" id="email" name="email" required
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
-      <div class="carousel-item">
-        <img src="https://via.placeholder.com/800x400?text=Apple+Product+2" class="d-block w-100" alt="Apple Product 2">
-        <div class="carousel-caption d-none d-md-block">
-          <h5>Apple Product 2</h5>
-          <p>Discover the future of technology.</p>
-        </div>
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="password" name="password" required
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#productSlider" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#productSlider" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
+      <div class="flex items-center justify-between">
+        <label class="flex items-center">
+          <input type="checkbox" name="remember" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+          <span class="ml-2 text-sm text-gray-600">Remember me</span>
+        </label>
+        <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+      </div>
+      <div>
+        <button type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Login
+        </button>
+      </div>
+    </form>
+    <p class="mt-6 text-center text-sm text-gray-600">
+      Don't have an account?
+      <a href="/signup" class="text-indigo-600 hover:text-indigo-500">Sign up</a>
+    </p>
   </div>
 </div>

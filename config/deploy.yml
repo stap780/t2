@@ -14,7 +14,7 @@ servers:
 
 proxy:
   ssl: true
-  host: teletri.ru
+  host: kamal.teletri.ru
 
 # Credentials for your image host.
 registry:
