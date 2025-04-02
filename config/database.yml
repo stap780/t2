@@ -8,11 +8,20 @@ development:
   primary:
     <<: *default
     database: t2_development
+  queue:
+    <<: *default
+    database: t2_development_queue
+    migrations_paths: db/queue_migrate
 
 test:
   primary:
     <<: *default
     database: t2_test
+  queue:
+    <<: *default
+    database: t2_test_queue
+    migrations_paths: db/queue_migrate
+
 production:
   primary: &primary_production
     <<: *default
