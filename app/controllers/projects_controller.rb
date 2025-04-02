@@ -57,6 +57,8 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def main; end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_project
