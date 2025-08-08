@@ -7,7 +7,7 @@ image: panaet780/t2
 servers:
   web:
     hosts:
-      - 185.119.57.16
+      - 89.223.125.34
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -15,7 +15,7 @@ servers:
 
 proxy:
   ssl: true
-  host: kamal.teletri.ru
+  host: avito.dizauto.ru
 
 # Credentials for your image host.
 registry:
@@ -88,7 +88,7 @@ builder:
 accessories:
   postgres:
     image: postgres:15
-    host: 185.119.57.16
+    host: 89.223.125.34
     port: '127.0.0.1:5432:5432'
     env:
       clear:
