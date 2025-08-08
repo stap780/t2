@@ -1,0 +1,42 @@
+<% content_for :title, "Imports" %>
+
+<!-- Turbo Stream connection for real-time updates -->
+<%= turbo_stream_from "imports" %>
+
+<!-- Use Tailwind utility classes -->
+<div class="container mx-auto px-4">
+  <div class="bg-white shadow-md rounded-lg">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Import Management</h1>
+        <%= button_to "New Import", 
+            imports_path, 
+            method: :post,
+            params: { import: { name: "" } },
+            class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+            data: { turbo: true } %>
+      </div>
+    </div>
+
+    <!-- Imports List -->
+    <div class="overflow-hidden">
+      <div class="px-6 py-4">        
+        <!-- Use Turbo Frames for dynamic updates -->
+          <% if @imports.any? %>
+            <%= turbo_frame_tag "imports", class: "space-y-4" do %>
+              <%= render @imports %>
+            <% end %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="mt-2">No imports yet. Create your first import to get started.</p>
+            </div>
+          <% end %>
+        
+      </div>
+    </div>
+  </div>
+</div>

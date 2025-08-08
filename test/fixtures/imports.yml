@@ -1,0 +1,22 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: "User One Import"
+  status: "completed"
+  imported_at: <%= 1.day.ago %>
+  user: one
+  file_path: "/storage/imports/import_1_20250808_120000.zip"
+
+two:
+  name: "User Two Import"
+  status: "pending"
+  imported_at: 
+  user: two
+  file_path: 
+
+three:
+  name: "Another User One Import"
+  status: "failed"
+  imported_at:
+  user: one
+  file_path:
