@@ -1,0 +1,27 @@
+<% content_for :title, "New Export" %>
+
+<div class="container mx-auto px-4">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Create New Export</h1>
+          <p class="mt-1 text-sm text-gray-600">Export data using customizable templates</p>
+        </div>
+        <%= link_to "← Back to Exports", exports_path, class: "text-violet-600 hover:text-violet-700" %>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-medium text-gray-900">Export Settings</h2>
+      </div>
+      
+      <div class="px-6 py-6">
+        <%= render 'form', export: @export %>
+      </div>
+    </div>
+  </div>
+</div>

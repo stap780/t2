@@ -63,6 +63,15 @@
             Imports
           <% end %>
 
+          <!-- Exports -->
+          <%= link_to exports_path, 
+              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == exports_path}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7l3 3m0 0l-3 3m3-3H9" />
+            </svg>
+            Exports
+          <% end %>
+
           <!-- Jobs Monitor -->
           <%= link_to "/jobs", 
               class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/jobs')}", target: "_blank" do %>
@@ -140,7 +149,7 @@
         <!-- Page content -->
         <main class="flex-1 overflow-y-auto">
           <div class="py-6">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-4">
               <%= yield %>
             </div>
           </div>

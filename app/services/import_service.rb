@@ -4,7 +4,7 @@ require 'zip'
 require 'stringio'
 
 class ImportService
-  CSV_URL = 'http://138.197.52.153/insales.csv'
+  CSV_URL = 'http://138.197.52.153/exports/products.csv'
   
   def initialize(import)
     @import = import

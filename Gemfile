@@ -23,6 +23,15 @@ gem "bcrypt", "~> 3.1.7"
 # Zip file handling for imports
 gem "rubyzip", "~> 2.3"
 
+# Excel file generation for exports
+gem "caxlsx", "~> 4.0"
+
+# XML generation for exports
+gem "builder", "~> 3.2"
+
+# Liquid templating engine for customizable exports
+gem "liquid", "~> 5.0"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

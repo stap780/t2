@@ -4,6 +4,7 @@ class User < ApplicationRecord
   # Use Rails 8 associations
   has_many :sessions, dependent: :destroy
   has_many :imports, dependent: :destroy
+  has_many :exports, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

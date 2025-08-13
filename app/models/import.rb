@@ -62,6 +62,10 @@ class Import < ApplicationRecord
     end
   end
   
+  def name_with_info
+    "#{name} (#{created_at.strftime('%m/%d/%Y')} - #{status.titleize})"
+  end
+  
   private
   
   def set_default_name
