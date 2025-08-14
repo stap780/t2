@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_13_073831) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_165942) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_073831) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "test", default: false
+    t.string "file_headers"
     t.index ["exported_at"], name: "index_exports_on_exported_at"
     t.index ["format"], name: "index_exports_on_format"
     t.index ["status"], name: "index_exports_on_status"
@@ -68,6 +69,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_13_073831) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "error_message"
+    t.string "file_header"
     t.index ["imported_at"], name: "index_imports_on_imported_at"
     t.index ["status"], name: "index_imports_on_status"
     t.index ["user_id"], name: "index_imports_on_user_id"

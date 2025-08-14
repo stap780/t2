@@ -16,18 +16,19 @@ class ExportService
     @export.update!(status: "processing")
 
     begin
-      # Get source data from the referenced import
-      data = @export.data
+      # Get filtered data based on selected headers
+      data = collect_filtered_data
 
       if data.empty?
         raise "No data available for export. Import may be missing or incomplete."
       end
 
       # Log data information
+      selected_headers_info = @export.file_headers&.any? ? " (#{@export.file_headers.length} selected fields)" : " (all fields)"
       if @export.test_mode?
-        Rails.logger.info "📤 ExportService: TEST MODE - Processing #{data.length} records (limited to #{Export::TEST_LIMIT})"
+        Rails.logger.info "📤 ExportService: TEST MODE - Processing #{data.length} records#{selected_headers_info} (limited to #{Export::TEST_LIMIT})"
       else
-        Rails.logger.info "📤 ExportService: PRODUCTION MODE - Processing #{data.length} records"
+        Rails.logger.info "📤 ExportService: PRODUCTION MODE - Processing #{data.length} records#{selected_headers_info}"
       end
 
       # Create export file based on format (like Dizauto)
@@ -66,17 +67,46 @@ class ExportService
 
   private
 
+  def collect_filtered_data
+    # Get source data from export
+    source_data = @export.data
+    return [] if source_data.empty?
+
+    # If no specific headers are selected, return all data
+    return source_data unless @export.file_headers&.any?
+
+    Rails.logger.info "📤 ExportService: Filtering data to include only selected headers: #{@export.file_headers.join(', ')}"
+
+    # Filter data to include only selected headers
+    filtered_data = source_data.map do |record|
+      filtered_record = {}
+      @export.file_headers.each do |header|
+        if record.key?(header)
+          filtered_record[header] = record[header]
+        else
+          Rails.logger.warn "📤 ExportService: Header '#{header}' not found in source data"
+          filtered_record[header] = nil
+        end
+      end
+      filtered_record
+    end
+
+    Rails.logger.info "📤 ExportService: Filtered #{filtered_data.length} records to #{@export.file_headers.length} selected fields"
+    filtered_data
+  end
+
   def create_csv
-    data = @export.data
+    data = collect_filtered_data
     return false if data.empty?
 
     csv_content = CSV.generate do |csv|
-      # Add headers from first record
-      csv << data.first.keys
+      # Add headers from selected fields or first record
+      headers = @export.file_headers&.any? ? @export.file_headers : data.first.keys
+      csv << headers
 
       # Add data rows
       data.each do |record|
-        csv << record.values
+        csv << headers.map { |header| record[header] }
       end
     end
 
@@ -84,7 +114,7 @@ class ExportService
   end
 
   def create_xlsx
-    data = @export.data
+    data = collect_filtered_data
     return false if data.empty?
 
     # Create XLSX using Axlsx (like Dizauto)
@@ -92,11 +122,12 @@ class ExportService
     wb = p.workbook
 
     wb.add_worksheet(name: "Sheet 1") do |sheet|
-      file_headers = data.first.keys
-      sheet.add_row file_headers
+      # Add headers from selected fields or first record
+      headers = @export.file_headers&.any? ? @export.file_headers : data.first.keys
+      sheet.add_row headers
 
       data.each do |record|
-        sheet.add_row record.values
+        sheet.add_row headers.map { |header| record[header] }
       end
     end
 

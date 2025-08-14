@@ -79,6 +79,6 @@ class ExportsController < ApplicationController
 
   # Use Rails 8 strong parameters pattern
   def export_params
-    params.expect(export: [:name, :format, :template, :test])
+    params.expect(export: [:name, :format, :template, :test, file_headers: []])
   end
 end

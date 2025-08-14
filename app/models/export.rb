@@ -25,7 +25,10 @@ class Export < ApplicationRecord
   validates :format, presence: true, inclusion: { in: %w[csv xlsx xml] }
   validates :status, presence: true, inclusion: { in: %w[pending processing completed failed] }
   validates :user, presence: true
-  
+
+  # Serialize file_headers as array to store selected field headers
+  serialize :file_headers, coder: JSON
+
   # Format constants inspired by Dizauto
   FORMATS = [
     ['CSV', 'csv'],
@@ -41,34 +44,34 @@ class Export < ApplicationRecord
   # Callbacks
   before_validation :set_default_name, on: :create
   before_validation :set_default_test_mode, on: :create
-  
+
   def completed?
     status == "completed"
   end
-  
+
   def pending?
     status == "pending"
   end
-  
+
   def processing?
     status == "processing"
   end
-  
+
   def failed?
     status == "failed"
   end
-  
+
   def has_error?
     failed? && error_message.present?
   end
-  
+
   def error_summary
     return nil unless has_error?
-    
+
     # Truncate long error messages for display
     error_message.length > 100 ? "#{error_message[0..97]}..." : error_message
   end
-  
+
   def status_color
     case status
     when 'completed'
@@ -99,7 +102,7 @@ class Export < ApplicationRecord
     @data ||= begin
       # Use the last created import (from any user) as data source
       last_import = Import.completed.recent.first
-      
+
       if last_import.present?
         extract_data_from_import(last_import)
       else
@@ -118,9 +121,9 @@ class Export < ApplicationRecord
   def has_data_source?
     Import.completed.any?
   end
-  
+
   private
-  
+
   def set_default_name
     if name.blank?
       self.name = "Export #{Time.current.strftime('%Y%m%d_%H%M%S')}"
@@ -139,7 +142,7 @@ class Export < ApplicationRecord
 
     begin
       Rails.logger.info "🎯 Export ##{id}: Extracting data from Import ##{import.id}"
-      
+
       # Download and unzip the import file
       zip_data = import.zip_file.download
       csv_content = nil
@@ -156,10 +159,14 @@ class Export < ApplicationRecord
 
       return [] unless csv_content
 
+      # Ensure proper encoding for CSV content
+      csv_content = csv_content.force_encoding('UTF-8')
+      csv_content = csv_content.scrub('?') unless csv_content.valid_encoding?
+
       # Parse CSV to array of hashes for Liquid template access
       csv_data = CSV.parse(csv_content, headers: true)
       data_array = csv_data.map(&:to_h)
-      
+
       # Apply test mode limit if enabled
       if test_mode? && data_array.length > TEST_LIMIT
         Rails.logger.info "🎯 Export ##{id}: TEST MODE - Limiting to #{TEST_LIMIT} records (from #{data_array.length} total)"

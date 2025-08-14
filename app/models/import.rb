@@ -19,6 +19,9 @@ class Import < ApplicationRecord
   validates :status, presence: true, inclusion: { in: %w[pending processing completed failed] }
   validates :user, presence: true
   
+  # Serialize file_header as array to store CSV headers
+  serialize :file_header, coder: JSON
+  
   # Callbacks
   before_validation :set_default_name, on: :create
   
