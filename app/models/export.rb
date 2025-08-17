@@ -5,7 +5,6 @@ class Export < ApplicationRecord
   # Active Storage attachment for the exported file
   has_one_attached :export_file
 
-  # Use Rails 8 callbacks for real-time updates
   after_create_commit { broadcast_prepend_to "exports" }
   after_update_commit { broadcast_replace_to "exports" }
   after_destroy_commit { broadcast_remove_to "exports" }
@@ -44,6 +43,9 @@ class Export < ApplicationRecord
   # Callbacks
   before_validation :set_default_name, on: :create
   before_validation :set_default_test_mode, on: :create
+  after_commit :enqueue_on_create, on: :create
+  after_commit :handle_enqueue_on_update, on: :update
+  before_destroy :cancel_pending_job
 
   def completed?
     status == "completed"
@@ -123,6 +125,63 @@ class Export < ApplicationRecord
   end
 
   private
+
+  # Schedule next run if time is present and this change affected time
+  def enqueue_on_create
+    schedule! if time.present?
+  end
+
+  def handle_enqueue_on_update
+    if saved_change_to_time?
+      cancel_pending_job
+      schedule! if time.present?
+    end
+  end
+
+  public
+
+  # Computes the next run time based on time-of-day in app timezone
+  def next_run_at(from_time: Time.zone.now)
+    return nil if time.blank?
+
+    h, m = time.split(":").map(&:to_i)
+    candidate = from_time.in_time_zone.change(hour: h, min: m, sec: 0)
+    candidate += 1.day if candidate <= from_time
+    candidate
+  end
+
+  # Schedule the export job at the next occurrence and track scheduled_for
+  def schedule!
+    ts = next_run_at
+    return unless ts
+
+  update_columns(scheduled_for: ts)
+  job = ExportJob.set(wait_until: ts).perform_later(self, ts)
+  update_columns(active_job_id: job.job_id)
+  end
+
+  # Call from job after finishing to create a daily schedule
+  def schedule_next_day!
+    ts = next_run_at(from_time: Time.zone.now + 1.minute)
+    return unless ts
+    update_columns(scheduled_for: ts)
+    job = ExportJob.set(wait_until: ts).perform_later(self, ts)
+    update_columns(active_job_id: job.job_id)
+  end
+
+  # Remove pending scheduled job if present
+  def cancel_pending_job
+    return if active_job_id.blank?
+    if defined?(SolidQueue::Job)
+      SolidQueue::Job.where(active_job_id: active_job_id, finished_at: nil).delete_all
+    end
+    if defined?(SolidQueue::ScheduledExecution)
+      SolidQueue::ScheduledExecution.joins(:job).where(solid_queue_jobs: { active_job_id: active_job_id }).delete_all
+    end
+    update_columns(active_job_id: nil)
+  rescue => e
+    Rails.logger.warn("Export##{id}: failed to cancel pending job #{active_job_id}: #{e.message}")
+  end
 
   def set_default_name
     if name.blank?

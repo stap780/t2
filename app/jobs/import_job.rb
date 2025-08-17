@@ -15,13 +15,13 @@ class ImportJob < ApplicationJob
     rescue => e
       Rails.logger.error "💥 ImportJob CRASHED for Import ##{import.id}: #{e.message}"
       Rails.logger.error "💥 ImportJob BACKTRACE: #{e.backtrace.join('\n')}"
-      
+
       # Update import with job-level error if service didn't handle it
       import.update!(
         status: 'failed',
         error_message: "Job error: #{e.class.name}: #{e.message}"
       ) unless import.failed?
-      
+
       raise # Re-raise so Solid Queue can track the failure
     end
 

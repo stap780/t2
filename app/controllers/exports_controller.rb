@@ -1,5 +1,5 @@
 class ExportsController < ApplicationController
-  before_action :set_export, only: [:edit, :update, :run, :destroy, :download]
+  before_action :set_export, only: [:edit, :update, :run, :destroy, :download, :file]
 
   def index
     # Show all exports from current user
@@ -34,16 +34,23 @@ class ExportsController < ApplicationController
   end
 
   def run
-    # Run the export job
-    Rails.logger.info "🎯 Controller: Queuing ExportJob for Export ##{@export.id} at #{Time.current}"
-    ExportJob.perform_later(@export)
-    Rails.logger.info "🎯 Controller: ExportJob queued successfully for Export ##{@export.id}"
+    # Run now or schedule depending on :time
+    if @export.time.present?
+      ts = @export.next_run_at
+      @export.schedule!
+      Rails.logger.info "🎯 Controller: Scheduled Export ##{@export.id} for #{ts}"
+      notice = "Export scheduled for #{ts.in_time_zone.strftime('%B %d, %Y at %l:%M %p')}"
+    else
+      Rails.logger.info "🎯 Controller: Queuing immediate ExportJob for Export ##{@export.id} at #{Time.current}"
+      ExportJob.perform_later(@export)
+      notice = "Export started successfully."
+    end
 
     respond_to do |format|
       format.turbo_stream { 
         render turbo_stream: turbo_stream.replace(@export, partial: "exports/export", locals: { export: @export })
       }
-      format.html { redirect_to exports_path, notice: "Export started successfully." }
+      format.html { redirect_to exports_path, notice: notice }
     end
   end
 
@@ -65,6 +72,23 @@ class ExportsController < ApplicationController
               type: @export.export_file.content_type,
               disposition: 'attachment'
   end
+
+  # Stable URL for browsers/external services: serves inline with a consistent filename
+  def file
+    unless @export.completed? && @export.export_file.attached?
+      head :not_found and return
+    end
+
+    # Build a stable, deterministic filename, e.g., export-<id>.<ext>
+    filename_obj = @export.export_file.filename
+    ext = filename_obj.extension.present? ? ".#{filename_obj.extension}" : ""
+    stable_name = "export-#{@export.id}#{ext}"
+
+    send_data @export.export_file.download,
+              filename: stable_name,
+              type: @export.export_file.content_type,
+              disposition: 'inline'
+  end
   
   def destroy
     @export.destroy
@@ -79,6 +103,6 @@ class ExportsController < ApplicationController
 
   # Use Rails 8 strong parameters pattern
   def export_params
-    params.expect(export: [:name, :format, :template, :test, file_headers: []])
+  params.expect(export: [:name, :format, :template, :test, :time, file_headers: []])
   end
 end

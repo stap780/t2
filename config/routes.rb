@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # Pretty, stable file URL: /exports/export-:id(.:ext)
+  get "exports/export-:id(.:ext)", to: "exports#file", as: :export_file_stable
+
   # Mission Control Jobs UI for monitoring background jobs
   # For now, mount without constraints - we'll handle auth in the controller
   mount MissionControl::Jobs::Engine, at: "/jobs"
@@ -21,6 +24,13 @@ Rails.application.routes.draw do
   resources :exports, only: [:index, :new, :create, :edit, :update, :destroy] do
     member do
       get :download
+      get :file
+      post :run
+    end
+  end
+
+  resources :import_schedules do
+    member do
       post :run
     end
   end

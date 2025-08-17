@@ -21,7 +21,10 @@ module T2
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+  # Set application time zone (used by Time.zone and view formatting)
+  config.time_zone = "Europe/Moscow"
+  # Keep database timestamps in UTC for consistency
+  config.active_record.default_timezone = :utc
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -29,6 +29,17 @@
       </div>
     </div>
 
+    <!-- Export Time (15-minute intervals) -->
+    <div class="space-y-3 mt-2 mb-2">
+      <%= form.label :time, "Scheduled Time", class: "block text-sm font-semibold text-gray-800" %>
+      <p class="text-xs text-gray-600 mt-2 mb-2">Select hour and minute in 15-minute steps</p>
+      <% time_options = (0..23).flat_map { |h| [0,15,30,45].map { |m| format("%02d:%02d", h, m) } } %>
+      <%= form.select :time, 
+          options_for_select(time_options, selected: form.object.time), 
+          { include_blank: "— Not set —" }, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900" %>
+    </div>
+
     <!-- Data Source Info -->
     <% if !export.has_data_source? %>
     <div class="space-y-3 mt-2 mb-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -148,8 +159,9 @@
         <%= form.text_area :template, 
             rows: 15,
             placeholder: "Enter your Liquid XML template here...\n\n<items>\n{% for item in data %}\n  <item>\n    <name>{{ item.name }}</name>\n    <email>{{ item.email }}</email>\n    <status>{{ item.status }}</status>\n  </item>\n{% endfor %}\n</items>",
-            class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed"
-        %>
+        class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
+        data: { controller: "codemirror", codemirror_mode_value: "html" }
+          %>
         
         <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
           <p class="text-sm font-semibold text-gray-700 mb-2">🔧 Available Liquid Objects:</p>
@@ -162,6 +174,25 @@
               <p><code class="bg-gray-100 px-2 py-1 rounded">export</code> - Export metadata</p>
               <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">current_time</code> - Export timestamp</p>
             </div>
+          </div>
+
+          <%# List all fields available on `item` based on the last completed import %>
+          <% item_fields = Import.completed.recent.first&.file_header || [] %>
+          <div class="mt-4">
+            <p class="text-sm font-semibold text-gray-700 mb-2">📋 item fields (use as <code class="bg-gray-100 px-1 py-0.5 rounded">{{ item.FIELD }}</code>):</p>
+            <% if item_fields.any? %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-gray-700 max-h-64 overflow-auto p-2 bg-gray-50 border border-gray-200 rounded">
+                <% item_fields.each do |field| %>
+                  <div class="flex items-center">
+                    <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ item.<%= field %> }}</code>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                No item fields available yet. Complete an import first to populate available fields.
+              </div>
+            <% end %>
           </div>
         </div>
       </div>

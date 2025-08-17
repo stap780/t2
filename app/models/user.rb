@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :imports, dependent: :destroy
   has_many :exports, dependent: :destroy
+  has_many :import_schedules, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

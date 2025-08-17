@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_165942) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_091500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,11 +54,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_165942) do
     t.datetime "updated_at", null: false
     t.boolean "test", default: false
     t.string "file_headers"
+    t.string "time"
+    t.datetime "scheduled_for"
+    t.string "active_job_id"
+    t.index ["active_job_id"], name: "index_exports_on_active_job_id"
     t.index ["exported_at"], name: "index_exports_on_exported_at"
     t.index ["format"], name: "index_exports_on_format"
+    t.index ["scheduled_for"], name: "index_exports_on_scheduled_for"
     t.index ["status"], name: "index_exports_on_status"
     t.index ["user_id", "created_at"], name: "index_exports_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_exports_on_user_id"
+  end
+
+  create_table "import_schedules", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.string "time", null: false
+    t.string "recurrence", default: "daily", null: false
+    t.datetime "scheduled_for"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "active_job_id"
+    t.index ["active_job_id"], name: "index_import_schedules_on_active_job_id"
+    t.index ["scheduled_for"], name: "index_import_schedules_on_scheduled_for"
+    t.index ["user_id"], name: "index_import_schedules_on_user_id"
   end
 
   create_table "imports", force: :cascade do |t|
@@ -95,6 +115,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_165942) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "exports", "users"
+  add_foreign_key "import_schedules", "users"
   add_foreign_key "imports", "users"
   add_foreign_key "sessions", "users"
 end

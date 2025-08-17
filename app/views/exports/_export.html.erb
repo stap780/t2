@@ -27,7 +27,7 @@
       </div>
       
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-gray-900 truncate">
+        <div class="export-title text-sm font-medium text-gray-900 truncate">
           <%= export.name %>
           <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
             <%= export.format.upcase %>
@@ -37,13 +37,13 @@
               Test Mode
             </span>
           <% end %>
-        </p>
-        <div class="flex items-center space-x-2 mt-1">
+        </div>
+        <div class="export-content-1 flex items-center space-x-2 mt-1">
           <span class="text-xs text-gray-500">
             Created by <%= export.user.email_address %>
           </span>
           <span class="text-xs text-gray-500">
-            • <%= export.created_at.strftime("%B %d, %Y at %l:%M %p") %>
+            • <%= export.created_at.strftime("%B %d, %Y at %H:%M") %>
           </span>
           <span class="text-xs text-gray-500">
             • <%= time_ago_in_words(export.created_at) %> ago
@@ -54,6 +54,24 @@
             </span>
           <% end %>
         </div>
+        <% if export.time.present? || export.scheduled_for.present? %>
+          <div class="export-schedule mt-1 flex items-center flex-wrap gap-2">
+            <% if export.time.present? %>
+                <span class="bg-violet-100 text-violet-800 py-1 rounded-full text-xs font-medium">
+                Time: <%= export.time %>
+                </span>
+            <% end %>
+            <% if export.scheduled_for.present? %>
+              <span class="text-xs text-violet-700">
+                Scheduled for <%= export.scheduled_for.in_time_zone.strftime("%B %d, %Y at %H:%M") %>
+              </span>
+            <% elsif export.time.present? %>
+              <span class="text-xs text-violet-700">
+                Next at <%= export.next_run_at&.in_time_zone&.strftime("%B %d, %Y at %H:%M") %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
         <% if export.has_error? %>
           <div class="mt-1">
             <p class="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
@@ -80,6 +98,17 @@
         </svg>
         Download
       <% end %>
+
+        <%= link_to export_file_stable_path(id: export.id, ext: export.export_file.filename.extension),
+          class: "inline-flex items-center px-3 py-1 border border-violet-300 shadow-sm text-xs font-medium rounded text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+      data: { turbo: false },
+      target: "_blank",
+          title: "Open #{export.export_file.filename}" do %>
+        <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 015.657 5.656l-3.536 3.536a4 4 0 01-5.657-5.656m-4.95-4.95a4 4 0 015.657 0l1.414 1.414m-7.071 7.07l3.536 3.536" />
+        </svg>
+        Link
+      <% end %>
     <% end %>
     
     <% unless export.processing? %>
@@ -90,7 +119,7 @@
         <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-7 4h12l-2 5H8l-2-5z" />
         </svg>
-        Run Export
+        Run
       <% end %>
     <% else %>
       <span class="inline-flex items-center px-3 py-1 border border-yellow-300 shadow-sm text-xs font-medium rounded text-yellow-700 bg-yellow-50">

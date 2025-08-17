@@ -1,10 +1,12 @@
 class Import < ApplicationRecord
   # Use Rails 8 associations
   belongs_to :user
+  # Optional: imports can be created by a schedule in the future
 
   # Active Storage attachment for the ZIP file
   has_one_attached :zip_file
 
+  after_create_commit { broadcast_prepend_to "imports" }
   after_update_commit { broadcast_replace_to "imports" }
 
   # Use Rails 8 query methods and optimizations

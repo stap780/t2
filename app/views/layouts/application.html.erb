@@ -18,8 +18,16 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+
+  <!-- CodeMirror v5 CSS/JS (global) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/edit/matchbrackets.min.js"></script>
+
+  <%= javascript_importmap_tags %>
   </head>
 
   <body class="<%= Current.user ? 'bg-gray-50 h-screen flex' : 'bg-gray-50' %>">
@@ -54,14 +62,30 @@
             Dashboard
           <% end %>
 
-          <!-- Imports -->
-          <%= link_to imports_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == imports_path}" do %>
-            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-            </svg>
-            Imports
-          <% end %>
+          <!-- Imports (collapsible) -->
+          <details class="group" <%= 'open' if request.path.start_with?(imports_path) || request.path.start_with?(import_schedules_path) %>>
+            <summary class="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+              <%= link_to imports_path, 
+                  class: "flex-1 flex items-center text-sm font-medium #{ request.path.start_with?(imports_path) && !request.path.start_with?(import_schedules_path) ? 'text-white' : 'text-white' }" do %>
+                <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
+                Imports
+              <% end %>
+              <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-6 mt-1 space-y-1">
+              <%= link_to import_schedules_path,
+                  class: "group flex items-center pl-11 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?(import_schedules_path)}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Import Schedules
+              <% end %>
+            </div>
+          </details>
 
           <!-- Exports -->
           <%= link_to exports_path, 
