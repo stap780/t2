@@ -4,9 +4,9 @@
   <div class="grid grid-cols-1 gap-8">
     <!-- Export Name -->
     <div class="space-y-3 mt-2 mb-2">
-      <%= form.label :name, class: "block text-sm font-semibold text-gray-800 mt-2 mb-2" %>
-      <%= form.text_field :name, 
-          placeholder: "e.g., Customer Export - January 2025",
+  <%= form.label :name, t("activerecord.attributes.export.name"), class: "block text-sm font-semibold text-gray-800 mt-2 mb-2" %>
+    <%= form.text_field :name, 
+      placeholder: t("exports.form.name_placeholder"),
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
@@ -20,10 +20,9 @@
           %>
         </div>
         <div class="ml-3 text-sm">
-          <%= form.label :test, "Test Mode", class: "font-semibold text-gray-800" %>
+          <%= form.label :test, t("exports.form.test_mode"), class: "font-semibold text-gray-800" %>
           <p class="text-gray-600">
-            Limit export to <%= Export::TEST_LIMIT %> records for testing purposes. 
-            <span class="font-medium">Recommended for first exports.</span>
+            <%= t("exports.form.test_limit_html", count: Export::TEST_LIMIT).html_safe %>
           </p>
         </div>
       </div>
@@ -31,23 +30,23 @@
 
     <!-- Export Time (15-minute intervals) -->
     <div class="space-y-3 mt-2 mb-2">
-      <%= form.label :time, "Scheduled Time", class: "block text-sm font-semibold text-gray-800" %>
-      <p class="text-xs text-gray-600 mt-2 mb-2">Select hour and minute in 15-minute steps</p>
+  <%= form.label :time, t("exports.form.scheduled_time"), class: "block text-sm font-semibold text-gray-800" %>
+  <p class="text-xs text-gray-600 mt-2 mb-2"><%= t("exports.form.time_hint") %></p>
       <% time_options = (0..23).flat_map { |h| [0,15,30,45].map { |m| format("%02d:%02d", h, m) } } %>
       <%= form.select :time, 
           options_for_select(time_options, selected: form.object.time), 
-          { include_blank: "— Not set —" }, 
+          { include_blank: t("exports.form.not_set") }, 
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900" %>
     </div>
 
     <!-- Data Source Info -->
     <% if !export.has_data_source? %>
     <div class="space-y-3 mt-2 mb-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-      <h3 class="text-sm font-semibold text-blue-800">📊 Data Source</h3>
+  <h3 class="text-sm font-semibold text-blue-800"><%= t("exports.form.data_source") %></h3>
         <div class="text-sm text-orange-700">
-          <p>⚠️ No completed imports found in the system. You need to create and complete an import first.</p>
+          <p><%= t("exports.form.no_imports") %></p>
           <p class="mt-2">
-            <%= link_to "Create Import", imports_path, 
+            <%= link_to t("exports.form.create_import"), imports_path, 
                 class: "inline-flex items-center text-blue-600 hover:text-blue-800 underline" %>
           </p>
         </div>
@@ -56,8 +55,8 @@
 
     <!-- Export Format -->
     <div class="space-y-3 mt-2 mb-2">
-      <%= form.label :format, "Export Format", class: "block text-sm font-semibold text-gray-800" %>
-      <p class="text-xs text-gray-600 mt-2 mb-2">Choose your preferred export format</p>
+  <%= form.label :format, t("exports.form.export_format"), class: "block text-sm font-semibold text-gray-800" %>
+  <p class="text-xs text-gray-600 mt-2 mb-2"><%= t("exports.form.export_format_hint") %></p>
       <div class="flex flex-wrap gap-4">
         <% %w[csv xlsx xml].each do |format_option| %>
           <label class="flex items-center cursor-pointer">
@@ -80,8 +79,8 @@
         # Get the last completed import
         last_import = Import.completed.recent.first
       %>
-      <%= form.label :file_headers, "Fields to Export", class: "block text-sm font-semibold text-gray-800" %>
-      <p class="text-xs text-gray-600 mt-2 mb-4">Select which fields to include in your CSV/Excel export</p>
+  <%= form.label :file_headers, t("exports.form.fields_to_export"), class: "block text-sm font-semibold text-gray-800" %>
+  <p class="text-xs text-gray-600 mt-2 mb-4"><%= t("exports.form.fields_hint") %></p>
       
       <% if last_import&.file_header&.any? %>
         <div class="flex gap-6 overflow-y-auto p-4 bg-gray-50 border-2 border-gray-200 rounded-lg">
@@ -104,10 +103,10 @@
         
         <div class="mt-3 flex items-center space-x-4">
           <button type="button" data-action="click->export-form#selectAllFields" class="text-xs text-violet-600 hover:text-violet-800 underline">
-            Select All
+            <%= t("exports.form.select_all") %>
           </button>
           <button type="button" data-action="click->export-form#deselectAllFields" class="text-xs text-violet-600 hover:text-violet-800 underline">
-            Deselect All
+            <%= t("exports.form.deselect_all") %>
           </button>
         </div>
       <% else %>
@@ -128,20 +127,19 @@
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
           </svg>
-          Liquid Template (Required for XML)
+          <%= t("exports.form.summary_title") %>
         </span>
-        <span class="text-sm font-normal text-gray-500">Click to customize</span>
+  <span class="text-sm font-normal text-gray-500"><%= t("exports.form.click_to_customize") %></span>
       </summary>
       
       <div class="p-6 bg-gray-50 border-t border-gray-200">
         <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
           <p class="text-sm text-blue-800 mb-3">
-            <span class="font-semibold">💡 XML Template Required:</span> Use Liquid templating to define your XML export structure. 
-            Your imported data is available as structured objects.
+            <span class="font-semibold">💡 <%= t("exports.form.xml_required") %>:</span> <%= t("exports.form.xml_hint") %>
           </p>
           
           <div class="bg-white p-3 rounded-lg border border-blue-200">
-            <p class="text-xs font-semibold text-blue-700 mb-2">Example XML Template:</p>
+            <p class="text-xs font-semibold text-blue-700 mb-2"><%= t("exports.form.example_xml_template") %></p>
             <code class="block text-xs text-blue-900 font-mono leading-relaxed">
               &lt;items&gt;<br>
               {% for item in data %}<br>
@@ -155,31 +153,31 @@
           </div>
         </div>
         
-        <%= form.label :template, "Custom XML Template", class: "block text-sm font-semibold text-gray-800 mb-3" %>
+  <%= form.label :template, t("exports.form.custom_xml_template"), class: "block text-sm font-semibold text-gray-800 mb-3" %>
         <%= form.text_area :template, 
             rows: 15,
-            placeholder: "Enter your Liquid XML template here...\n\n<items>\n{% for item in data %}\n  <item>\n    <name>{{ item.name }}</name>\n    <email>{{ item.email }}</email>\n    <status>{{ item.status }}</status>\n  </item>\n{% endfor %}\n</items>",
+            placeholder: t("exports.form.template_placeholder"),
         class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
         data: { controller: "codemirror", codemirror_mode_value: "html" }
           %>
         
         <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-          <p class="text-sm font-semibold text-gray-700 mb-2">🔧 Available Liquid Objects:</p>
+          <p class="text-sm font-semibold text-gray-700 mb-2">🔧 <%= t("exports.form.available_objects") %>:</p>
           <div class="grid grid-cols-2 gap-4 text-xs text-gray-600">
             <div>
-              <p><code class="bg-gray-100 px-2 py-1 rounded">data</code> - All available records</p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">item</code> - Individual record (in loops)</p>
+              <p><code class="bg-gray-100 px-2 py-1 rounded">data</code> - <%= t("exports.form.obj_all_records") %></p>
+              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">item</code> - <%= t("exports.form.obj_item") %></p>
             </div>
             <div>
-              <p><code class="bg-gray-100 px-2 py-1 rounded">export</code> - Export metadata</p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">current_time</code> - Export timestamp</p>
+              <p><code class="bg-gray-100 px-2 py-1 rounded">export</code> - <%= t("exports.form.obj_export") %></p>
+              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">current_time</code> - <%= t("exports.form.obj_current_time") %></p>
             </div>
           </div>
 
           <%# List all fields available on `item` based on the last completed import %>
           <% item_fields = Import.completed.recent.first&.file_header || [] %>
           <div class="mt-4">
-            <p class="text-sm font-semibold text-gray-700 mb-2">📋 item fields (use as <code class="bg-gray-100 px-1 py-0.5 rounded">{{ item.FIELD }}</code>):</p>
+            <p class="text-sm font-semibold text-gray-700 mb-2">📋 <%= t("exports.form.item_fields") %> (<%= t("exports.form.use_as_html") %>):</p>
             <% if item_fields.any? %>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-gray-700 max-h-64 overflow-auto p-2 bg-gray-50 border border-gray-200 rounded">
                 <% item_fields.each do |field| %>
@@ -190,7 +188,7 @@
               </div>
             <% else %>
               <div class="p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
-                No item fields available yet. Complete an import first to populate available fields.
+                <%= t("exports.form.no_item_fields") %>
               </div>
             <% end %>
           </div>
@@ -202,14 +200,14 @@
   <!-- Action Buttons -->
   <div class="flex items-center justify-between pt-6 border-t border-gray-200">
     <div class="text-sm text-gray-500">
-      <p>Save your export configuration. Run it from the exports list.</p>
+  <p><%= t("exports.form.footer_hint") %></p>
     </div>
     <div class="flex items-center space-x-4">
-      <%= link_to "Cancel", exports_path, 
+    <%= link_to t("actions.cancel"), exports_path, 
           class: "inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out"
       %>
-      <%= form.submit export.persisted? ? "Update" : "Save", 
-          data: { disable_with: export.persisted? ? "Updating..." : "Saving..." },
+    <%= form.submit export.persisted? ? t("actions.update") : t("actions.save"), 
+      data: { disable_with: export.persisted? ? t("actions.updating") : t("actions.saving") },
           class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out"
       %>
     </div>

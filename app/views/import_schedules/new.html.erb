@@ -1,8 +1,8 @@
-<% content_for :title, "New Import Schedule" %>
+<% content_for :title, t("import_schedules.new.title") %>
 <div class="container mx-auto px-4 max-w-2xl">
   <div class="bg-white shadow rounded-md">
     <div class="p-4 border-b">
-      <h1 class="text-xl font-semibold">New Schedule</h1>
+  <h1 class="text-xl font-semibold"><%= t("import_schedules.new.header") %></h1>
     </div>
     <div class="p-4">
       <%= render partial: "form", locals: { import_schedule: @import_schedule } %>

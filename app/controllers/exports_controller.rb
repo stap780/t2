@@ -1,5 +1,9 @@
 class ExportsController < ApplicationController
-  before_action :set_export, only: [:edit, :update, :run, :destroy, :download, :file]
+  # Allow public access to the stable file URL for external services
+  allow_unauthenticated_access only: [:file]
+
+  before_action :set_export, only: [:edit, :update, :run, :destroy, :download]
+  before_action :set_export_public, only: [:file]
 
   def index
     # Show all exports from current user
@@ -50,12 +54,12 @@ class ExportsController < ApplicationController
   def download
     # Check if export is completed and file exists
     unless @export.completed?
-      redirect_to exports_path, alert: 'Export is not completed yet.'
+      redirect_to exports_path, alert: "Export is not completed yet."
       return
     end
 
     unless @export.export_file.attached?
-      redirect_to exports_path, alert: 'File not found.'
+      redirect_to exports_path, alert: "File not found."
       return
     end
 
@@ -63,7 +67,7 @@ class ExportsController < ApplicationController
     send_data @export.export_file.download,
               filename: @export.export_file.filename.to_s,
               type: @export.export_file.content_type,
-              disposition: 'attachment'
+              disposition: "attachment"
   end
 
   # Stable URL for browsers/external services: serves inline with a consistent filename
@@ -82,20 +86,25 @@ class ExportsController < ApplicationController
               type: @export.export_file.content_type,
               disposition: 'inline'
   end
-  
+
   def destroy
     @export.destroy
     redirect_to exports_path, notice: "Export deleted successfully."
   end
-  
+
   private
   
   def set_export
     @export = Current.user.exports.find(params[:id])
   end
 
+  # Public finder for unauthenticated file access
+  def set_export_public
+    @export = Export.find(params[:id])
+  end
+
   # Use Rails 8 strong parameters pattern
   def export_params
-  params.expect(export: [:name, :format, :template, :test, :time, file_headers: []])
+    params.expect(export: [:name, :format, :template, :test, :time, file_headers: []])
   end
 end

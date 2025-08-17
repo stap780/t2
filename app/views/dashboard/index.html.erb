@@ -14,10 +14,10 @@
         </div>
         <div class="ml-5 w-0 flex-1">
           <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            Welcome to T2 Dashboard
+            <%= t("nav.dashboard") %>
           </h1>
           <p class="mt-1 text-sm text-gray-500">
-            You're successfully signed in to your Rails 8 application.
+            Вы успешно вошли в приложение
           </p>
         </div>
       </div>
@@ -75,8 +75,8 @@
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">Rails Version</dt>
-              <dd class="text-lg font-medium text-gray-900"><%= Rails.version %></dd>
+              <dt class="text-sm font-medium text-gray-500 truncate">Всего импортов</dt>
+              <dd class="text-lg font-medium text-gray-900"><%= Import.count %></dd>
             </dl>
           </div>
         </div>
@@ -85,7 +85,7 @@
   </div>
 
   <!-- Quick Actions -->
-  <div class="bg-white shadow rounded-lg">
+  <div class="bg-white shadow rounded-lg hidden">
     <div class="px-4 py-5 sm:p-6">
       <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Quick Actions</h3>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

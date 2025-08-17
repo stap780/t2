@@ -19,35 +19,35 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         <% end %>
+        <span class="<%= import.status_color %> px-2 py-1 rounded-full text-xs font-medium">
+          <%= t("enums.import.status.#{import.status}") %>
+        </span>
       </div>
       
       <div class="flex-1 min-w-0">
         <p class="text-sm font-medium text-gray-900 truncate">
           <%= import.name %>
+          <span class="text-xs text-gray-500">
+            • <%= import.created_at.strftime("%d/%m/%Y-%H:%M") %>
+          </span>
         </p>
         <div class="flex items-center space-x-2 mt-1">
-          <span class="<%= import.status_color %> px-2 py-1 rounded-full text-xs font-medium">
-            <%= import.status.titleize %>
+          <span class="text-xs text-gray-500">
+            <%= t("imports.item.created_by") %> <%= import.user.email_address %>
           </span>
           <span class="text-xs text-gray-500">
-            Created by <%= import.user.email_address %>
-          </span>
-          <span class="text-xs text-gray-500">
-            • <%= import.created_at.strftime("%B %d, %Y at %H:%M") %>
-          </span>
-          <span class="text-xs text-gray-500">
-            • <%= time_ago_in_words(import.created_at) %> ago
+            • <%= time_ago_in_words(import.created_at) %> <%= t("imports.item.ago") %>
           </span>
           <% if import.imported_at %>
             <span class="text-xs text-gray-500">
-              • Completed <%= time_ago_in_words(import.imported_at) %> ago
+              • <%= t("imports.item.completed") %> <%= time_ago_in_words(import.imported_at) %> <%= t("imports.item.ago") %>
             </span>
           <% end %>
         </div>
         <% if import.has_error? %>
           <div class="mt-1">
             <p class="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
-              <span class="font-medium">Error:</span> <%= import.error_summary %>
+              <span class="font-medium"><%= t("imports.item.error") %>:</span> <%= import.error_summary %>
             </p>
           </div>
         <% end %>
@@ -68,13 +68,13 @@
         <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m5-8H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2z" />
         </svg>
-        Download
+  <%= t("imports.item.download") %>
       <% end %>
     <% end %>
     
     <%= button_to import_path(import), 
         method: :delete,
-        confirm: "Are you sure you want to delete this import?",
+  confirm: t("imports.item.delete_confirm"),
         class: "inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out",
         data: { turbo: true } do %>
       <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

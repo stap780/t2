@@ -45,7 +45,7 @@
               </div>
             </div>
             <div class="ml-3">
-              <h1 class="text-lg font-semibold text-white">T2 Admin</h1>
+              <h1 class="text-lg font-semibold text-white"><%= t("nav.brand") %></h1>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
             </svg>
-            Dashboard
+            <%= t("nav.dashboard") %>
           <% end %>
 
           <!-- Imports (collapsible) -->
@@ -70,7 +70,7 @@
                 <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
-                Imports
+                <%= t("nav.imports") %>
               <% end %>
               <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -82,7 +82,7 @@
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Import Schedules
+                <%= t("nav.import_schedules") %>
               <% end %>
             </div>
           </details>
@@ -93,7 +93,7 @@
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7l3 3m0 0l-3 3m3-3H9" />
             </svg>
-            Exports
+            <%= t("nav.exports") %>
           <% end %>
 
           <!-- Jobs Monitor -->
@@ -102,19 +102,19 @@
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            Jobs Monitor
+            <%= t("nav.jobs_monitor") %>
           <% end %>
         </nav>
 
         <!-- Settings at bottom -->
-        <div class="flex-shrink-0 px-4 pb-4">
+        <div class="flex-shrink-0 px-4 pb-4 hidden">
           <%= link_to "#", 
               class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-violet-100 hover:bg-violet-500 hover:bg-opacity-75 hover:text-white transition duration-150 ease-in-out opacity-75" do %>
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            Settings
+            <%= t("nav.settings") %>
           <% end %>
         </div>
       </div>
@@ -128,27 +128,37 @@
               <div class="flex">
                 <div class="flex-shrink-0 flex items-center">
                   <!-- Search -->
-                  <div class="max-w-lg w-full lg:max-w-xs">
+                    <div class="max-w-lg w-full lg:max-w-xs hidden">
                     <label for="search" class="sr-only">Search</label>
                     <div class="relative">
                       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
+                      <svg class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                      </svg>
                       </div>
                       <input id="search" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 sm:text-sm" placeholder="Search" type="search">
                     </div>
-                  </div>
+                    </div>
                 </div>
               </div>
               <div class="flex items-center">
                 <!-- Notification button -->
-                <button class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
+                <button class="hidden bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500">
                   <span class="sr-only">View notifications</span>
                   <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                 </button>
+
+              <!-- Locale switcher -->
+              <div class="ml-3 flex items-center space-x-1 hidden">
+                <% en_active = I18n.locale.to_s == 'en' %>
+                <% ru_active = I18n.locale.to_s == 'ru' %>
+                <%= link_to "EN", url_for(locale: :en),
+                  class: "px-2 py-1 rounded text-xs font-medium #{en_active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+                <%= link_to "RU", url_for(locale: :ru),
+                  class: "px-2 py-1 rounded text-xs font-medium #{ru_active ? 'bg-violet-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+              </div>
 
                 <!-- Profile section -->
                 <div class="ml-3 flex items-center">

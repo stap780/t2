@@ -29,3 +29,158 @@
 
 en:
   hello: "Hello world"
+  nav:
+    brand: "Exports"
+    dashboard: "Dashboard"
+    imports: "Imports"
+    import_schedules: "Import Schedules"
+    exports: "Exports"
+    jobs_monitor: "Jobs Monitor"
+    settings: "Settings"
+  enums:
+    import:
+      status:
+        pending: "Pending"
+        processing: "Processing"
+        completed: "Completed"
+        failed: "Failed"
+    export:
+      status:
+        pending: "Pending"
+        processing: "Processing"
+        completed: "Completed"
+        failed: "Failed"
+  exports:
+    export:
+      created_by: "Created by"
+      scheduled_for: "Scheduled for"
+      next_at: "Next at"
+      test_mode: "Test Mode"
+      ago: "ago"
+      completed: "Completed"
+      time: "Time"
+      error: "Error"
+      delete_confirm: "Are you sure you want to delete this export?"
+    index:
+      title: "Exports"
+      heading: "Export Management"
+      new_export: "New Export"
+      empty: "No exports yet. Create your first export."
+    new:
+      title: "New Export"
+      header: "Create New Export"
+      subheader: "Export data using customizable templates"
+      back: "← Back to Exports"
+    edit:
+      title: "Edit Export"
+      header: "Edit Export"
+      subheader: "Modify your export settings and re-run the export"
+      back: "← Back to Exports"
+    form:
+      settings: "Export Settings"
+      name_placeholder: "e.g., Customer Export - January 2025"
+      test_mode: "Test Mode"
+      test_limit_html: "Limit export to %{count} records for testing purposes. <span class=\"font-medium\">Recommended for first exports.</span>"
+      scheduled_time: "Scheduled Time"
+      time_hint: "Select hour and minute in 15-minute steps"
+      not_set: "— Not set —"
+      data_source: "📊 Data Source"
+      no_imports: "⚠️ No completed imports found in the system. You need to create and complete an import first."
+      create_import: "Create Import"
+      export_format: "Export Format"
+      export_format_hint: "Choose your preferred export format"
+      fields_to_export: "Fields to Export"
+      fields_hint: "Select which fields to include in your CSV/Excel export"
+      select_all: "Select All"
+      deselect_all: "Deselect All"
+      no_item_fields: "No item fields available yet. Complete an import first to populate available fields."
+      xml_required: "XML Template Required"
+      xml_hint: "Use Liquid templating to define your XML export structure. Your imported data is available as structured objects."
+      custom_xml_template: "Custom XML Template"
+      template_placeholder: "Enter your Liquid XML template here...\n\n<items>\n{% for item in data %}\n  <item>\n    <name>{{ item.name }}</name>\n    <email>{{ item.email }}</email>\n    <status>{{ item.status }}</status>\n  </item>\n{% endfor %}\n</items>"
+      available_objects: "Available Liquid Objects"
+      obj_all_records: "All available records"
+      obj_item: "Individual record (in loops)"
+      obj_export: "Export metadata"
+      obj_current_time: "Export timestamp"
+      item_fields: "item fields"
+      use_as_html: "use as <code class=\"bg-gray-100 px-1 py-0.5 rounded\">{{ item.FIELD }}</code>"
+      footer_hint: "Save your export configuration. Run it from the exports list."
+  summary_title: "Liquid Template (Required for XML)"
+  click_to_customize: "Click to customize"
+  example_xml_template: "Example XML Template:"
+  imports:
+    index:
+      title: "Imports"
+      heading: "Import Management"
+      schedules: "Schedules"
+      new_import: "New Import"
+      empty: "No imports yet. Create your first import to get started."
+    item:
+      created_by: "Created by"
+      completed: "Completed"
+      ago: "ago"
+      error: "Error"
+      download: "Download"
+      delete_confirm: "Are you sure you want to delete this import?"
+  import_schedules:
+    index:
+      title: "Import Schedules"
+      header: "Import Schedules"
+      new: "New Schedule"
+      empty: "No schedules yet."
+    new:
+      title: "New Import Schedule"
+      header: "New Schedule"
+    edit:
+      title: "Edit Import Schedule"
+      header: "Edit Schedule"
+    item:
+      default_name: "Scheduled Import"
+      daily: "Daily"
+      active: "Active"
+      paused: "Paused"
+      time: "Time"
+      next_at: "Next at"
+      not_scheduled: "Not scheduled yet"
+      delete_confirm: "Delete schedule?"
+    form:
+      time_label: "Time (24h, 15-minute steps)"
+      daily: "Daily"
+  actions:
+    edit: "Edit"
+    run: "Run"
+    cancel: "Cancel"
+    save: "Save"
+    update: "Update"
+    updating: "Updating..."
+    saving: "Saving..."
+    download: "Download"
+    open: "Open"
+    link: "Link"
+    processing: "Processing..."
+  activerecord:
+    models:
+      export:
+        one: "Export"
+        other: "Exports"
+    attributes:
+      export:
+        name: "Name"
+        time: "Time"
+        format: "Format"
+        template: "Template"
+  activerecord:
+    models:
+      import_schedule:
+        one: "Import Schedule"
+        other: "Import Schedules"
+    attributes:
+      import_schedule:
+        name: "Name"
+        time: "Time"
+        recurrence: "Recurrence"
+        active: "Active"
+        scheduled_for: "Scheduled for"
+        created_at: "Created at"
+        updated_at: "Updated at"

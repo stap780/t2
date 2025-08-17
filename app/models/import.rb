@@ -20,40 +20,39 @@ class Import < ApplicationRecord
   validates :name, presence: true
   validates :status, presence: true, inclusion: { in: %w[pending processing completed failed] }
   validates :user, presence: true
-  
+
   # Serialize file_header as array to store CSV headers
   serialize :file_header, coder: JSON
-  
-  # Callbacks
+
   before_validation :set_default_name, on: :create
-  
+
   def completed?
     status == "completed"
   end
-  
+
   def pending?
     status == "pending"
   end
-  
+
   def processing?
     status == "processing"
   end
-  
+
   def failed?
     status == "failed"
   end
-  
+
   def has_error?
     failed? && error_message.present?
   end
-  
+
   def error_summary
     return nil unless has_error?
-    
+
     # Truncate long error messages for display
     error_message.length > 100 ? "#{error_message[0..97]}..." : error_message
   end
-  
+
   def status_color
     case status
     when 'completed'

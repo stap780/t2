@@ -35,7 +35,19 @@ module Authentication
     end
 
     def after_authentication_url
-      session.delete(:return_to_after_authenticating) || dashboard_path
+      target = session.delete(:return_to_after_authenticating)
+      if target.present?
+        begin
+          uri = URI.parse(target)
+          query_hash = Rack::Utils.parse_nested_query(uri.query)
+          query_hash["locale"] = "ru"
+          uri.query = query_hash.to_query
+          return uri.to_s
+        rescue URI::InvalidURIError
+          # fall through to dashboard
+        end
+      end
+      dashboard_path(locale: :ru)
     end
 
     def start_new_session_for(user)

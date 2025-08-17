@@ -1,4 +1,4 @@
-<% content_for :title, "Import Schedules" %>
+<% content_for :title, t("import_schedules.index.title") %>
 
 <!-- Turbo Stream connection for real-time updates -->
 <%= turbo_stream_from "import_schedules" %>
@@ -9,9 +9,9 @@
     <!-- Header -->
     <div class="px-6 py-4 border-b border-gray-200">
       <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900">Import Schedules</h1>
+        <h1 class="text-2xl font-bold text-gray-900"><%= t("import_schedules.index.header") %></h1>
         <div class="flex items-center gap-2">
-          <%= link_to "New Schedule", new_import_schedule_path, class: "px-4 py-2 bg-violet-600 text-white rounded-md" %>
+          <%= link_to t("import_schedules.index.new"), new_import_schedule_path, class: "px-4 py-2 bg-violet-600 text-white rounded-md" %>
         </div>
       </div>
     </div>
@@ -25,7 +25,7 @@
           <%= render @import_schedules %>
         <% end %>
         <% if @import_schedules.blank? %>
-          <div class="p-6 text-sm text-gray-500">No schedules yet.</div>
+          <div class="p-6 text-sm text-gray-500"><%= t("import_schedules.index.empty") %></div>
         <% end %>
       </div>
     </div>
