@@ -34,17 +34,10 @@ class ExportsController < ApplicationController
   end
 
   def run
-    # Run now or schedule depending on :time
-    if @export.time.present?
-      ts = @export.next_run_at
-      @export.schedule!
-      Rails.logger.info "🎯 Controller: Scheduled Export ##{@export.id} for #{ts}"
-      notice = "Export scheduled for #{ts.in_time_zone.strftime('%B %d, %Y at %l:%M %p')}"
-    else
-      Rails.logger.info "🎯 Controller: Queuing immediate ExportJob for Export ##{@export.id} at #{Time.current}"
-      ExportJob.perform_later(@export)
-      notice = "Export started successfully."
-    end
+    # Always run immediately, regardless of any scheduled time
+    Rails.logger.info "🎯 Controller: Queuing immediate ExportJob for Export ##{@export.id} at #{Time.current}"
+    ExportJob.perform_later(@export)
+    notice = "Export started successfully."
 
     respond_to do |format|
       format.turbo_stream { 
