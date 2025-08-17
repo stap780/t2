@@ -15,7 +15,7 @@
       <span class="text-xs text-gray-500"><%= t("import_schedules.item.time") %>:  <%= import_schedule.time %></span>
           <span class="text-xs text-gray-500">
             <% if import_schedule.scheduled_for %>
-        • <%= t("import_schedules.item.next_at") %> <%= import_schedule.scheduled_for.in_time_zone.strftime("%B %d, %Y at %H:%M") %>
+        • <%= t("import_schedules.item.next_at") %> <%= import_schedule.scheduled_for.in_time_zone.strftime("%d/%m/%Y") %>
             <% else %>
         • <%= t("import_schedules.item.not_scheduled") %>
             <% end %>
