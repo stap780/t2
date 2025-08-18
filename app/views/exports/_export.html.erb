@@ -50,9 +50,6 @@
           <span class="text-xs text-gray-500">
             • <%= export.created_at.strftime("%d/%m/%Y-%H:%M") %>
           </span>
-          <span class="text-xs text-gray-500">
-            • <%= time_ago_in_words(export.created_at) %> <%= t("exports.export.ago") %>
-          </span>
           <% if export.exported_at %>
             <span class="text-xs text-gray-500">
               • <%= t("exports.export.completed") %> <%= time_ago_in_words(export.exported_at) %> <%= t("exports.export.ago") %>
@@ -68,11 +65,11 @@
             <% end %>
             <% if export.scheduled_for.present? %>
               <span class="text-xs text-violet-700">
-                <%= t("exports.export.scheduled_for") %> <%= export.scheduled_for.in_time_zone.strftime("%d/%m/%Y-%H:%M") %>
+                <%= t("exports.export.scheduled_for") %> <%= export.scheduled_for.in_time_zone.strftime("%d/%m/%Y") %>
               </span>
             <% elsif export.time.present? %>
               <span class="text-xs text-violet-700">
-                <%= t("exports.export.next_at") %> <%= export.next_run_at&.in_time_zone&.strftime("%d/%m/%Y-%H:%M") %>
+                <%= t("exports.export.next_at") %> <%= export.next_run_at&.in_time_zone&.strftime("%d/%m/%Y") %>
               </span>
             <% end %>
           </div>
