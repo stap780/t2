@@ -7,7 +7,8 @@ class ExportsController < ApplicationController
 
   def index
     # Show all exports from current user
-    @exports = Current.user.exports.recent
+    # @exports = Current.user.exports.recent
+    @exports = Export.recent.includes(:user)
   end
 
   def new
@@ -95,7 +96,8 @@ class ExportsController < ApplicationController
   private
   
   def set_export
-    @export = Current.user.exports.find(params[:id])
+    # @export = Current.user.exports.find(params[:id])
+    @export = Export.find(params[:id])
   end
 
   # Public finder for unauthenticated file access
