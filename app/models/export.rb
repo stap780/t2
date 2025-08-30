@@ -44,7 +44,8 @@ class Export < ApplicationRecord
   before_validation :set_default_name, on: :create
   before_validation :set_default_test_mode, on: :create
   after_commit :enqueue_on_create, on: :create
-  after_commit :handle_enqueue_on_update, on: :update
+  # Use after_update so saved_change_to_time? is available
+  after_update :handle_enqueue_on_update
   before_destroy :cancel_pending_job
 
   def completed?
@@ -76,14 +77,14 @@ class Export < ApplicationRecord
 
   def status_color
     case status
-    when 'completed'
-      'bg-green-100 text-green-800'
-    when 'processing'
-      'bg-blue-100 text-blue-800'
-    when 'failed'
-      'bg-red-100 text-red-800'
+    when "completed"
+      "bg-green-100 text-green-800"
+    when "processing"
+      "bg-blue-100 text-blue-800"
+    when "failed"
+      "bg-red-100 text-red-800"
     else
-      'bg-yellow-100 text-yellow-800'
+      "bg-yellow-100 text-yellow-800"
     end
   end
 
@@ -155,9 +156,9 @@ class Export < ApplicationRecord
     ts = next_run_at
     return unless ts
 
-  update_columns(scheduled_for: ts)
-  job = ExportJob.set(wait_until: ts).perform_later(self, ts)
-  update_columns(active_job_id: job.job_id)
+    update_columns(scheduled_for: ts)
+    job = ExportJob.set(wait_until: ts).perform_later(self, ts)
+    update_columns(active_job_id: job.job_id)
   end
 
   # Call from job after finishing to create a daily schedule
@@ -172,6 +173,7 @@ class Export < ApplicationRecord
   # Remove pending scheduled job if present
   def cancel_pending_job
     return if active_job_id.blank?
+
     if defined?(SolidQueue::Job)
       SolidQueue::Job.where(active_job_id: active_job_id, finished_at: nil).delete_all
     end

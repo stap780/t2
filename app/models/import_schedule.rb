@@ -7,7 +7,7 @@ class ImportSchedule < ApplicationRecord
   validates :recurrence, inclusion: { in: RECURRENCES }
 
   after_commit :enqueue_on_create, on: :create
-  after_commit :handle_enqueue_on_update, on: :update
+  after_update :handle_enqueue_on_update
   before_destroy :cancel_pending_job
 
   # Compute the next run at given time-of-day in app timezone
