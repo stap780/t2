@@ -26,6 +26,14 @@ class Import < ApplicationRecord
 
   before_validation :set_default_name, on: :create
 
+  def self.ransackable_attributes(auth_object = nil)
+    Import.attribute_names
+  end
+  
+  def self.ransackable_associations(auth_object = nil)
+    ["user"]
+  end
+
   def completed?
     status == "completed"
   end

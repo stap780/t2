@@ -3,13 +3,13 @@ class ImportsController < ApplicationController
   before_action :set_import, only: [:show, :destroy, :download]
 
   def index
-    # Show all imports from all users
-    @imports = Import.recent.includes(:user)
+    @search = Import.ransack(params[:q])
+    @search.sorts = "id desc" if @search.sorts.empty?
+    @imports = @search.result(distinct: true).paginate(page: params[:page], per_page: 50)
     @recent_import = @imports.first
   end
 
-  def show
-  end
+  def show; end
 
   def download
     # Check if import is completed and file exists

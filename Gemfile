@@ -40,9 +40,12 @@ gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
 
+gem "tailwindcss-rails", "~> 4.2"
+
 # Solid Queue Web UI for monitoring background jobs
 gem "mission_control-jobs"
 
+gem "aws-sdk-s3", require: false
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
@@ -53,7 +56,19 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 1.2"
+
+gem "insales_api", github: "stap780/insales_api"
+
+gem "nokogiri"
+
+gem 'rack-cors'
+gem "ransack"
+gem "will_paginate"
+
+gem 'acts_as_list'
+
+gem 'receipts'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -76,4 +91,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-gem "tailwindcss-rails", "~> 4.2"

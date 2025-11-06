@@ -1,0 +1,92 @@
+<% content_for :title, "Sign In" %>
+
+<div class="signin-container min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="signin-form max-w-md w-full space-y-8">
+    <div>
+      <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
+        <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+      <h2 class="signin-title mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+        Sign in to your account
+      </h2>
+      <p class="mt-2 text-center text-sm text-gray-600">
+        Welcome back! Please sign in to continue.
+      </p>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if alert = flash[:alert] %>
+      <div class="rounded-md bg-red-50 p-4 border border-red-200" id="alert">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-red-800"><%= alert %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if notice = flash[:notice] %>
+      <div class="rounded-md bg-green-50 p-4 border border-green-200" id="notice">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-green-800"><%= notice %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= form_with url: session_url, class: "mt-8 space-y-6", data: { controller: "signin_form", action: "submit->signin_form#submit" } do |form| %>
+      <div class="rounded-md shadow-sm space-y-4">
+        <div>
+          <%= form.label :email_address, "Email address", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.email_field :email_address, 
+              required: true, 
+              autofocus: true, 
+              autocomplete: "username", 
+              placeholder: "Enter your email address",
+              value: params[:email_address],
+              class: "signin-input appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 transition duration-150 ease-in-out sm:text-sm",
+              data: { signin_form_target: "email" } %>
+        </div>
+
+        <div>
+          <%= form.label :password, "Password", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.password_field :password, 
+              required: true, 
+              autocomplete: "current-password", 
+              placeholder: "Enter your password",
+              maxlength: 72,
+              class: "signin-input appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 transition duration-150 ease-in-out sm:text-sm",
+              data: { signin_form_target: "password" } %>
+        </div>
+      </div>
+
+      <div>
+        <%= form.submit "Sign in", 
+            class: "signin-button group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out",
+            data: { signin_form_target: "submit" } %>
+      </div>
+
+      <div class="text-center hidden">
+        <p class="text-sm text-gray-600">
+          Don't have an account?
+          <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+        Sign up here
+          </a>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

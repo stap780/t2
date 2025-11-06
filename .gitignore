@@ -41,3 +41,5 @@
 
 .DS_Store
 /z-help.txt
+help.md
+/docs/*

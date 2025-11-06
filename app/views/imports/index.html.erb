@@ -30,6 +30,7 @@
           <% if @imports.any? %>
             <%= turbo_frame_tag "imports", class: "space-y-4" do %>
               <%= render @imports %>
+              <%= render "shared/paginate", f: @imports %>
             <% end %>
           <% else %>
             <div class="text-center py-8 text-gray-500">
