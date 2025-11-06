@@ -75,8 +75,6 @@ ru:
         few: "почти %{count} года"
         many: "почти %{count} лет"
         other: "почти %{count} года"
-  many: "Импортов"
-  other: "Импортов"
   enums:
     import:
       status:
@@ -205,16 +203,17 @@ ru:
         one: "Импорт"
         few: "Импорта"
         many: "Импортов"
+        other: "Импортов"
       export:
         one: "Экспорт"
         few: "Экспорта"
         many: "Экспортов"
-        one: "Расписание импорта"
+        other: "Экспортов"
       import_schedule:
+        one: "Расписание импорта"
         few: "Расписания импорта"
         many: "Расписаний импорта"
         other: "Расписания импорта"
-        other: "Экспорта"
     attributes:
       import:
         name: "Название"
