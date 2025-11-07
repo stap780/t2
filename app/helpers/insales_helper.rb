@@ -1,0 +1,2 @@
+module InsalesHelper
+end

@@ -1,0 +1,41 @@
+<%= form_with model: insale, class: "space-y-6" do |form| %>
+  <%= render 'shared/errors', object: insale %>
+
+  <div class="grid grid-cols-1 gap-6">
+    <!-- API Key -->
+    <div class="space-y-2">
+      <%= form.label :api_key, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.text_field :api_key, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+
+    <!-- API Password -->
+    <div class="space-y-2">
+      <%= form.label :api_password, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.password_field :api_password, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+
+    <!-- API Link -->
+    <div class="space-y-2">
+      <%= form.label :api_link, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.text_field :api_link, 
+          placeholder: "https://your-store.myshopify.com",
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+    <button type="button" 
+            data-action="click->offcanvas#close"
+            class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out">
+      <%= t("actions.cancel", default: "Cancel") %>
+    </button>
+    <%= form.submit data: { disable_with: t("helpers.submit.saving", default: "Saving...") },
+      class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
+  </div>
+<% end %>

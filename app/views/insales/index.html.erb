@@ -1,0 +1,35 @@
+<% content_for :title, t("insales.index.title", default: "InSales") %>
+
+<div class="container mx-auto px-0">
+  <div class="bg-white shadow-md rounded-lg">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900"><%= t("insales.index.heading", default: "InSales Integration") %></h1>
+        <%= link_to t("insales.index.new_insale", default: "New InSales"), 
+              new_insale_path, 
+              data: { turbo_frame: :offcanvas },
+              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out"
+          %>
+      </div>
+    </div>
+
+    <!-- Insales List -->
+    <div class="overflow-hidden">
+      <div class="px-6 py-4">
+        <%= turbo_frame_tag "insales", class: "space-y-4" do %>
+          <% if @insales.any? %>
+            <%= render @insales %>
+          <% else %>
+            <div class="text-center py-8 text-gray-500">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              <p class="mt-2 text-sm text-gray-500"><%= t("insales.index.empty", default: "No InSales configurations yet.") %></p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+<%= form_with model: user, class: "space-y-6" do |form| %>
+  <%= render 'shared/errors', object: user %>
+
+  <div class="grid grid-cols-1 gap-6">
+    <!-- Email -->
+    <div class="space-y-2">
+      <%= form.label :email_address, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.email_field :email_address, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+
+    <!-- Password -->
+    <div class="space-y-2">
+      <%= form.label :password, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.password_field :password, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+      <% if user.persisted? %>
+        <p class="text-xs text-gray-500 mt-1"><%= t("users.form.password_hint", default: "Leave blank to keep current password") %></p>
+      <% end %>
+    </div>
+
+    <!-- Password Confirmation -->
+    <div class="space-y-2">
+      <%= form.label :password_confirmation, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.password_field :password_confirmation, 
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+
+    <!-- Role -->
+    <% if Current.user&.admin? %>
+      <div class="space-y-2">
+        <%= form.label :role, class: "block text-sm font-semibold text-gray-800" %>
+        <%= form.select :role, 
+            options_for_select(User.roles.map { |k, v| [k.humanize, k] }, selected: user.role),
+            {},
+            class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
+        %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+    <button type="button" 
+            data-action="click->offcanvas#close"
+            class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out">
+      <%= t("actions.cancel", default: "Cancel") %>
+    </button>
+    <%= form.submit data: { disable_with: t("helpers.submit.saving", default: "Saving...") },
+      class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
+  </div>
+<% end %>
+

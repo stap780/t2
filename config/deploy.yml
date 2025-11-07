@@ -94,11 +94,33 @@ accessories:
       clear:
         POSTGRES_USER: postgres
         POSTGRES_DB: t2_production
-        # DB_HOST: 127.0.0.1
-        # DB_PORT: 5432
       secret:
         - POSTGRES_PASSWORD
     files:
       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
     directories:
       - data:/var/lib/postgresql/data
+  db_backup:
+    image: eeshugerman/postgres-backup-s3:15
+    host: 89.223.125.34
+    env:
+      clear:
+        SCHEDULE: '@daily'     # optional
+        BACKUP_KEEP_DAYS: 7     # optional
+        S3_BUCKET: 44a86f3f-2d01d1b4-e28b-4b31-b13c-2907ba675dd0
+        S3_PREFIX: backups
+        S3_REGION: ru-1
+        S3_ENDPOINT: https://s3.twcstorage.ru
+        POSTGRES_HOST: t2-postgres
+        POSTGRES_DATABASE: t2_production
+        POSTGRES_USER: postgres
+      secret:
+        - POSTGRES_PASSWORD
+        - S3_ACCESS_KEY_ID
+        - S3_SECRET_ACCESS_KEY
+#   redis:
+#     image: redis:7.0
+#     host: 192.168.0.2
+#     port: 6379
+#     directories:
+#       - data:/data

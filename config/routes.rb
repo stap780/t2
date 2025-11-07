@@ -34,6 +34,23 @@ Rails.application.routes.draw do
       post :run
     end
   end
+
+  # Settings section
+  resources :insales do
+    member do
+      get :check
+      post :add_order_webhook
+    end
+  end
+
+  resources :users
+
+  # API webhooks
+  namespace :api do
+    namespace :webhooks do
+      post 'insales/order', to: 'insales#order'
+    end
+  end
   
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

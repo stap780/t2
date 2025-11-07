@@ -7,6 +7,8 @@ ru:
     exports: "Экспорты"
     jobs_monitor: "Монитор задач"
     settings: "Настройки"
+    insales: "InSales"
+    users: "Пользователи"
   datetime:
     distance_in_words:
       half_a_minute: "меньше минуты"
@@ -87,7 +89,11 @@ ru:
         pending: "Ожидает"
         processing: "В обработке"
         completed: "Завершён"
-        failed: "Ошибка"  
+        failed: "Ошибка"
+    user:
+      role:
+        admin: "Администратор"
+        user: "Пользователь"  
   exports:
     export:
       created_by: "Создал"
@@ -197,6 +203,10 @@ ru:
     open: "Открыть"
     link: "Ссылка"
     processing: "Обработка..."
+    back: "Назад"
+    create: "Создать"
+    delete: "Удалить"
+  access_denied: "Доступ запрещён. Требуются права администратора."
   activerecord:
     models:
       import:
@@ -214,6 +224,16 @@ ru:
         few: "Расписания импорта"
         many: "Расписаний импорта"
         other: "Расписания импорта"
+      user:
+        one: "Пользователь"
+        few: "Пользователя"
+        many: "Пользователей"
+        other: "Пользователей"
+      insale:
+        one: "InSales"
+        few: "InSales"
+        many: "InSales"
+        other: "InSales"
     attributes:
       import:
         name: "Название"
@@ -239,3 +259,68 @@ ru:
         scheduled_for: "Запланировано на"
         created_at: "Создано"
         updated_at: "Обновлено"
+      user:
+        email_address: "Email"
+        password: "Пароль"
+        password_confirmation: "Подтверждение пароля"
+        role: "Роль"
+      insale:
+        api_key: "API ключ"
+        api_password: "API пароль"
+        api_link: "API ссылка"
+  helpers:
+    submit:
+      saving: "Сохранение..."
+      create: "Создать"
+      update: "Обновить"
+  users:
+    index:
+      title: "Пользователи"
+      heading: "Пользователи"
+      new_user: "Новый пользователь"
+      empty: "Пока нет пользователей."
+    new:
+      heading: "Новый пользователь"
+    edit:
+      heading: "Редактировать пользователя"
+    show:
+      title: "Пользователь"
+      heading: "Детали пользователя"
+    create:
+      created: "Пользователь успешно создан."
+    update:
+      updated: "Пользователь успешно обновлён."
+    destroy:
+      destroyed: "Пользователь успешно удалён."
+      cannot_delete_self: "Вы не можете удалить свой собственный аккаунт."
+      cannot_delete_last_admin: "Нельзя удалить последнего администратора."
+    user:
+      delete_confirm: "Вы уверены, что хотите удалить этого пользователя?"
+    form:
+      password_hint: "Оставьте пустым, чтобы сохранить текущий пароль"
+  insales:
+    index:
+      title: "InSales"
+      heading: "Интеграция с InSales"
+      new_insale: "Новая конфигурация InSales"
+      empty: "Пока нет конфигураций InSales."
+    new:
+      heading: "Новая конфигурация InSales"
+    edit:
+      heading: "Редактировать конфигурацию InSales"
+    create:
+      created: "Конфигурация InSales успешно создана."
+    update:
+      updated: "Конфигурация InSales успешно обновлена."
+    destroy:
+      destroyed: "Конфигурация InSales успешно удалена."
+    check:
+      check_success: "Подключение к API успешно"
+      check_error: "Ошибка подключения к API: %{messages}"
+    add_order_webhook:
+      webhook_success: "Webhook успешно добавлен: %{message}"
+      webhook_error: "Не удалось добавить webhook: %{messages}"
+    insale:
+      check: "Проверить"
+      add_webhook: "Добавить Webhook"
+      delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"

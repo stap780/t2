@@ -1,0 +1,38 @@
+<% content_for :title, t("users.show.title", default: "User") %>
+
+<div class="container mx-auto px-0">
+  <div class="bg-white shadow-md rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900"><%= t("users.show.heading", default: "User Details") %></h1>
+        <% if Current.user&.admin? %>
+          <%= link_to t("actions.edit", default: "Edit"), edit_user_path(@user), 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+            %>
+        <% end %>
+      </div>
+    </div>
+    <div class="px-6 py-4">
+      <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm font-medium text-gray-500"><%= t("activerecord.attributes.user.email_address", default: "Email") %></dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @user.email_address %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500"><%= t("activerecord.attributes.user.role", default: "Role") %></dt>
+          <dd class="mt-1">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= @user.admin? ? 'bg-violet-100 text-violet-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= @user.role.humanize %>
+            </span>
+          </dd>
+        </div>
+      </dl>
+      <div class="mt-6">
+        <%= link_to t("actions.back", default: "Back"), users_path, 
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+          %>
+      </div>
+    </div>
+  </div>
+</div>
+
