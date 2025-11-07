@@ -15,7 +15,7 @@ servers:
 
 proxy:
   ssl: true
-  host: avito.dizauto.ru
+  host: cpt.dizauto.ru
 
 # Credentials for your image host.
 registry:
