@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  record: one
+  record_type: Record
+  bindable: one
+  bindable_type: Bindable
+  value: MyString
+
+two:
+  record: two
+  record_type: Record
+  bindable: two
+  bindable_type: Bindable
+  value: MyString

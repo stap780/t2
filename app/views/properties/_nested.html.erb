@@ -1,0 +1,8 @@
+<%= fields_for "property[characteristics_attributes][#{turbo_id_for(characteristic)}]", characteristic do |ff| %>
+  <div class="flex items-center gap-4 mb-2" id="characteristic_<%= turbo_id_for(characteristic) %>">
+    <%= ff.text_field :title, class: "flex-1 px-2 py-1 border rounded-md" %>
+    <%= ff.hidden_field :id %>
+    <% path = property.new_record? ? characteristic_path(id: turbo_id_for(characteristic)) : property_characteristic_path(property, turbo_id_for(characteristic)) %>
+    <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+  </div>
+<% end %>

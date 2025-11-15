@@ -1,0 +1,18 @@
+<div id="<%= dom_id(record, :bindings) %>">
+  <h2 class="text-lg font-semibold mb-4">Bindings (External IDs)</h2>
+
+  <div class="mb-4">
+    <%= link_to "New Varbind", polymorphic_path([record, :varbind], action: :new), 
+        class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", 
+        data: { turbo_frame: dom_id(record, dom_id(Varbind.new)), turbo_prefetch: false } %>
+  </div>
+
+  <div class="mb-4">
+    <%= turbo_frame_tag dom_id(record, dom_id(Varbind.new)) %>
+  </div>
+
+  <% varbinds = @varbinds || record.bindings %>
+  <% varbinds.each do |varbind| %>
+    <%= render partial: "varbinds/varbind", locals: { varbind: varbind, record: record } %>
+  <% end %>
+</div>

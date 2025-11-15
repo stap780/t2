@@ -1,0 +1,24 @@
+<div class="max-w-1xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold"><%= @property.title %></h1>
+    <div class="flex space-x-2">
+      <%# link_to "Edit", edit_property_path(@property), 
+          class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700",
+          data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+      <%= link_to t("actions.back"), properties_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6 mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold">Characteristics</h2>
+      <%= link_to "Add a Characteristic", new_property_characteristic_path(@property), 
+          data: { turbo_frame: :offcanvas }, 
+          class: "p-2 rounded-md bg-blue-300 hover:bg-blue-400" %>
+    </div>
+    <%= turbo_frame_tag "property_characteristics" do %>
+      <%= render @property.characteristics, property: @property %>
+    <% end %>
+
+  </div>
+</div>

@@ -5,6 +5,8 @@ ru:
     imports: "Импорты"
     import_schedules: "Расписания"
     exports: "Экспорты"
+    products: "Товары"
+    parameters: "Параметры"
     jobs_monitor: "Монитор задач"
     settings: "Настройки"
     insales: "InSales"
@@ -324,3 +326,47 @@ ru:
       check: "Проверить"
       add_webhook: "Добавить Webhook"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+  products:
+    index:
+      title: "Товары"
+      heading: "Товары"
+    new:
+      title: "Новый товар"
+    edit:
+      title: "Редактировать товар"
+    create:
+      success: "Товар создан"
+    update:
+      success: "Товар обновлен"
+    destroy:
+      success: "Товар удален"
+    insales_info:
+      success: "Данные из InSales обновлены"
+  properties:
+    index:
+      title: "Параметры"
+      heading: "Параметры"
+    new:
+      title: "Новое свойство"
+    edit:
+      title: "Редактировать свойство"
+    create:
+      success: "Свойство создано"
+    update:
+      success: "Свойство обновлено"
+    destroy:
+      success: "Свойство удалено"
+  characteristics:
+    create:
+      success: "Характеристика создана"
+    update:
+      success: "Характеристика обновлена"
+    destroy:
+      success: "Характеристика удалена"
+  variants:
+    create:
+      success: "Вариант создан"
+    update:
+      success: "Вариант обновлен"
+    destroy:
+      success: "Вариант удален"

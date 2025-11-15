@@ -1,0 +1,84 @@
+<%  signed_id = blob.signed_id
+    display_name = blob.filename.to_s
+    blob_path = rails_blob_path(blob, disposition: "attachment") %>
+
+<div id="<%= signed_id %>" 
+     class="w-full sm:w-1/3 md:w-1/4 p-2 flex flex-col border border-blue-400 rounded-md shadow-sm bg-white image-item"
+     data-sort-item-id="<%= image_id%>" 
+     data-sort-url="/products/<%= product_id%>/sort_image"
+     data-signed-id="<%= signed_id %>" 
+     data-image-target="fileItem">
+  
+  <% if f.present? %>
+    <% img_def_url = image_id.present? ? url_for(blob.variant(:default)) : '' %>
+    <%= f.hidden_field :id %>
+    <%= f.hidden_field :file, value: signed_id %>
+    <%= f.hidden_field :position, value: image_position, "data-sortable-target": "hposition" %>
+  <% else %>
+    <% img_def_url = blob.present? ? url_for(blob) : ''%>
+    <input value="<%= signed_id %>" 
+           autocomplete="off" 
+           type="hidden" 
+           name="product[images_attributes][<%= blob.id%>][file]">
+    <input value="<%= image_position%>" 
+           autocomplete="off" 
+           type="hidden" 
+           name="product[images_attributes][<%= blob.id%>][position]" 
+           data-sortable-target="hposition">
+  <% end %>
+  
+  <!-- Иконка сортировки и позиция (Tailwind) -->
+  <div class="flex items-center justify-between mb-2">
+    <button type="button" class="js-sort-handle flex items-center justify-center text-blue-400 hover:text-blue-600 rounded p-1 focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-move" title="Перетащить">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 9h14M5 15h14" />
+      </svg>
+    </button>
+    <span class="ml-auto bg-blue-200 text-blue-800 text-xs font-semibold px-2 py-1 rounded" data-sortable-target="position">
+      <%= image_position %>
+    </span>
+  </div>
+  
+  <!-- Изображение -->
+  <div class="w-full flex items-center justify-center bg-gray-50 rounded aspect-square mb-2 overflow-hidden" data-original-image-url="<%= img_def_url %>">
+    <% not_uploaded_img = image_id.present? && blob.service.exist?(blob.key) ? blob : nil %>
+    <% img = not_uploaded_img.present? ? blob.variant(:thumb_webp).processed.url : url_for(blob) %>
+    <% if blob.service.exist?(blob.key) %>
+      <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
+        <div class="img-ratio__inner w-full h-full">
+          <%= picture_tag(class: "block w-full h-full") do %>
+            <%= tag(:source, srcset: img) %>
+            <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md") %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+  
+  <!-- Чекбокс для массового удаления -->
+  <div class="flex items-center justify-center mb-2">
+    <input type="checkbox" 
+           name="blob_signed_ids[]" 
+           checked 
+           value="<%=signed_id%>" 
+           class="absolute opacity-0 pointer-events-none" 
+           form="bulk_images_form">
+  </div>
+  
+  <!-- Действия -->
+  <div class="flex items-center justify-between mt-1">
+    <a href="<%= img_def_url %>" data-fancybox="gallery" class="text-blue-400 hover:text-blue-600 mr-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.92 3.053-3.858 6.002-9.542 7-5.685-.999-8.623-3.947-9.542-7z" />
+      </svg>
+    </a>
+    <%= link_to delete_images_path(blob_signed_ids: [signed_id]), 
+        data: { turbo_method: :post, turbo_confirm: "Are you sure?" },
+        class: "text-red-400 hover:text-red-600" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    <% end %>
+  </div>
+</div>

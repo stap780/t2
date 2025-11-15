@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :set_locale
+  before_action :set_active_storage_url_options
 
   private
   
@@ -11,6 +12,13 @@ class ApplicationController < ActionController::Base
       requested = params[:locale]
       available = I18n.available_locales.map(&:to_s)
       I18n.locale = available.include?(requested) ? requested : I18n.default_locale
+    end
+
+    def set_active_storage_url_options
+      ActiveStorage::Current.url_options = {
+        host: request.base_url,
+        protocol: request.protocol
+      }
     end
 
     def default_url_options

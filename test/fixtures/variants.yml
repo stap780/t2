@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  barcode: MyString
+  sku: MyString
+  price: 9.99
+  image_link: MyString
+  quantity: 1
+  cost_price: 9.99
+
+two:
+  product: two
+  barcode: MyString
+  sku: MyString
+  price: 9.99
+  image_link: MyString
+  quantity: 1
+  cost_price: 9.99

@@ -1,0 +1,10 @@
+<%= turbo_stream.append "images", 
+    partial: "images/image", 
+    locals: { 
+      blob: @blob, 
+      image_id: nil, 
+      image_position: @blob.id, 
+      product_id: @product_id, 
+      f: nil 
+    } %>
+<%= turbo_stream.prepend "flash", partial: "shared/flash" %>

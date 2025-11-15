@@ -1,0 +1,31 @@
+<div class="max-w-4xl mx-auto">
+  <h1 class="text-2xl font-semibold mb-4"><%= @product.title %></h1>
+  
+  <div class="bg-white rounded-lg shadow p-6 mb-4">
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <div>
+        <strong class="block font-medium mb-1">Status:</strong>
+        <%= @product.status %>
+      </div>
+      <div>
+        <strong class="block font-medium mb-1">Type:</strong>
+        <%= @product.tip %>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <strong class="block font-medium mb-1">Description:</strong>
+      <%= @product.description %>
+    </div>
+    
+    <div class="mb-4">
+      <strong class="block font-medium mb-1">Variants:</strong>
+      <%= @product.variants.count %>
+    </div>
+  </div>
+  
+  <div class="flex space-x-3">
+    <%= link_to "Edit", edit_product_path(@product), class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+    <%= link_to "Back", products_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+  </div>
+</div>

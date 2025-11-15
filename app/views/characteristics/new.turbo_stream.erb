@@ -1,0 +1,3 @@
+<%= turbo_stream.prepend "characteristics" do %>
+  <%= render partial: "properties/nested", locals: { characteristic: Characteristic.new, property: @property } %>
+<% end %>

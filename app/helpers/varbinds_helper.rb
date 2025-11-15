@@ -1,0 +1,2 @@
+module VarbindsHelper
+end

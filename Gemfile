@@ -70,6 +70,15 @@ gem 'acts_as_list'
 
 gem 'receipts'
 
+# Audit trail for models
+gem 'audited', '~> 5.0'
+
+# Barcode generation
+gem 'barby'
+
+# Rich text editor
+gem 'actiontext'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

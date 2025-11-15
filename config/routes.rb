@@ -1,4 +1,55 @@
 Rails.application.routes.draw do
+  resources :varbinds
+  resources :variants
+  resources :images do
+    collection do
+      post :upload
+      post :delete
+    end
+  end
+  
+  # Properties
+  resources :properties do
+    collection do
+      get :characteristics
+      post :search
+    end
+    resources :characteristics, only: [:new, :create, :edit, :update, :destroy]
+  end
+  
+  resources :characteristics, only: [:new, :destroy] do
+    collection do
+      post :search
+    end
+  end
+
+  resources :products do
+    collection do
+      get :search
+      post :price_edit
+      post :price_update
+    end
+    member do
+      post :copy
+      post :delete_image
+      patch :sort_image
+      post :add_image
+    end
+    resources :variants
+    resources :varbinds, only: [:new, :create, :edit, :update, :destroy]
+    resources :images, only: [:create]
+    resources :features do
+      member do
+        get :update_characteristics
+      end
+    end
+  end
+
+  resources :features, only: [:new, :destroy] # for new nested features without product
+
+  resources :variants do
+    resources :varbinds, only: [:new, :create, :edit, :update, :destroy]
+  end
   # Pretty, stable file URL: /exports/export-:id(.:ext)
   get "exports/export-:id(.:ext)", to: "exports#file", as: :export_file_stable
 
