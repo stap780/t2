@@ -132,7 +132,6 @@
         <!-- Список изображений -->
         <%= turbo_frame_tag "images", class: "flex flex-wrap gap-3", data: { controller: "sortable" } do %>
           <%= f.fields_for :images do |form| %>
-            <%= form.file_field :file, multiple: true, accept: 'image/*' %>
             <%= render partial: "images/image", 
                 locals: { 
                   blob: form.object.file, 

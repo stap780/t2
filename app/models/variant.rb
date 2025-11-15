@@ -22,6 +22,15 @@ class Variant < ApplicationRecord
     Variant.attribute_names
   end
 
+  def relation?
+    result = []
+    # Проверяем наличие связанных list_items
+    if list_items.exists?
+      result << 'list_items'
+    end
+    result.count.zero? ? [false, ''] : [true, result]
+  end
+
   private
 
   def prevent_destroy_if_last
