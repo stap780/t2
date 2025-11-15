@@ -42,9 +42,9 @@ class ImagesController < ApplicationController
     upload_blob = ActiveStorage::Blob.find_signed(signed_id)
     filename = upload_blob.filename
 
-    # Сжатие изображения через ImageProcessing::MiniMagick
+    # Сжатие изображения через ImageProcessing::Vips
     file = upload_blob.open do |tempfile|
-      ImageProcessing::MiniMagick.source(tempfile.path).saver!(quality: 80)
+      ImageProcessing::Vips.source(tempfile.path).saver!(quality: 80)
     end
 
     new_blob = ActiveStorage::Blob.create_and_upload!(io: file, filename: filename)
