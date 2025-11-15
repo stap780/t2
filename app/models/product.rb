@@ -27,7 +27,7 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
-  before_destroy :check_variants_have_relations, prepend: true
+  # before_destroy :check_variants_have_relations, prepend: true
 
   validates :title, presence: true
 
