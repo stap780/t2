@@ -25,9 +25,9 @@ class Variant < ApplicationRecord
   def relation?
     result = []
     # Проверяем наличие связанных list_items
-    if list_items.exists?
-      result << 'list_items'
-    end
+    # if list_items.exists?
+    #   result << 'list_items'
+    # end
     result.count.zero? ? [false, ''] : [true, result]
   end
 
