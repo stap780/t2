@@ -1,6 +1,6 @@
 class VariantsController < ApplicationController
   before_action :set_product
-  before_action :set_variant, only: %i[show edit update destroy]
+  before_action :set_variant, only: %i[show edit update destroy print_etiketka]
   include ActionView::RecordIdentifier
 
   def index
@@ -59,6 +59,28 @@ class VariantsController < ApplicationController
         format.json { render json: @variant.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  def print_etiketka
+    # Если этикетка уже существует, используем её
+    if @variant.etiketka.attached?
+      redirect_to rails_blob_path(@variant.etiketka, disposition: 'inline'), allow_other_host: false
+    else
+      # Если этикетки нет, генерируем её
+      @variant.generate_etiketka
+      
+      if @variant.etiketka.attached?
+        redirect_to rails_blob_path(@variant.etiketka, disposition: 'inline'), allow_other_host: false
+      else
+        flash[:alert] = "Не удалось сгенерировать этикетку. Убедитесь, что у варианта есть штрих-код."
+        redirect_back(fallback_location: product_variants_path(@product))
+      end
+    end
+  rescue => e
+    Rails.logger.error "VariantsController#print_etiketka error: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    flash[:alert] = "Ошибка при открытии этикетки: #{e.message}"
+    redirect_back(fallback_location: product_variants_path(@product))
   end
 
   def destroy

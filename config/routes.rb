@@ -28,6 +28,8 @@ Rails.application.routes.draw do
       get :search
       post :price_edit
       post :price_update
+      post :download
+      post :bulk_delete
     end
     member do
       post :copy
@@ -35,7 +37,11 @@ Rails.application.routes.draw do
       patch :sort_image
       post :add_image
     end
-    resources :variants
+    resources :variants do
+      member do
+        get :print_etiketka
+      end
+    end
     resources :varbinds, only: [:new, :create, :edit, :update, :destroy]
     resources :images, only: [:create]
     resources :features do

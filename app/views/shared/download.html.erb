@@ -1,0 +1,5 @@
+<%= turbo_frame_tag "offcanvas", "" %>
+<%= render "shared/offcanvas_inner", title: "Download Excel", width: "30rem" do %>
+  <%= render partial: "shared/pending_bulk" %>
+<% end %>
+<%= turbo_stream_action_tag :set_unchecked, targets: '.checkboxes' %>

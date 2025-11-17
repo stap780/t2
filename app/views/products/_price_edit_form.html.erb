@@ -1,0 +1,17 @@
+<%= form_with url: price_update_products_path, method: :post, data: {turbo_frame: "_top"} do |f| %>
+  <% products.each do |pr|%>
+    <%= hidden_field_tag "product_ids[]", pr.id %>
+  <% end %>
+  <%= fields_for :product_price do |pf| %>
+    <div class="flex items-center space-x-2">
+      <%= pf.select :field_type, [['Цена продажи','price']], {include_blank: false}, {class: "px-3 py-2 border border-gray-300 rounded-md"} %>
+      <%= pf.select :move, [['+','plus'], ['-','minus']], {include_blank: false}, {class: "px-3 py-2 border border-gray-300 rounded-md"} %>
+      <%= pf.text_field :shift, {type: "number", class: "px-3 py-2 border border-gray-300 rounded-md", min: "0", placeholder: "Значение"} %>
+      <%= pf.select :points, [['%','percents'], ['ед.','fixed']], {include_blank: false}, {class: "px-3 py-2 border border-gray-300 rounded-md"} %>
+      <%= pf.select :round, [['до сотен','-2'], ['до десятков','-1'], ['без округ','0']], {include_blank: false}, {class: "px-3 py-2 border border-gray-300 rounded-md"} %>
+    </div>
+  <% end %>
+  <div class="mt-4">
+    <%= f.submit class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+  </div>
+<% end %>

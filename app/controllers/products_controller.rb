@@ -1,6 +1,8 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy delete_image sort_image add_image ]
   include ActionView::RecordIdentifier
+  include DownloadExcel
+  include BulkDelete
 
   def index
     @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(params[:q])
@@ -156,8 +158,14 @@ class ProductsController < ApplicationController
         format.turbo_stream
       end
     else
-      notice = 'Выберите позиции'
-      redirect_to products_url, alert: notice
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:notice] = 'Выберите позиции'
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
+      end
     end
   end
 
@@ -169,15 +177,13 @@ class ProductsController < ApplicationController
       points = params[:product_price][:points]
       round = params[:product_price][:round]
 
-      ProductPriceUpdateJob.perform_later(params[:product_ids], field_type, move, shift, points, round)
-      render turbo_stream:
-        turbo_stream.update(
-          'modal',
-          partial: 'shared/pending_bulk_text'
-        )
-    else
-      notice = 'Выберите товары'
-      redirect_to products_url, alert: notice
+      ProductPriceUpdateJob.perform_later(params[:product_ids], field_type, move, shift, points, round, Current.user&.id)
+      respond_to do |format|
+        flash.now[:success] = 'Starting price update...'
+        format.turbo_stream do
+          render turbo_stream: turbo_close_offcanvas_flash
+        end
+      end
     end
   end
 

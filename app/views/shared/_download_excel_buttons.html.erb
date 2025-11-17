@@ -1,0 +1,27 @@
+<div class="relative inline-block" data-controller="dropdown">
+  <button type="button" 
+          class="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
+          data-action="click->dropdown#toggle">
+    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    Экспорт
+    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+  <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg" data-dropdown-target="menu">
+    <div class="py-1">
+      <%= f.button 'Выбранное', type: :submit, 
+          class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+          formaction: polymorphic_path(object, action: 'download', download_type: :selected) %>
+      <%= f.button 'Отфильтрованное', type: :submit, 
+          class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+          formaction: polymorphic_path(object, action: 'download', download_type: :filtered) %>
+      <%= f.button 'Всё', type: :submit, 
+          class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+          formaction: polymorphic_path(object, action: 'download', download_type: :all) %>
+    </div>
+  </div>
+</div>
+

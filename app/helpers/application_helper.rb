@@ -15,6 +15,12 @@ module ApplicationHelper
       </svg>'.html_safe
   end
 
+  def barcode_icon
+    '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 4h2v16H2V4zM6 4h1v16H6V4zM9 4h2v16H9V4zM13 4h1v16h-1V4zM16 4h2v16h-2V4zM20 4h2v16h-2V4z" />
+      </svg>'.html_safe
+  end
+
   def link_to_varbind(path, **options)
     if options[:class]
       options[:class]

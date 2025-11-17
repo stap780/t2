@@ -1,52 +1,24 @@
 class ProductPriceUpdateJob < ApplicationJob
   queue_as :default
 
-  def perform(product_ids, field_type, move, shift, points, round)
+  def perform(product_ids, field_type, move, shift, points, round, current_user_id = nil)
     products = Product.where(id: product_ids)
-    
-    products.find_each do |product|
-      product.variants.each do |variant|
-        current_price = variant.price || 0
-        
-        new_price = case field_type
-        when 'price'
-          calculate_new_price(current_price, move, shift, points, round)
-        when 'cost_price'
-          # Аналогично для себестоимости, если нужно
-          current_price
-        else
-          current_price
-        end
-        
-        variant.update(price: new_price)
-      end
-    end
-  end
 
-  private
+    success, message = Product::PriceUpdate.new(products, {
+      field_type: field_type,
+      move: move,
+      shift: shift,
+      points: points,
+      round: round
+    }).call
 
-  def calculate_new_price(current_price, move, shift, points, round)
-    new_price = current_price
-    
-    # move: 'percent' или 'fixed'
-    # shift: значение изменения
-    # points: количество знаков после запятой
-    # round: округление
-    
-    if move == 'percent'
-      new_price = current_price * (1 + shift.to_f / 100)
-    elsif move == 'fixed'
-      new_price = current_price + shift.to_f
-    end
-    
-    # Округление
-    if round.present?
-      new_price = new_price.round(round.to_i)
+    if success
+      Rails.logger.info "ProductPriceUpdateJob: Successfully updated prices for #{product_ids.count} products"
+      # TODO: Добавить уведомления пользователю через Turbo Streams или Notifications
     else
-      new_price = new_price.round(points.to_i)
+      Rails.logger.error "ProductPriceUpdateJob: Failed to update prices: #{message.inspect}"
+      # TODO: Добавить уведомления об ошибке
     end
-    
-    new_price
   end
 end
 

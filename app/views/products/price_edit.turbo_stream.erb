@@ -1,0 +1,6 @@
+<%= turbo_stream.update "offcanvas" do %>
+  <%= render "shared/offcanvas_inner", title: "Price Update", width: "43rem" do %>
+    <%= render "products/price_edit_form", products: @products %>
+  <% end %>
+<% end %>
+<%= turbo_stream_action_tag :set_unchecked, targets: '.checkboxes' %>

@@ -25,6 +25,7 @@ gem "rubyzip", "~> 2.3"
 
 # Excel file generation for exports
 gem "caxlsx", "~> 4.0"
+gem 'caxlsx_rails'
 
 # XML generation for exports
 gem "builder", "~> 3.2"
@@ -75,6 +76,10 @@ gem 'audited', '~> 5.0'
 
 # Barcode generation
 gem 'barby'
+gem 'chunky_png'
+
+# PDF generation for labels
+gem 'prawn', '~> 2.4'
 
 # Rich text editor
 gem 'actiontext'

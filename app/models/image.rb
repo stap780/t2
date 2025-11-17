@@ -25,7 +25,14 @@ class Image < ApplicationRecord
   end
 
   def s3_url
-    "https://s3.timeweb.cloud/#{self.file.service.bucket.name}/#{self.file.blob.key}"
+    return unless file.attached?
+
+    service = file.service
+    if service.respond_to?(:bucket) && service.bucket.respond_to?(:name)
+      "https://s3.timeweb.cloud/#{service.bucket.name}/#{file.blob.key}"
+    else
+      rails_blob_path(file, only_path: true)
+    end
   end
 
   private
