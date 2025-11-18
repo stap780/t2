@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_12_163056) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_132001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,6 +83,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_163056) do
     t.index ["property_id"], name: "index_characteristics_on_property_id"
   end
 
+  create_table "detals", force: :cascade do |t|
+    t.boolean "status"
+    t.string "sku"
+    t.string "title"
+    t.text "desc"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "oszz_price", precision: 12, scale: 2, default: "0.0"
+  end
+
   create_table "exports", force: :cascade do |t|
     t.string "name", null: false
     t.string "format", default: "csv", null: false
@@ -108,14 +118,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_163056) do
   end
 
   create_table "features", force: :cascade do |t|
-    t.bigint "product_id", null: false
     t.bigint "property_id", null: false
     t.bigint "characteristic_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "featureable_type", null: false
+    t.bigint "featureable_id", null: false
     t.index ["characteristic_id"], name: "index_features_on_characteristic_id"
-    t.index ["product_id", "property_id"], name: "index_features_on_product_and_property", unique: true
-    t.index ["product_id"], name: "index_features_on_product_id"
+    t.index ["featureable_type", "featureable_id", "property_id"], name: "index_features_on_featureable_and_property", unique: true
+    t.index ["featureable_type", "featureable_id"], name: "index_features_on_featureable"
     t.index ["property_id"], name: "index_features_on_property_id"
   end
 
@@ -235,7 +246,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_12_163056) do
   add_foreign_key "characteristics", "properties"
   add_foreign_key "exports", "users"
   add_foreign_key "features", "characteristics"
-  add_foreign_key "features", "products"
   add_foreign_key "features", "properties"
   add_foreign_key "images", "products"
   add_foreign_key "import_schedules", "users"

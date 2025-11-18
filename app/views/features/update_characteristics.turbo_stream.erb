@@ -1,6 +1,6 @@
 <turbo-stream action="replace" target="feature_<%= turbo_id_for(@feature) %>">
   <template>
-    <%= render partial: "features/feature", locals: { feature: @feature, product: @product } %>
+    <%= render partial: "features/feature", locals: { feature: @feature, featureable: @featureable } %>
   </template>
 </turbo-stream>
 

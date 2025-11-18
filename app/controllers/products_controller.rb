@@ -232,7 +232,7 @@ class ProductsController < ApplicationController
   def product_params
     params.require(:product).permit(
       :status, :tip, :title, :description,
-      features_attributes: [:id, :product_id, :property_id, :characteristic_id, :_destroy],
+      features_attributes: [:id, :property_id, :characteristic_id, :_destroy],
       images_attributes: [:id, :product_id, :position, :file, :_destroy],
       variants_attributes: [:id, :product_id, :sku, :barcode, :quantity, :cost_price, :price, :_destroy]
     )

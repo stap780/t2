@@ -1,18 +1,18 @@
 class FeaturesController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_product
+  before_action :set_featureable
   before_action :set_feature, only: %i[ show edit update destroy ]
 
   def index
-    @features = @product.features.order(:id)
+    @features = @featureable.features.order(:id)
   end
 
   def show
   end
 
   def new
-    @feature = @product.features.build
+    @feature = @featureable.features.build
     respond_to do |format|
       format.turbo_stream
       format.html
@@ -22,7 +22,7 @@ class FeaturesController < ApplicationController
   def edit; end
 
   def create
-    @feature = @product.features.build(feature_params)
+    @feature = @featureable.features.build(feature_params)
 
     respond_to do |format|
       if @feature.save
@@ -31,11 +31,11 @@ class FeaturesController < ApplicationController
             turbo_stream.append(
               'features',
               partial: "features/feature",
-              locals: { feature: @feature, product: @product }
+              locals: { feature: @feature, featureable: @featureable }
             )
           ]
         end
-        format.html { redirect_to @feature, notice: "Feature was successfully created." }
+        format.html { redirect_to @feature, notice: t('.success') }
         format.json { render :show, status: :created, location: @feature }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -54,11 +54,11 @@ class FeaturesController < ApplicationController
             turbo_stream.update(
               dom_id(@feature),
               partial: "features/feature",
-              locals: { feature: @feature, product: @product }
+              locals: { feature: @feature, featureable: @featureable }
             )
           ]
         end
-        format.html { redirect_to product_path(@product), notice: t('.success') }
+        format.html { redirect_to polymorphic_path(@featureable), notice: t('.success') }
         format.json { render :show, status: :ok, location: @feature }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -87,13 +87,13 @@ class FeaturesController < ApplicationController
           ]
         end
       end
-      format.html { redirect_to product_path(@product), notice: t(".success") }
+      format.html { redirect_to polymorphic_path(@featureable), notice: t(".success") }
       format.json { head :no_content }
     end
   end
 
   def update_characteristics
-    set_product
+    set_featureable
     set_feature
     if params[:property_id].present?
       @feature.property_id = params[:property_id].to_i
@@ -109,22 +109,36 @@ class FeaturesController < ApplicationController
 
   private
 
-    def set_product
+    def set_featureable
       if params[:product_id].present?
-        @product = Product.find(params[:product_id])
+        @featureable = Product.find(params[:product_id])
+      elsif params[:detal_id].present?
+        @featureable = Detal.find(params[:detal_id])
       else
-        @product = Product.new
+        # Для новых записей определяем по параметрам
+        if params[:product_id] == nil && params[:detal_id] == nil
+          # Пытаемся определить из feature_params или создаем новый объект
+          if params[:feature] && params[:feature][:featureable_type]
+            @featureable = params[:feature][:featureable_type].constantize.new
+          else
+            @featureable = Product.new
+          end
+        end
       end
     end
 
     def set_feature
-      @feature = @product.features.find(params[:id])
+      if @featureable.persisted?
+        @feature = @featureable.features.find(params[:id])
+      else
+        @feature = Feature.new(id: params[:id])
+      end
     rescue ActiveRecord::RecordNotFound
       @feature = Feature.new(id: params[:id])      
     end
 
     def feature_params
-      params.require(:feature).permit(:product_id, :property_id, :characteristic_id)
+      params.require(:feature).permit(:property_id, :characteristic_id)
     end
 
 end

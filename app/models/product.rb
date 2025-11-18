@@ -9,7 +9,7 @@ class Product < ApplicationRecord
   include Bindable
   audited
 
-  has_many :features, dependent: :destroy
+  has_many :features, as: :featureable, dependent: :destroy
   has_many :properties, through: :features
   accepts_nested_attributes_for :features, allow_destroy: true
 

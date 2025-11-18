@@ -153,6 +153,7 @@ GEM
     debug (1.11.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    domain_name (0.6.20240107)
     dotenv (3.1.8)
     drb (2.2.3)
     ed25519 (1.4.0)
@@ -174,6 +175,9 @@ GEM
     globalid (1.2.1)
       activesupport (>= 6.1)
     htmlentities (4.3.4)
+    http-accept (1.7.0)
+    http-cookie (1.1.0)
+      domain_name (~> 0.5)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -220,6 +224,10 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.3)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2025.0924)
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
@@ -249,6 +257,7 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     net-ssh (7.3.0)
+    netrc (0.11.0)
     nio4r (2.7.4)
     nokogiri (1.18.9-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -356,6 +365,11 @@ GEM
     regexp_parser (2.11.1)
     reline (0.6.2)
       io-console (~> 0.5)
+    rest-client (2.1.0)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     rexml (3.4.1)
     rubocop (1.79.2)
       json (~> 2.3)
@@ -511,6 +525,7 @@ DEPENDENCIES
   rails (~> 8.0.2)
   ransack
   receipts
+  rest-client
   rubocop-rails-omakase
   rubyzip (~> 2.3)
   selenium-webdriver

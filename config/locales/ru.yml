@@ -6,6 +6,7 @@ ru:
     import_schedules: "Расписания"
     exports: "Экспорты"
     products: "Товары"
+    detals: "Детали"
     parameters: "Параметры"
     jobs_monitor: "Монитор задач"
     settings: "Настройки"
@@ -236,6 +237,31 @@ ru:
         few: "InSales"
         many: "InSales"
         other: "InSales"
+      feature:
+        one: "Параметр"
+        few: "Параметра"
+        many: "Параметров"
+        other: "Параметров"
+      property:
+        one: "Параметр"
+        few: "Параметра"
+        many: "Параметров"
+        other: "Параметров"
+      characteristic:
+        one: "Значение"
+        few: "Значения"
+        many: "Значений"
+        other: "Значений"
+      product:
+        one: "Товар"
+        few: "Товара"
+        many: "Товаров"
+        other: "Товаров"
+      variant:
+        one: "Вариант"
+        few: "Варианта"
+        many: "Вариантов"
+        other: "Вариантов"
     attributes:
       import:
         name: "Название"
@@ -266,6 +292,18 @@ ru:
         password: "Пароль"
         password_confirmation: "Подтверждение пароля"
         role: "Роль"
+      variant:
+        sku: "Артикул"
+        barcode: "Штрихкод"
+        quantity: "Кол-во"
+        cost_price: "Вх. цена"
+        price: "Цена"
+      detal:
+        sku: "Артикул"
+        title: "Название"
+        desc: "Описание"
+        status: "Статус"
+        oszz_price: "ОСЗЗ цена"
       insale:
         api_key: "API ключ"
         api_password: "API пароль"
@@ -330,10 +368,41 @@ ru:
     index:
       title: "Товары"
       heading: "Товары"
+      search_by_title_sku: "Поиск по названию, артикулу"
+      search: "Поиск"
+      clear: "Очистить"
+      new: "Новый"
+      image: "Изображение"
+      status: "Статус"
+      title_label: "Название"
+      price: "Цена"
     new:
       title: "Новый товар"
+      heading: "Новый товар"
     edit:
       title: "Редактировать товар"
+      heading: "Редактировать товар"
+    show:
+      status: "Статус"
+      type: "Тип"
+      description: "Описание"
+      variants: "Варианты"
+      edit: "Редактировать"
+      back: "Назад"
+    form:
+      title: "Название"
+      description: "Описание"
+      variants: "Варианты"
+      add_variant: "Добавить вариант"
+      select_status: "Выберите статус"
+      select_type: "Выберите тип"
+      cancel: "Отмена"
+      price_update: "Цена"
+      sku: "Артикул"
+      barcode: "Штрихкод"
+      quantity: "Кол-во"
+      cost_price: "Вх. цена"
+      price: "Цена"
     create:
       success: "Товар создан"
     update:
@@ -347,26 +416,77 @@ ru:
       title: "Параметры"
       heading: "Параметры"
     new:
-      title: "Новое свойство"
+      title: "Новый параметр"
     edit:
-      title: "Редактировать свойство"
+      title: "Редактировать параметр"
     create:
-      success: "Свойство создано"
+      success: "Параметр создан"
     update:
-      success: "Свойство обновлено"
+      success: "Параметр обновлен"
     destroy:
-      success: "Свойство удалено"
+      success: "Параметр удален"
   characteristics:
     create:
-      success: "Характеристика создана"
+      success: "Значение создано"
     update:
-      success: "Характеристика обновлена"
+      success: "Значение обновлено"
     destroy:
-      success: "Характеристика удалена"
+      success: "Значение удалено"
   variants:
+    index:
+      title: "Варианты"
+      heading: "Варианты"
+      new_variant: "Новый вариант"
+      show: "Показать"
+      edit: "Редактировать"
+      destroy: "Удалить"
+      no_variants: "Варианты не найдены"
+    new:
+      title: "Новый вариант"
+    edit:
+      title: "Редактировать вариант"
+    show:
+      title: "Привязки варианта"
+    form:
+      save: "Сохранить"
+      cancel: "Отмена"
     create:
       success: "Вариант создан"
     update:
       success: "Вариант обновлен"
     destroy:
       success: "Вариант удален"
+  detals:
+    index:
+      title: "Название"
+      heading: "Детали"
+      search_by_title_sku: "Поиск по названию, артикулу"
+      search: "Поиск"
+      clear: "Очистить"
+      new: "Новый"
+      status_active: "Активен"
+      status_inactive: "Неактивен"
+      get_oszz: "Получить цену ОСЗЗ"
+    new:
+      title: "Новая деталь"
+    edit:
+      title: "Редактировать деталь"
+    form:
+      cancel: "Отмена"
+    create:
+      success: "Деталь создана"
+    update:
+      success: "Деталь обновлена"
+    destroy:
+      success: "Деталь удалена"
+  features:
+    title: "Параметры"
+    add_feature: "Добавить параметр"
+    select_property: "Выберите параметр"
+    select_characteristic: "Выберите значение"
+    create:
+      success: "Параметр создан"
+    update:
+      success: "Параметр обновлен"
+    destroy:
+      success: "Параметр удален"

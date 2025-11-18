@@ -1,4 +1,18 @@
 Rails.application.routes.draw do
+  resources :detals do
+    member do
+      get :get_oszz
+    end
+    collection do
+      post :download
+      post :bulk_delete
+    end
+    resources :features do
+      member do
+        get :update_characteristics
+      end
+    end
+  end
   resources :varbinds
   resources :variants
   resources :images do
@@ -8,7 +22,6 @@ Rails.application.routes.draw do
     end
   end
   
-  # Properties
   resources :properties do
     collection do
       get :characteristics

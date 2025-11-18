@@ -1,5 +1,5 @@
 <%= turbo_stream.update "offcanvas" do %>
-  <%= render "shared/offcanvas_inner", title: "Price Update", width: "43rem" do %>
+  <%= render "shared/offcanvas_inner", title: t("products.form.price_update"), width: "43rem" do %>
     <%= render "products/price_edit_form", products: @products %>
   <% end %>
 <% end %>

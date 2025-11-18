@@ -1,0 +1,53 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t("detals.index.heading") %></h1>
+  <div class="flex space-x-2">
+    <%= search_form_for @search, url: detals_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+      <%= f.label :title_or_sku_cont, t("detals.index.search_by_title_sku"), class: "sr-only" %>
+      <%= f.search_field :title_or_sku_cont, value: params.dig(:q, :title_or_sku_cont), placeholder: t("detals.index.search_by_title_sku"), class: "px-2 py-1 border rounded", style: "width: 350px;" %>
+      <%= f.submit t("detals.index.search"), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+      <%= link_to detals_path, class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("detals.index.clear") do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="flex space-x-2">
+    <%= form_with url: detals_path, method: :post, id: :bulk_action_form, local: false do |f| %>
+      <!-- Download Excel Buttons -->
+      <%= render 'shared/download_excel_buttons', f: f, object: Detal.new %>
+      
+      <!-- Bulk Delete Buttons -->
+      <%= render 'shared/bulk_delete_buttons', f: f, object: Detal.new %>
+    <% end %>
+    
+    <%= link_to t("detals.index.new"), new_detal_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg shadow divide-y" data-controller="selectall">
+  <div class="grid grid-cols-[30px_40px_80px_140px_1fr_100px_120px] gap-2 px-3 py-4 font-medium text-gray-700">
+    <div>
+      <%= check_box_tag "select_all", "1", false, {
+        class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500',
+        id: 'select_all_checkbox',
+        data: { 
+          'selectall_target': 'parentCheckbox',
+          action: "change->selectall#toggleAll"
+        },
+        form: :bulk_action_form
+      } %>
+    </div>
+    <div>#</div>
+    <div><%= t("detals.index.status") %></div>
+    <div><%= t("detals.index.sku")%></div>
+    <div><%= t("detals.index.title")%></div>
+    <div><%= t("detals.index.oszz_price")%></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "detals" do %>
+    <%= render @detals %>
+    <%= render "shared/paginate", f: @detals %>
+  <% end %>
+</div>

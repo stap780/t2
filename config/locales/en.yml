@@ -35,6 +35,9 @@ en:
     imports: "Imports"
     import_schedules: "Import Schedules"
     exports: "Exports"
+    products: "Products"
+    detals: "Detals"
+    parameters: "Parameters"
     jobs_monitor: "Jobs Monitor"
     settings: "Settings"
   enums:
@@ -164,12 +167,36 @@ en:
       export:
         one: "Export"
         other: "Exports"
+      feature:
+        one: "Feature"
+        other: "Features"
+      product:
+        one: "Product"
+        other: "Products"
+      variant:
+        one: "Variant"
+        other: "Variants"
+      detal:
+        one: "Detal"
+        other: "Detals"
     attributes:
       export:
         name: "Name"
         time: "Time"
         format: "Format"
         template: "Template"
+      variant:
+        sku: "SKU"
+        barcode: "Barcode"
+        quantity: "Quantity"
+        cost_price: "Cost Price"
+        price: "Price"
+      detal:
+        sku: "SKU"
+        title: "Title"
+        desc: "Description"
+        status: "Status"
+        oszz_price: "OSZZ Price"
   activerecord:
     models:
       import_schedule:
@@ -184,3 +211,106 @@ en:
         scheduled_for: "Scheduled for"
         created_at: "Created at"
         updated_at: "Updated at"
+  products:
+    index:
+      title: "Products"
+      heading: "Products"
+      search_by_title_sku: "Search by title, sku"
+      search: "Search"
+      clear: "Clear"
+      new: "New"
+      image: "Image"
+      status: "Status"
+      title_label: "Title"
+      price: "Price"
+    new:
+      title: "New Product"
+      heading: "New Product"
+    edit:
+      title: "Edit Product"
+      heading: "Edit Product"
+    show:
+      status: "Status"
+      type: "Type"
+      description: "Description"
+      variants: "Variants"
+      edit: "Edit"
+      back: "Back"
+    form:
+      title: "Title"
+      description: "Description"
+      variants: "Variants"
+      add_variant: "Add Variant"
+      select_status: "Select status"
+      select_type: "Select type"
+      cancel: "Cancel"
+      price_update: "Price"
+      sku: "SKU"
+      barcode: "Barcode"
+      quantity: "Quantity"
+      cost_price: "Cost Price"
+      price: "Price"
+    create:
+      success: "Product was successfully created."
+    update:
+      success: "Product was successfully updated."
+    destroy:
+      success: "Product was successfully destroyed."
+  variants:
+    index:
+      title: "Variants"
+      heading: "Variants"
+      new_variant: "New variant"
+      show: "Show"
+      edit: "Edit"
+      destroy: "Destroy"
+      no_variants: "No variants found."
+    new:
+      title: "New Variant"
+    edit:
+      title: "Edit Variant"
+    show:
+      title: "Show Variant Bindings"
+    form:
+      save: "Save"
+      cancel: "Cancel"
+    create:
+      success: "Variant was successfully created."
+    update:
+      success: "Variant was successfully updated."
+    destroy:
+      success: "Variant was successfully destroyed."
+  detals:
+    index:
+      title: "Detals"
+      heading: "Detals"
+      search_by_title_sku: "Search by title, sku"
+      search: "Search"
+      clear: "Clear"
+      new: "New"
+      status_active: "Active"
+      status_inactive: "Inactive"
+      get_oszz: "Get OSZZ Price"
+    new:
+      title: "New Detal"
+    edit:
+      title: "Edit Detal"
+    form:
+      cancel: "Cancel"
+    create:
+      success: "Detal was successfully created."
+    update:
+      success: "Detal was successfully updated."
+    destroy:
+      success: "Detal was successfully destroyed."
+  features:
+    title: "Features"
+    add_feature: "Add a Feature"
+    select_property: "Select Property"
+    select_characteristic: "Select Characteristic"
+    create:
+      success: "Feature was successfully created."
+    update:
+      success: "Feature was successfully updated."
+    destroy:
+      success: "Feature was successfully destroyed."

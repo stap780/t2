@@ -1,7 +1,12 @@
+<% 
+  featureable = local_assigns[:featureable] || local_assigns[:product] || local_assigns[:detal]
+  featureable_type = featureable.class.name.downcase
+  featureable_param = "#{featureable_type}_id"
+%>
 <%= turbo_frame_tag "feature_#{turbo_id_for(feature)}" do %>
-  <%= fields_for "product[features_attributes][#{turbo_id_for(feature)}]", feature do |ff| %>
+  <%= fields_for "#{featureable_type}[features_attributes][#{turbo_id_for(feature)}]", feature do |ff| %>
     <div class="grid grid-cols-[1fr_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50" id="feature_<%= turbo_id_for(feature) %>">
-      <%= ff.collection_select :property_id, Property.all, :id, :title, { prompt: "Select Property", selected: feature.property_id }, 
+      <%= ff.collection_select :property_id, Property.all, :id, :title, { prompt: t("features.select_property"), selected: feature.property_id }, 
       { class: "flex-1 px-2 py-1 border rounded-md w-full",
         data: {
           controller: "slimselect",
@@ -9,13 +14,13 @@
           nested_url: characteristics_properties_path,
           turbo_frame: "feature_#{turbo_id_for(feature)}",
           turbo_frame_characteristic: "characteristic_#{turbo_id_for(feature)}",
-          product_id: (product.persisted? ? product.id : nil)
+          "#{featureable_param}": (featureable.persisted? ? featureable.id : nil)
         } } %>
       
       <%= turbo_frame_tag "characteristic_#{turbo_id_for(feature)}" do %>
         <%= ff.collection_select :characteristic_id, 
             (feature.property&.characteristics || []), :id, :title, 
-            { prompt: "Select Characteristic", selected: feature.characteristic_id }, 
+            { prompt: t("features.select_characteristic"), selected: feature.characteristic_id }, 
             { 
               class: "flex-1 px-2 py-1 border rounded-md",
               id: "feature_#{turbo_id_for(feature)}_characteristic_id",
@@ -27,7 +32,15 @@
       <% end %>
       
       <%= ff.hidden_field :id %>
-      <% path = product.new_record? ? feature_path(id: turbo_id_for(feature)) : product_feature_path(product, turbo_id_for(feature)) %>
+      <% 
+        if featureable.is_a?(Product)
+          path = featureable.new_record? ? feature_path(id: turbo_id_for(feature)) : product_feature_path(featureable, turbo_id_for(feature))
+        elsif featureable.is_a?(Detal)
+          path = featureable.new_record? ? feature_path(id: turbo_id_for(feature)) : detal_feature_path(featureable, turbo_id_for(feature))
+        else
+          path = feature_path(id: turbo_id_for(feature))
+        end
+      %>
       <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
     </div>
   <% end %>
