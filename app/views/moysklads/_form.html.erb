@@ -1,5 +1,5 @@
-<%= form_with model: insale, class: "space-y-6" do |form| %>
-  <%= render 'shared/errors', object: insale %>
+<%= form_with model: moysklad, class: "space-y-6" do |form| %>
+  <%= render 'shared/errors', object: moysklad %>
 
   <div class="grid grid-cols-1 gap-6">
     <!-- API Key -->
@@ -17,15 +17,6 @@
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
-
-    <!-- API Link -->
-    <div class="space-y-2">
-      <%= form.label :api_link, class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :api_link, 
-          placeholder: "https://your-store.myshopify.com",
-          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
-      %>
-    </div>
   </div>
 
   <!-- Action Buttons -->
@@ -39,3 +30,4 @@
       class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
   </div>
 <% end %>
+

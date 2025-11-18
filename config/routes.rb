@@ -113,6 +113,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :moysklads do
+    member do
+      get :check
+    end
+  end
+
   resources :users
 
   # API webhooks

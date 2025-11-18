@@ -40,6 +40,8 @@ en:
     parameters: "Parameters"
     jobs_monitor: "Jobs Monitor"
     settings: "Settings"
+    insales: "InSales"
+    moysklads: "Moysklad"
   enums:
     import:
       status:
@@ -179,6 +181,9 @@ en:
       detal:
         one: "Detal"
         other: "Detals"
+      moysklad:
+        one: "Moysklad"
+        other: "Moysklads"
     attributes:
       export:
         name: "Name"
@@ -314,3 +319,25 @@ en:
       success: "Feature was successfully updated."
     destroy:
       success: "Feature was successfully destroyed."
+  moysklads:
+    index:
+      title: "Moysklad"
+      heading: "Moysklad Integration"
+      new_moysklad: "New Moysklad"
+      empty: "No Moysklad configurations yet."
+    new:
+      heading: "New Moysklad Configuration"
+    edit:
+      heading: "Edit Moysklad Configuration"
+    create:
+      created: "Moysklad configuration was successfully created."
+    update:
+      updated: "Moysklad configuration was successfully updated."
+    destroy:
+      destroyed: "Moysklad configuration was successfully destroyed."
+    check:
+      check_success: "API connection successful"
+      check_error: "API connection error: %{messages}"
+    moysklad:
+      check: "Check"
+      delete_confirm: "Are you sure you want to delete this configuration?"

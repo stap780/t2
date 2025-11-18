@@ -11,6 +11,7 @@ ru:
     jobs_monitor: "Монитор задач"
     settings: "Настройки"
     insales: "InSales"
+    moysklads: "Moysklad"
     users: "Пользователи"
   datetime:
     distance_in_words:
@@ -363,6 +364,28 @@ ru:
     insale:
       check: "Проверить"
       add_webhook: "Добавить Webhook"
+      delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+  moysklads:
+    index:
+      title: "Moysklad"
+      heading: "Интеграция с Moysklad"
+      new_moysklad: "Новая конфигурация Moysklad"
+      empty: "Пока нет конфигураций Moysklad."
+    new:
+      heading: "Новая конфигурация Moysklad"
+    edit:
+      heading: "Редактировать конфигурацию Moysklad"
+    create:
+      created: "Конфигурация Moysklad успешно создана."
+    update:
+      updated: "Конфигурация Moysklad успешно обновлена."
+    destroy:
+      destroyed: "Конфигурация Moysklad успешно удалена."
+    check:
+      check_success: "Подключение к API успешно"
+      check_error: "Ошибка подключения к API: %{messages}"
+    moysklad:
+      check: "Проверить"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
   products:
     index:

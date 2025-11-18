@@ -30,6 +30,7 @@ class InsalesController < ApplicationController
         format.turbo_stream do
           flash[:notice] = t('.created')
           render turbo_stream: turbo_close_offcanvas_flash + [
+            turbo_stream.update(:insales_actions,partial: "insales/actions"),
             turbo_stream.append("insales", partial: "insales/insale", locals: { insale: @insale })
           ]
         end
@@ -64,8 +65,10 @@ class InsalesController < ApplicationController
         flash[:notice] = t('.destroyed')
         render turbo_stream: [
           render_turbo_flash,
-          turbo_stream.remove(dom_id(@insale))
+          turbo_stream.remove(dom_id(@insale)),
+          turbo_stream.update(:insales_actions, partial: "insales/actions")
         ]
+        
       end
     end
   end

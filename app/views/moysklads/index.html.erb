@@ -1,29 +1,29 @@
-<% content_for :title, t("insales.index.title", default: "InSales") %>
+<% content_for :title, t("moysklads.index.title", default: "Moysklad") %>
 
 <div class="container mx-auto px-0">
   <div class="bg-white shadow-md rounded-lg">
     <!-- Header -->
     <div class="px-6 py-4 border-b border-gray-200">
       <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-gray-900"><%= t("insales.index.heading", default: "InSales Integration") %></h1>
-        <%= turbo_frame_tag :insales_actions do %>
+        <h1 class="text-2xl font-bold text-gray-900"><%= t("moysklads.index.heading", default: "Moysklad Integration") %></h1>
+        <%= turbo_frame_tag :moysklads_actions do %>
           <%= render "actions" %>
         <% end %>
       </div>
     </div>
 
-    <!-- Insales List -->
+    <!-- Moysklads List -->
     <div class="overflow-hidden">
       <div class="px-6 py-4">
-        <%= turbo_frame_tag "insales", class: "space-y-4" do %>
-          <% if @insales.any? %>
-            <%= render @insales %>
+        <%= turbo_frame_tag "moysklads", class: "space-y-4" do %>
+          <% if @moysklads.any? %>
+            <%= render @moysklads %>
           <% else %>
             <div class="text-center py-8 text-gray-500">
               <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
-              <p class="mt-2 text-sm text-gray-500"><%= t("insales.index.empty", default: "No InSales configurations yet.") %></p>
+              <p class="mt-2 text-sm text-gray-500"><%= t("moysklads.index.empty", default: "No Moysklad configurations yet.") %></p>
             </div>
           <% end %>
         <% end %>
@@ -31,3 +31,4 @@
     </div>
   </div>
 </div>
+

@@ -142,7 +142,7 @@
 
         <!-- Settings at bottom (collapsible) -->
         <div class="flex-shrink-0 px-4 pb-4">
-          <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/users') %>>
+          <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/users') %>>
             <summary class="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
               <div class="flex-1 flex items-center text-sm font-medium text-violet-100">
                 <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -162,6 +162,13 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
                 <%= t("nav.insales") %>
+              <% end %>
+              <%= link_to moysklads_path,
+                  class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklads')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                <%= t("nav.moysklads") %>
               <% end %>
               <%= link_to users_path,
                   class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/users')}" do %>
