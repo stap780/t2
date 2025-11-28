@@ -1,0 +1,31 @@
+<div class="space-y-4">
+
+  <% if incase.new_record? %>
+    <!-- Для новых заявок: форма комментария прямо в форме -->
+    <%= f.fields_for :comments, Comment.new do |comment| %>
+      <%= render 'incases/comments/form_data', f: comment %>
+    <% end %>
+  <% else %>
+    <!-- Для существующих заявок: кнопка и список комментариев -->
+    <div class="flex items-center justify-between mb-3">
+      <%= tag.label t("incases.comments.title"), class: "text-sm font-medium text-gray-700" %>
+      <%= link_to t("incases.comments.add_comment"), new_incase_comment_path(incase), 
+          class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700",
+          data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    </div>
+          
+    <%= turbo_stream_from incase, :comments %>
+    
+    <%= turbo_frame_tag incase, :comments, class: "w-full" do %>
+      <% if incase.comments.any? %>
+        <% incase.comments.order(created_at: :desc).each do |comment| %>
+          <%= render "incases/comments/comment", comment: comment, incase: incase %>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-gray-500 p-3"><%= t("incases.comments.no_comments") %></p>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+

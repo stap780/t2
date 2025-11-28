@@ -46,9 +46,7 @@ Rails.application.routes.draw do
     end
     member do
       post :copy
-      post :delete_image
       patch :sort_image
-      post :add_image
     end
     resources :variants do
       member do
@@ -120,6 +118,94 @@ Rails.application.routes.draw do
   end
 
   resources :users
+
+  resources :companies do
+    collection do
+      post :download
+      post :bulk_delete
+    end
+    resources :client_companies, only: [:new, :create, :destroy]
+    resources :company_plan_dates, only: [:new, :create, :destroy]
+  end
+
+  resources :client_companies, only: [:new, :create, :destroy]
+  resources :company_plan_dates, only: [:new, :create, :destroy]
+
+  resources :clients do
+    collection do
+      get :search
+      post :download
+      post :bulk_delete
+    end
+  end
+
+  # Incase routes
+  resources :incase_statuses do
+    member do
+      patch :sort
+    end
+  end
+
+  resources :incase_tips do
+    member do
+      patch :sort
+    end
+  end
+
+  resources :item_statuses
+
+  resources :okrugs do
+    member do
+      patch :sort
+    end
+  end
+
+  resources :acts do
+    member do
+      get :act, format: :pdf
+    end
+    collection do
+      post :create_multi
+      put :update_multi
+      post :bulk_print
+    end
+  end
+
+  resources :incases do
+    member do
+      get :act
+    end
+    collection do
+      post :bulk_print
+      post :bulk_status
+      post :download
+      post :bulk_delete
+      get :filter
+    end
+    resources :items do
+      member do
+        get :update_variant_fields
+      end
+    end
+    resources :comments, module: :incases, only: [:new, :create, :destroy]
+  end
+  
+  resources :incase_imports, only: [:index, :show, :new, :create, :destroy]
+  
+  resources :incase_dubls, only: [:index, :show, :destroy] do
+    member do
+      post :merge
+    end
+  end
+
+  resources :items, only: [:new, :destroy] do
+    collection do
+      post :search
+    end
+    member do
+      get :update_variant_fields
+    end
+  end
 
   # API webhooks
   namespace :api do

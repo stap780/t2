@@ -1,0 +1,4 @@
+<%= turbo_stream.append "company_plan_dates",
+    partial: "company_plan_dates/company_plan_date",
+    locals: { company_plan_date: @company_plan_date, company: @company } %>
+

@@ -13,7 +13,7 @@ class Image < ApplicationRecord
   end
   
   validates :position, uniqueness: { scope: :product }
-  validate :validate_image
+  validate :is_image
   before_validation :set_position_if_nil, on: :create
 
   def self.ransackable_attributes(auth_object = nil)
@@ -37,7 +37,7 @@ class Image < ApplicationRecord
 
   private
 
-  def validate_image
+  def is_image
     return unless file.attached?
 
     unless file.blob.byte_size <= 10.megabyte

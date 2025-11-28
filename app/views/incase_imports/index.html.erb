@@ -1,0 +1,42 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t('.heading') %></h1>
+  <div class="flex space-x-2">
+    <%= search_form_for @search, url: incase_imports_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+      <%= f.label :status_eq, t('.search'), class: "sr-only" %>
+      <%= f.select :status_eq, options_for_select(
+        IncaseImport.statuses.map { |key, value| [t("incase_imports.status.#{key}"), value] },
+        params.dig(:q, :status_eq)
+      ), { prompt: t('.all_statuses') }, class: "px-2 py-1 border rounded" %>
+      <%= f.submit t('.search'), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+      <%= link_to incase_imports_path, class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t('.clear') do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
+    <% end %>
+  </div>
+  
+  <div class="flex space-x-2 items-center">
+    <%= link_to t('.new'), new_incase_import_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+  </div>
+</div>
+
+<%= turbo_stream_from "incase_imports" %>
+
+<div class="bg-white rounded-lg shadow divide-y">
+  <div class="grid grid-cols-[1fr_140px_120px_100px_100px_100px_150px_100px] gap-2 px-3 py-4 font-medium text-gray-700">
+    <div><%= t('.file') %></div>
+    <div><%= t('.created_at') %></div>
+    <div><%= t('.status') %></div>
+    <div><%= t('.total_rows') %></div>
+    <div><%= t('.success_count') %></div>
+    <div><%= t('.failed_count') %></div>
+    <div><%= t('.user') %></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "incase_imports" do %>
+    <%= render @incase_imports %>
+    <%= render "shared/paginate", f: @incase_imports %>
+  <% end %>
+</div>
+

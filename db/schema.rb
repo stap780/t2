@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_27_140348) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "act_items", force: :cascade do |t|
+    t.bigint "act_id", null: false
+    t.bigint "item_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["act_id", "item_id"], name: "index_act_items_on_act_id_and_item_id", unique: true
+    t.index ["act_id"], name: "index_act_items_on_act_id"
+    t.index ["item_id"], name: "index_act_items_on_item_id"
+  end
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -52,6 +62,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "acts", force: :cascade do |t|
+    t.string "number"
+    t.date "date"
+    t.string "status", default: "Новый"
+    t.bigint "company_id", null: false
+    t.bigint "strah_id", null: false
+    t.bigint "okrug_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_acts_on_company_id"
+    t.index ["date"], name: "index_acts_on_date"
+    t.index ["number"], name: "index_acts_on_number"
+    t.index ["okrug_id"], name: "index_acts_on_okrug_id"
+    t.index ["status"], name: "index_acts_on_status"
+    t.index ["strah_id"], name: "index_acts_on_strah_id"
+  end
+
   create_table "audits", force: :cascade do |t|
     t.integer "auditable_id"
     t.string "auditable_type"
@@ -61,7 +88,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.string "user_type"
     t.string "username"
     t.string "action"
-    t.text "audited_changes"
+    t.jsonb "audited_changes"
     t.integer "version", default: 0
     t.string "comment"
     t.string "remote_address"
@@ -81,6 +108,67 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.datetime "updated_at", null: false
     t.index ["property_id", "title"], name: "index_characteristics_on_property_and_title", unique: true
     t.index ["property_id"], name: "index_characteristics_on_property_id"
+  end
+
+  create_table "client_companies", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_client_companies_on_client_id"
+    t.index ["company_id"], name: "index_client_companies_on_company_id"
+  end
+
+  create_table "clients", force: :cascade do |t|
+    t.string "surname"
+    t.string "name"
+    t.string "middlename"
+    t.string "phone"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.string "commentable_type"
+    t.integer "commentable_id"
+    t.integer "user_id"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["commentable_type", "commentable_id"], name: "index_comments_on_commentable_type_and_commentable_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "companies", force: :cascade do |t|
+    t.string "inn"
+    t.string "kpp"
+    t.string "title"
+    t.string "short_title"
+    t.string "ur_address"
+    t.string "fact_address"
+    t.string "ogrn"
+    t.string "okpo"
+    t.string "bik"
+    t.string "bank_title"
+    t.string "bank_account"
+    t.string "tip"
+    t.integer "okrug_id"
+    t.text "info"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "weekdays", default: []
+    t.index ["short_title"], name: "index_companies_on_short_title"
+    t.index ["tip"], name: "index_companies_on_tip"
+    t.index ["weekdays"], name: "index_companies_on_weekdays", using: :gin
+  end
+
+  create_table "company_plan_dates", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.datetime "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_plan_dates_on_company_id"
   end
 
   create_table "detals", force: :cascade do |t|
@@ -169,6 +257,86 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.index ["user_id"], name: "index_imports_on_user_id"
   end
 
+  create_table "incase_dubls", force: :cascade do |t|
+    t.string "region"
+    t.integer "strah_id"
+    t.string "stoanumber"
+    t.string "unumber"
+    t.integer "company_id"
+    t.string "carnumber"
+    t.datetime "date"
+    t.string "modelauto"
+    t.decimal "totalsum"
+    t.bigint "incase_import_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["incase_import_id"], name: "index_incase_dubls_on_incase_import_id"
+    t.index ["unumber", "stoanumber"], name: "index_incase_dubls_on_unumber_and_stoanumber"
+    t.index ["unumber"], name: "index_incase_dubls_on_unumber"
+  end
+
+  create_table "incase_imports", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "status", default: "pending", null: false
+    t.text "error_message"
+    t.jsonb "import_errors", default: []
+    t.integer "success_count", default: 0
+    t.integer "failed_count", default: 0
+    t.integer "total_rows", default: 0
+    t.datetime "imported_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_incase_imports_on_created_at"
+    t.index ["status"], name: "index_incase_imports_on_status"
+    t.index ["user_id"], name: "index_incase_imports_on_user_id"
+  end
+
+  create_table "incase_item_dubls", force: :cascade do |t|
+    t.bigint "incase_dubl_id", null: false
+    t.string "title"
+    t.integer "quantity"
+    t.string "katnumber"
+    t.decimal "price", precision: 12, scale: 2, default: "0.0"
+    t.string "supplier_code"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["incase_dubl_id"], name: "index_incase_item_dubls_on_incase_dubl_id"
+  end
+
+  create_table "incase_statuses", force: :cascade do |t|
+    t.string "title"
+    t.string "color"
+    t.integer "position", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "incase_tips", force: :cascade do |t|
+    t.string "title"
+    t.string "color"
+    t.integer "position", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "incases", force: :cascade do |t|
+    t.string "region"
+    t.integer "strah_id"
+    t.string "stoanumber"
+    t.string "unumber"
+    t.integer "company_id"
+    t.string "carnumber"
+    t.datetime "date"
+    t.string "modelauto"
+    t.decimal "totalsum"
+    t.string "incase_status_id"
+    t.string "incase_tip_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_incases_on_company_id"
+    t.index ["strah_id"], name: "index_incases_on_strah_id"
+  end
+
   create_table "insales", force: :cascade do |t|
     t.string "api_key"
     t.string "api_password"
@@ -177,11 +345,44 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "item_statuses", force: :cascade do |t|
+    t.string "title"
+    t.string "color"
+    t.integer "position", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "items", force: :cascade do |t|
+    t.integer "incase_id"
+    t.string "title"
+    t.integer "quantity"
+    t.string "katnumber"
+    t.decimal "price", precision: 12, scale: 2, default: "0.0"
+    t.decimal "sum", precision: 12, scale: 2, default: "0.0"
+    t.integer "item_status_id"
+    t.integer "variant_id"
+    t.integer "vat"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "supplier_code"
+    t.index ["incase_id"], name: "index_items_on_incase_id"
+    t.index ["variant_id"], name: "index_items_on_variant_id"
+  end
+
   create_table "moysklads", force: :cascade do |t|
     t.string "api_key"
     t.string "api_password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "okrugs", force: :cascade do |t|
+    t.string "title", null: false
+    t.integer "position", default: 1
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["title"], name: "index_okrugs_on_title", unique: true
   end
 
   create_table "products", force: :cascade do |t|
@@ -248,15 +449,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_161007) do
     t.index ["sku"], name: "index_variants_on_sku"
   end
 
+  add_foreign_key "act_items", "acts"
+  add_foreign_key "act_items", "items"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "acts", "companies"
+  add_foreign_key "acts", "companies", column: "strah_id"
+  add_foreign_key "acts", "okrugs"
   add_foreign_key "characteristics", "properties"
+  add_foreign_key "client_companies", "clients"
+  add_foreign_key "client_companies", "companies"
+  add_foreign_key "company_plan_dates", "companies"
   add_foreign_key "exports", "users"
   add_foreign_key "features", "characteristics"
   add_foreign_key "features", "properties"
   add_foreign_key "images", "products"
   add_foreign_key "import_schedules", "users"
   add_foreign_key "imports", "users"
+  add_foreign_key "incase_dubls", "incase_imports"
+  add_foreign_key "incase_imports", "users"
+  add_foreign_key "incase_item_dubls", "incase_dubls"
+  add_foreign_key "incases", "companies"
+  add_foreign_key "incases", "companies", column: "strah_id"
+  add_foreign_key "items", "incases"
+  add_foreign_key "items", "variants"
   add_foreign_key "sessions", "users"
   add_foreign_key "variants", "products"
 end

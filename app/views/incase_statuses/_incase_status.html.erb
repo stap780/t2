@@ -1,0 +1,16 @@
+<%= turbo_frame_tag dom_id(incase_status), class: "grid grid-cols-[50px_1fr_100px_200px] gap-4 p-4 border-t hover:bg-gray-50" do %>
+  <div><%= incase_status.id %></div>
+  <div>
+    <%= link_to incase_status.title, incase_status_path(incase_status), class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %>
+  </div>
+  <div>
+    <% if incase_status.color.present? %>
+      <span class="inline-block w-6 h-6 rounded-full" style="background-color: <%= incase_status.color %>"></span>
+    <% end %>
+  </div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to_edit edit_incase_status_path(incase_status), data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    <%= link_to_delete incase_status_path(incase_status), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+  </div>
+<% end %>
+

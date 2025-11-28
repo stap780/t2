@@ -1,0 +1,34 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t('.heading') %></h1>
+  <div class="flex space-x-2">
+    <%= search_form_for @search, url: incase_dubls_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+      <%= f.label :unumber_cont, t('.search'), class: "sr-only" %>
+      <%= f.search_field :unumber_cont, value: params.dig(:q, :unumber_cont), placeholder: t('.search'), class: "px-2 py-1 border rounded", style: "width: 350px;" %>
+      <%= f.submit t('.search'), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+      <%= link_to incase_dubls_path, class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t('.clear') do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg shadow divide-y">
+  <div class="grid grid-cols-[170px_170px_150px_150px_150px_150px_100px] gap-2 px-3 py-4 font-medium text-gray-700">
+    <div><%= t('.unumber') %></div>
+    <div><%= t('.company') %></div>
+    <div><%= t('.existing_date') %></div>
+    <div><%= t('.dubl_date') %></div>
+    <div><%= t('.differences') %></div>
+    <div><%= t('.import') %></div>
+    <div></div>
+  </div>
+  <div id="incase_dubls">
+    <% @incase_dubls.each do |incase_dubl| %>
+      <%= render "incase_dubl", incase_dubl: incase_dubl %>
+    <% end %>
+  </div>
+  <%= render "shared/paginate", f: @incase_dubls %>
+</div>
+

@@ -33,6 +33,7 @@ class Product::PriceUpdate
           @error_message << variant.errors.full_messages if variant.errors.present?
         end
       end
+      product.update(title: product.title)
     end
   end
 
@@ -63,5 +64,6 @@ class Product::PriceUpdate
 
     new_price
   end
+
 end
 

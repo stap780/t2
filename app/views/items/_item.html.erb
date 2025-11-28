@@ -1,0 +1,51 @@
+<%= turbo_frame_tag "item_#{turbo_id_for(item)}" do %>
+  <%= fields_for "incase[items_attributes][#{turbo_id_for(item)}]", item do |ff| %>
+    <div id="item_<%= turbo_id_for(item) %>" class="grid grid-cols-[310px_170px_140px_140px_70px_110px_110px_40px] gap-2 py-2 border-t hover:bg-gray-50" data-controller="item-calculator" data-item-calculator-item-id-value="<%= turbo_id_for(item) %>">
+      <% start_title = item.title if item.present? %>
+      <% title_value = item.variant&.product&.title || start_title %>
+      <%= ff.hidden_field :title, value: title_value %>
+      <% start_variant_id = item.variant_id if item.present? %>
+      <% variant_id = start_variant_id %>
+      <% selected = Variant.collection_for_select(variant_id).first if variant_id %>
+      <%= ff.select :variant_id, 
+          options_for_select(Variant.collection_for_select(variant_id), selected: selected),
+          { prompt: '' },
+          { class: "px-2 py-1 border rounded-md text-sm",
+            data: {
+              controller: "slimselect",
+              search_url: search_items_path,
+              nested_url: (incase.new_record? ? update_variant_fields_item_path(id: turbo_id_for(item)) : update_variant_fields_incase_item_path(incase, id: turbo_id_for(item))),
+              turbo_frame: "item_#{turbo_id_for(item)}"
+            } } %>
+      <%= ff.text_field :katnumber, placeholder: t('activerecord.attributes.item.katnumber'), value: item.katnumber, class: "px-2 py-1 border rounded-md" %>
+      <%= ff.text_field :supplier_code, placeholder: t('activerecord.attributes.item.supplier_code'), class: "px-2 py-1 border rounded-md" %>
+      <%= ff.collection_select :item_status_id, ItemStatus.all, :id, :title, { prompt: '', selected: item.item_status_id }, { class: "px-2 py-1 border rounded-md text-sm" } %>
+      <% start_quantity = item.quantity.present? ? item.quantity : 0 %>
+      <%= ff.number_field :quantity, placeholder: t('activerecord.attributes.item.quantity'), 
+          class: "px-2 py-1 border rounded-md", 
+          min: 0,
+          value: start_quantity,
+          data: { 
+            item_calculator_target: "quantity",
+            action: "input->item-calculator#calculate change->item-calculator#calculate"
+          } %>
+      <% start_price = item.price.present? ? item.price : 0 %>
+      <%= ff.number_field :price, placeholder: t('activerecord.attributes.item.price'), 
+          class: "px-2 py-1 border rounded-md", 
+          step: 0.01, 
+          min: 0,
+          value: start_price,
+          data: { 
+            item_calculator_target: "price",
+            action: "input->item-calculator#calculate change->item-calculator#calculate"
+          } %>
+      <%= number_field_tag "item_sum_#{turbo_id_for(item)}", item.sum, 
+          readonly: true, 
+          class: "px-2 py-1 border rounded-md bg-gray-100",
+          data: { item_calculator_target: "sum" } %>
+      <% path = incase.new_record? ? item_path(id: turbo_id_for(item)) : incase_item_path(incase, turbo_id_for(item)) %>
+      <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+      <%= ff.hidden_field :id %>
+    </div>
+  <% end %>
+<% end %>

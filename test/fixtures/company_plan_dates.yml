@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company: one
+  date: 2025-11-22 15:41:02
+
+two:
+  company: two
+  date: 2025-11-22 15:41:02

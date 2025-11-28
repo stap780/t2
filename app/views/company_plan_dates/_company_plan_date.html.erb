@@ -1,0 +1,39 @@
+<% 
+  company = local_assigns[:company] || @company
+  company_type = company.class.name.downcase
+%>
+<%= turbo_frame_tag "company_plan_date_#{turbo_id_for(company_plan_date)}" do %>
+  <%= fields_for "#{company_type}[company_plan_dates_attributes][#{turbo_id_for(company_plan_date)}]", company_plan_date do |f| %>
+    <div class="grid grid-cols-[200px_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50" id="company_plan_date_<%= turbo_id_for(company_plan_date) %>">
+      <!-- Date field -->
+      <div>
+        <%= f.date_field :date, 
+            class: "w-full px-2 py-1 border rounded-md",
+            min: Date.tomorrow.to_s,
+            required: true %>
+      </div>
+      
+      <!-- Comments nested form -->
+      <div>
+        <%= f.fields_for :comments, company_plan_date.comments.present? ? company_plan_date.comments : company_plan_date.comments.build do |comment_form| %>
+          <%= render "company_plan_dates/comment_fields", f: comment_form %>
+        <% end %>
+      </div>
+      
+      <!-- Hidden fields -->
+      <%= f.hidden_field :id %>
+      <%= f.hidden_field :company_id, value: company.persisted? ? company.id : nil %>
+      
+      <!-- Delete button -->
+      <% 
+        if company.persisted?
+          path = company_company_plan_date_path(company, turbo_id_for(company_plan_date))
+        else
+          path = company_plan_date_path(id: turbo_id_for(company_plan_date))
+        end
+      %>
+      <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
+    </div>
+  <% end %>
+<% end %>
+

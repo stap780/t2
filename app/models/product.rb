@@ -27,7 +27,7 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
-  # before_destroy :check_variants_have_relations, prepend: true
+  before_destroy :check_variants_have_items, prepend: true
 
   validates :title, presence: true
 
@@ -163,6 +163,18 @@ class Product < ApplicationRecord
   end
 
   private
+
+  def check_variants_have_items
+    # Проверяем, есть ли Items, которые ссылаются на Variant этого Product
+    variant_ids = variants.pluck(:id)
+    return if variant_ids.empty?
+    
+    items_count = Item.where(variant_id: variant_ids).count
+    if items_count > 0
+      errors.add(:base, "Cannot delete product. There are #{items_count} item(s) that reference this product's variants.")
+      throw(:abort)
+    end
+  end
 
   def check_variants_have_relations
     if variants.size.positive?

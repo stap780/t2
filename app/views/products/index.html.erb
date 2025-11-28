@@ -1,9 +1,9 @@
 <div class="flex items-center justify-between mb-4">
-  <h1 class="text-xl font-semibold"><%= t("products.index.heading") %></h1>
+  <h1 class="text-xl font-semibold"><%= t("products.index.heading") %> <small class="text-sm text-gray-500"><%= @products.count %></small></h1>
   <div class="flex space-x-2">
     <%= search_form_for @search, url: products_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
       <%= f.label :title_or_variants_sku_cont, t("products.index.search_by_title_sku"), class: "sr-only" %>
-      <%= f.search_field :title_or_variants_sku_cont, value: params.dig(:q, :title_cont), placeholder: t("products.index.search_by_title_sku"), class: "px-2 py-1 border rounded", style: "width: 350px;" %>
+      <%= f.search_field :title_or_variants_sku_or_variants_barcode_cont, value: params.dig(:q, :title_cont), placeholder: t("products.index.search_by_title_sku"), class: "px-2 py-1 border rounded", style: "width: 350px;" %>
       <%= f.submit t("products.index.search"), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
       <%= link_to products_path, class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("products.index.clear") do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

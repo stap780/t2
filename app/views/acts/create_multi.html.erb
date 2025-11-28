@@ -1,0 +1,106 @@
+<%= form_with url: update_multi_acts_path, method: :put, local: true, data: { controller: "acts", turbo: false } do |f| %>
+  <div class="max-w-7xl mx-auto">
+    <h1 class="text-2xl font-semibold mb-4"><%= t('.heading') %></h1>
+    
+    <% if @incases_group_by_company_id.present? %>
+      <!-- Таблица с компаниями и позициями -->
+      <% @incases_group_by_company_id.each do |company_id, incases| %>
+        
+        <% company = incases.first.company %>
+        <% metadata = @companies_metadata[company_id] %>
+        
+        <div class="bg-white rounded-lg shadow mb-4">
+        <!-- Заголовок компании с метаданными (цветовой статус уже вычислен на сервере) -->
+        <details class="group" data-company-id="<%= company.id %>">
+          <summary class="p-4 border-b <%= metadata[:status_css] %> cursor-pointer flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <%= check_box_tag "act_datas[#{company.id}][id]", '1', false, { 
+                class: 'company-checkbox',
+                data: { 
+                  action: 'change->acts#toggleCompany',
+                  company_id: company.id
+                },
+                onclick: "event.stopPropagation()"
+              } %>
+              <h3 class="font-semibold"><%= company.short_title %></h3>
+              <span class="text-sm text-gray-600">Округ: <%= company.okrug&.title %></span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-4 text-sm">
+                <span>К-во дет: <strong><%= metadata[:items_quantity] %></strong></span>
+                <span>Долг: <strong><%= metadata[:items_dolg] %></strong></span>
+                <span>Посл. визит: <strong><%= metadata[:last_day] %></strong></span>
+                <% if metadata[:plandate].present? %>
+                  <span>План: <strong><%= metadata[:plandate] %></strong></span>
+                <% end %>
+              </div>
+              <svg class="w-5 h-5 text-gray-500 transform transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </summary>
+          
+          <!-- Заявки и позиции компании -->
+          <div class="p-4">
+            <% incases.each do |incase| %>
+              <div class="mb-4">
+                <div class="font-medium mb-2">
+                  Заявка #<%= incase.id %> (<%= incase.unumber %>)
+                  <% if incase.incase_status.present? %>
+                    <span class="text-sm text-gray-600">- <%= incase.incase_status.title %></span>
+                  <% end %>
+                </div>
+                
+                <%= hidden_field_tag "act_datas[#{company.id}][incases][#{incase.id}][id]", incase.id %>
+                <%= check_box_tag "act_datas[#{company.id}][incases][#{incase.id}][selected]", '1', false, { 
+                  class: 'incase-checkbox',
+                  data: { 
+                    action: 'change->acts#toggleIncase',
+                    incase_id: incase.id,
+                    company_id: company.id,
+                    'incase-checkbox': true
+                  }
+                } %>
+                
+                <div class="ml-6">
+                  <% incase.items.select { |item| @item_status_ids.include?(item.item_status_id.to_s) }.each do |item| %>
+                    <%= hidden_field_tag "act_datas[#{company.id}][incases][#{incase.id}][items][#{item.id}][id]", item.id %>
+                    <label class="flex items-center space-x-2">
+                      <%= check_box_tag "act_datas[#{company.id}][incases][#{incase.id}][items][#{item.id}][selected]", '1', false, { 
+                        class: 'item-checkbox',
+                        data: { 
+                          'item-checkbox': true,
+                          incase_id: incase.id,
+                          company_id: company.id
+                        }
+                      } %>
+                      <span><%= item.title %> (<%= item.katnumber %>)</span>
+                      <span class="text-sm text-gray-600">
+                        - <%= item.item_status&.title || 'Без статуса' %>
+                        (<%= item.updated_at.strftime('%d/%m/%Y') %>)
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </details>
+        </div>
+
+      <% end %>
+      
+      <div class="flex justify-end space-x-3 mt-6">
+        <%= f.submit t('actions.create'), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+        <%= link_to t('actions.cancel'), acts_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+      </div>
+    <% else %>
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+        <p class="text-yellow-800">Не найдено заявок с позициями для выбранных округов и статусов.</p>
+      </div>
+      <div class="flex justify-end space-x-3 mt-6">
+        <%= link_to t('actions.back'), new_act_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

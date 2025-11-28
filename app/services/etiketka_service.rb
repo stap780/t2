@@ -23,6 +23,42 @@ class EtiketkaService
 
   private
 
+  def setup_fonts(pdf)
+    # Настройка шрифтов с поддержкой кириллицы
+    # Используем Verdana из папки public/fonts
+    font_path = Rails.root.join('public', 'fonts')
+    
+    verdana_normal = font_path.join('verdana.ttf').to_s
+    verdana_bold = font_path.join('verdanab.ttf').to_s
+    verdana_italic = font_path.join('verdanai.ttf').to_s
+    
+    # Проверяем наличие шрифтов и используем их, если доступны
+    if File.exist?(verdana_normal)
+      pdf.font_families.update(
+        'Verdana' => {
+          normal: verdana_normal,
+          bold: File.exist?(verdana_bold) ? verdana_bold : verdana_normal,
+          italic: File.exist?(verdana_italic) ? verdana_italic : verdana_normal,
+          bold_italic: File.exist?(verdana_bold) ? verdana_bold : verdana_normal
+        }
+      )
+      @use_cyrillic_font = true
+      Rails.logger.info "Verdana fonts loaded from public/fonts"
+    else
+      # Fallback на Helvetica, если Verdana недоступен
+      pdf.font_families.update(
+        'Helvetica' => {
+          normal: 'Helvetica',
+          bold: 'Helvetica-Bold',
+          italic: 'Helvetica-Oblique',
+          bold_italic: 'Helvetica-BoldOblique'
+        }
+      )
+      @use_cyrillic_font = false
+      Rails.logger.warn "Verdana fonts not found in public/fonts, using Helvetica (no Cyrillic support)"
+    end
+  end
+
   def generate_pdf
     # Точное соответствие параметрам из dizauto:
     # page_height: 41 мм, page_width: 65 мм
@@ -51,6 +87,10 @@ class EtiketkaService
       margin: [margin_top_pt, margin_right_pt, margin_bottom_pt, margin_left_pt],
       page_layout: :portrait
     )
+    
+    # Настройка шрифтов с поддержкой UTF-8
+    # Используем системные шрифты или встроенные шрифты Prawn
+    setup_fonts(pdf)
 
     # Вычисляем доступную высоту для контента (исключая footer)
     footer_height = 10
@@ -58,14 +98,17 @@ class EtiketkaService
 
     # Название продукта (обрезанное до 26 символов) - уменьшаем высоту для экономии места
     product_title = @variant.product.title.to_s[0..25] || ''
-    pdf.text_box product_title, 
-                 at: [pdf.bounds.left, pdf.bounds.top], 
-                 width: pdf.bounds.width,
-                 height: 10,
-                 size: 14, 
-                 align: :center, 
-                 valign: :top,
-                 overflow: :shrink_to_fit
+    font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
+    pdf.font(font_name) do
+      pdf.text_box product_title, 
+                   at: [pdf.bounds.left, pdf.bounds.top], 
+                   width: pdf.bounds.width,
+                   height: 10,
+                   size: 14, 
+                   align: :center, 
+                   valign: :top,
+                   overflow: :shrink_to_fit
+    end
 
     # Штрих-код (PNG изображение) - максимально уменьшаем отступы
     barcode_y = pdf.bounds.top - 12
@@ -73,48 +116,70 @@ class EtiketkaService
     
     if @variant.barcode.present? && @variant.barcode.size == 13
       insert_barcode_image(pdf, barcode_y)
-      # Опускаем числовой код ниже (увеличиваем расстояние с 50 до 60)
-      barcode_text_y = barcode_y - 60
+      # Поднимаем числовой код выше (уменьшаем расстояние)
+      barcode_text_y = barcode_y - 55  # Уменьшили с 55 до 50
     end
 
     # Числовой код штрих-кода (крупным шрифтом)
     if @variant.barcode.present? && barcode_text_y
-      pdf.text_box @variant.barcode.to_s, 
-                   at: [pdf.bounds.left, barcode_text_y], 
-                   width: pdf.bounds.width,
-                   height: 13,
-                   size: 12, 
-                   align: :center, 
-                   valign: :top,
-                   style: :bold,
-                   overflow: :shrink_to_fit
+      font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
+      pdf.font(font_name) do
+        pdf.text_box @variant.barcode.to_s, 
+                     at: [pdf.bounds.left, barcode_text_y], 
+                     width: pdf.bounds.width,
+                     height: 13,
+                     size: 12, 
+                     align: :center, 
+                     valign: :top,
+                     style: :bold,
+                     overflow: :shrink_to_fit
+      end
     end
 
-    # SKU
+    # SKU - размещаем между числовым кодом штрих-кода и footer
     if @variant.sku.present?
-      sku_y = barcode_text_y ? barcode_text_y - 20 : pdf.bounds.top - 60
-      pdf.text_box "Ор.Н. #{@variant.sku}", 
-                   at: [pdf.bounds.left, sku_y], 
-                   width: pdf.bounds.width,
-                   height: 12,
-                   size: 12, 
-                   align: :center, 
-                   valign: :top,
-                   overflow: :shrink_to_fit
+      # Вычисляем позицию SKU: между числовым кодом и footer
+      # Поднимаем SKU выше (уменьшаем отступ от числового кода)
+      if barcode_text_y
+        # SKU ниже числового кода штрих-кода с меньшим отступом (поднимаем выше)
+        sku_y = barcode_text_y - 15
+      else
+        # Размещаем выше footer с достаточным отступом
+        sku_y = footer_height + 20
+      end
+      
+      # Используем кириллицу, если шрифт поддерживает, иначе латиницу
+      sku_text = @use_cyrillic_font ? "Ор.Н. #{@variant.sku}" : "Art.#{@variant.sku}"
+      font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
+      pdf.font(font_name) do
+        pdf.text_box sku_text, 
+                     at: [pdf.bounds.left, sku_y], 
+                     width: pdf.bounds.width,
+                     height: 12,
+                     size: 10, 
+                     align: :center, 
+                     valign: :top,
+                     overflow: :shrink_to_fit
+      end
     end
 
     # Footer (точное соответствие dizauto: font_size: 12, center: 'www.dizauto.ru   84951503437')
-    # Размещаем footer внизу страницы в области margin_bottom
+    # Размещаем footer внизу страницы в области margin_bottom, опускаем ниже
     footer_text = "www.dizauto.ru   84951503437"
     footer_font_size = 12
-    pdf.text_box footer_text, 
-                 at: [pdf.bounds.left, footer_height], 
-                 width: pdf.bounds.width,
-                 height: footer_height,
-                 size: footer_font_size, 
-                 align: :center,
-                 valign: :center,
-                 overflow: :shrink_to_fit
+    # Опускаем footer ниже (уменьшаем высоту позиции)
+    footer_y = footer_height - 9  # Опускаем на 9 точек ниже (было -7)
+    font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
+    pdf.font(font_name) do
+      pdf.text_box footer_text, 
+                   at: [pdf.bounds.left, footer_y], 
+                   width: pdf.bounds.width,
+                   height: footer_height,
+                   size: footer_font_size, 
+                   align: :center,
+                   valign: :center,
+                   overflow: :shrink_to_fit
+    end
 
     pdf.render
   rescue => e

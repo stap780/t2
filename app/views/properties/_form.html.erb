@@ -11,7 +11,7 @@
     <legend class="text-sm font-medium text-gray-700">characteristics Info</legend>
     <%= link_to "Add a Characteristic", 
     property.new_record? ? new_characteristic_path(property_id: nil) : new_property_characteristic_path(property), 
-    data: { turbo_stream: true }, 
+    data: { turbo_stream: "true" }, 
     class: "p-2 rounded-md bg-blue-300 hover:bg-blue-400" %>
   </div>
 

@@ -1,0 +1,6 @@
+<%= turbo_stream.append "offcanvas",
+    partial: "shared/offcanvas_inner",
+    locals: { title: t('items.edit.title', default: "Edit Item") } do %>
+  <%= render "form", item: @item, incase: @incase %>
+<% end %>
+

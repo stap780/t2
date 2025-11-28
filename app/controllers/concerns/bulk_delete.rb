@@ -6,13 +6,14 @@ module BulkDelete
       flash.now[:error] = 'Выберите позиции'
     else
       BulkDeleteJob.perform_later(delete_collection_ids, {
-        model: model.to_s, 
+        model: controller_name, 
         current_user_id: Current.user&.id
       })
       flash.now[:success] = 'Запустили удаление'
     end
     render turbo_stream: [
-      render_turbo_flash
+      render_turbo_flash,
+      turbo_stream.set_unchecked(targets: '.checkboxes')
     ]
   end
 

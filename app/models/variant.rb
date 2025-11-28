@@ -19,7 +19,7 @@ class Variant < ApplicationRecord
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :barcode, length: { minimum: 8, maximum: 13 }, allow_blank: true
+  validates :barcode, length: { minimum: 4, maximum: 13 }, allow_blank: true
   validates :barcode, uniqueness: { allow_blank: true }
 
   def broadcast_target_for_bindings
@@ -36,6 +36,27 @@ class Variant < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     Variant.attribute_names
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["bindings", "etiketka_attachment", "etiketka_blob", "list_items", "product"]
+  end
+
+  # scopes for slimselect
+  scope :for_slimselect, -> { order(:id).limit(8) }
+  scope :selected, ->(id) { where(id: id) }
+
+  def self.collection_for_select(id)
+    collection = id.present? ? (selected(id) + for_slimselect).uniq : for_slimselect
+    collection.map { |var| [var.full_title, var.id] }
+  end
+
+  def full_title
+    "#{barcode} - #{product.title} - #{sku}"
+  end
+
+  def title
+    product.title.to_s
   end
 
   def relation?

@@ -1,0 +1,8 @@
+<%= f.hidden_field :commentable_type, value: 'CompanyPlanDate' %>
+<%= f.hidden_field :commentable_id, value: f.object.commentable_id || '' %>
+<%= f.hidden_field :id %>
+<%= f.text_area :body, 
+    rows: 2,
+    class: "w-full px-2 py-1 border rounded-md",
+    placeholder: t("company_plan_dates.comment_placeholder") %>
+

@@ -1,0 +1,32 @@
+<div class="bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4"><%= t('.heading') %></h1>
+  
+  <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <dt class="text-sm font-medium text-gray-500"><%= t('activerecord.attributes.client.surname') %></dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= @client.surname %></dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-gray-500"><%= t('activerecord.attributes.client.name') %></dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= @client.name %></dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-gray-500"><%= t('activerecord.attributes.client.middlename') %></dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= @client.middlename %></dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-gray-500"><%= t('activerecord.attributes.client.phone') %></dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= @client.phone %></dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-gray-500"><%= t('activerecord.attributes.client.email') %></dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= @client.email %></dd>
+    </div>
+  </dl>
+
+  <div class="mt-6 flex space-x-3">
+    <%= link_to t('actions.edit'), edit_client_path(@client), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+    <%= link_to t('actions.back'), clients_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+  </div>
+</div>
+

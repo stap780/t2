@@ -1,0 +1,50 @@
+<%= form_with model: incase, local: true, data: { controller: "totalsum-calculator" } do |f| %>
+  <%= render "shared/errors", object: incase if incase.errors.any? %>
+
+  <!-- Tabs Navigation -->
+  <div class="bg-white rounded-lg shadow mb-6 w-full min-w-0" data-controller="tabs">
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px" aria-label="Tabs">
+        <button type="button" 
+                data-tabs-target="tab"
+                data-action="click->tabs#switch"
+                data-tab-name="main"
+                class="px-6 py-3 text-sm font-medium text-violet-600 border-b-2 border-violet-600">
+          Основная информация
+        </button>
+        <button type="button" 
+                data-tabs-target="tab"
+                data-action="click->tabs#switch"
+                data-tab-name="comment"
+                class="px-6 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300">
+          Комментарии
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-4 w-full min-w-0">
+      <!-- Main Tab -->
+      <div data-tabs-target="panel" data-tab-name="main" class="tab-panel w-full min-w-0">
+        <div class="space-y-6 w-full min-w-0">
+          <%= render "form_data", f: f, incase: incase %>
+          <%= render "items", f: f, incase: incase %>
+        </div>
+      </div>
+
+      <!-- Comments Tab -->
+      <div data-tabs-target="panel" data-tab-name="comment" class="tab-panel hidden">
+        <%= render "comments", f: f, incase: incase %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопки действий -->
+  <div class="mt-6 flex justify-start space-x-3">
+    <%= f.submit class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo: false } %>
+    <%= link_to t('actions.cancel'), incases_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+  </div>
+<% end %>
+
+
+

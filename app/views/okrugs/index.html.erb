@@ -1,0 +1,20 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t('.heading') %></h1>
+  <div class="flex space-x-2">
+    <%= link_to t('.new'), new_okrug_path, 
+        class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
+        data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+  </div>
+</div>
+<%= turbo_stream_from "okrugs" %>
+<div class="bg-white rounded-lg shadow divide-y">
+  <div class="grid grid-cols-[50px_1fr_150px] gap-4 p-4 font-medium text-gray-700">
+    <div>#</div>
+    <div><%= t('activerecord.attributes.okrug.title') %></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "okrugs" do %>
+    <%= render @okrugs %>
+  <% end %>
+</div>
+

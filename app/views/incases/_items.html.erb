@@ -1,0 +1,28 @@
+<div class="bg-white w-full min-w-0" data-action="itemSumChanged@window->totalsum-calculator#updateTotal">
+  <div class="mb-2 flex items-center justify-between">
+    <legend class="text-sm font-medium text-gray-700"><%= t('activerecord.models.item.few') %></legend>
+    <% path = incase.new_record? ? new_item_path(incase_id: nil) : new_incase_item_path(incase) %>
+    <%= link_to t('items.new.title'), path, data: { turbo_stream: true },
+        class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" %>
+  </div>
+
+  <div class="w-full min-w-0 px-0">
+    <div class="grid grid-cols-[310px_170px_140px_140px_70px_110px_110px_40px] gap-2 p-2 border-t hover:bg-gray-50 font-medium text-gray-700">
+      <div><%= t('activerecord.attributes.item.title') %></div>
+      <div><%= t('activerecord.attributes.item.katnumber') %></div>
+      <div><%= t('activerecord.attributes.item.supplier_code') %></div>
+      <div><%= t('activerecord.attributes.item.item_status_id') %></div>
+      <div><%= t('activerecord.attributes.item.quantity') %></div>
+      <div><%= t('activerecord.attributes.item.price') %></div>
+      <div><%= t('activerecord.attributes.item.sum') %></div>
+      <div></div>
+    </div>
+    
+    <div id="items">
+      <% incase.items.each do |item| %>  
+        <%= render "items/item", item: item, incase: incase %>
+      <% end %>
+    </div>
+  </div>
+</div>
+

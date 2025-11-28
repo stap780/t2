@@ -1,0 +1,94 @@
+<div class="mb-4">
+  <%= link_to t('.back'), incase_imports_path, class: "text-blue-600 hover:underline" %>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-semibold mb-6"><%= t('.heading') %></h1>
+  
+  <div class="space-y-4 mb-6">
+    <div>
+      <span class="font-medium"><%= t('.file') %>:</span>
+      <span><%= @incase_import.file.filename %></span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.status') %>:</span>
+      <span class="px-2 py-1 text-xs font-medium rounded <%= @incase_import.status_color %>">
+        <%= t("incase_imports.status.#{@incase_import.status_before_type_cast}") %>
+      </span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.total_rows') %>:</span>
+      <span><%= @incase_import.total_rows %></span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.success_count') %>:</span>
+      <span class="text-green-600"><%= @incase_import.success_count %></span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.failed_count') %>:</span>
+      <span class="text-red-600"><%= @incase_import.failed_count %></span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.user') %>:</span>
+      <span><%= @incase_import.user.email_address %></span>
+    </div>
+    <div>
+      <span class="font-medium"><%= t('.created_at') %>:</span>
+      <span><%= @incase_import.created_at.strftime('%d.%m.%Y %H:%M') %></span>
+    </div>
+    <% if @incase_import.imported_at.present? %>
+      <div>
+        <span class="font-medium"><%= t('.imported_at') %>:</span>
+        <span><%= @incase_import.imported_at.strftime('%d.%m.%Y %H:%M') %></span>
+      </div>
+    <% end %>
+    <% if @incase_import.error_message.present? %>
+      <div>
+        <span class="font-medium text-red-600"><%= t('.error_message') %>:</span>
+        <span class="text-red-600"><%= @incase_import.error_message %></span>
+      </div>
+    <% end %>
+  </div>
+  
+  <% if @incase_import.has_errors? && @incase_import.import_errors.present? %>
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold mb-4"><%= t('.errors') %></h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"><%= t('.row') %></th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"><%= t('.unumber') %></th>
+              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase"><%= t('.errors') %></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @incase_import.import_errors.each do |error| %>
+              <tr>
+                <td class="px-4 py-2 text-sm"><%= error['row'] %></td>
+                <td class="px-4 py-2 text-sm"><%= error['unumber'] %></td>
+                <td class="px-4 py-2 text-sm text-red-600">
+                  <ul class="list-disc list-inside">
+                    <% error['errors'].each do |err| %>
+                      <li><%= err %></li>
+                    <% end %>
+                  </ul>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+  
+  <% if @incase_import.incase_dubls.any? %>
+    <div class="mt-6">
+      <h2 class="text-lg font-semibold mb-4"><%= t('.dubls') %></h2>
+      <p class="mb-4 text-gray-600"><%= t('.dubls_message', count: @incase_import.incase_dubls.count) %></p>
+      <%= link_to t('.view_dubls'), incase_dubls_path(q: { incase_import_id_eq: @incase_import.id }), 
+          class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+    </div>
+  <% end %>
+</div>
+

@@ -8,17 +8,17 @@ module DownloadExcel
         render_turbo_flash
       ]
     else
+      # puts "controller_name => #{controller_name}"
       # Использовать существующий ExportService или создать новый
       CreateZipXlsxJob.perform_later(excel_collection_ids, {
-        model: model.to_s, 
+        model: controller_name, 
         current_user_id: Current.user&.id
       })
 
-      render turbo_stream: 
-        turbo_stream.update(
-          'offcanvas',
-          template: 'shared/download'
-        )
+      render turbo_stream: [
+        turbo_stream.update('offcanvas',template: 'shared/download'),
+        turbo_stream.set_unchecked(targets: '.checkboxes')
+      ]
     end
   end
 

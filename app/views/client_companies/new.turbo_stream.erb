@@ -1,0 +1,4 @@
+<%= turbo_stream.append "client_companies",
+    partial: "client_companies/client_company",
+    locals: { client_company: @client_company, company: @company } %>
+

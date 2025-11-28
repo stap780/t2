@@ -12,6 +12,15 @@ class ProductPriceUpdateJob < ApplicationJob
       round: round
     }).call
 
+    flash = ActionDispatch::Flash::FlashHash.new
+    flash[:notice] = message
+    Turbo::StreamsChannel.broadcast_update_to(
+      'products',
+      target: 'flash',
+      partial: 'shared/flash',
+      layout: false,
+      locals: {flash: flash}
+    )
     if success
       Rails.logger.info "ProductPriceUpdateJob: Successfully updated prices for #{product_ids.count} products"
       # TODO: Добавить уведомления пользователю через Turbo Streams или Notifications

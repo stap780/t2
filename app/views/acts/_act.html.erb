@@ -1,0 +1,21 @@
+<%= turbo_frame_tag dom_id(act), class: "grid grid-cols-[50px_100px_150px_150px_150px_120px_100px_150px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
+  <div><%= act.id %></div>
+  <div>
+    <%= link_to act.number, act_path(act), class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %>
+  </div>
+  <div class="text-sm text-gray-600"><%= act.date&.strftime('%d.%m.%Y') %></div>
+  <div class="text-sm text-gray-600"><%= act.company&.short_title %></div>
+  <div class="text-sm text-gray-600"><%= act.strah&.short_title %></div>
+  <div>
+    <span class="px-2 py-1 text-xs font-medium rounded" style="background-color: #f3f4f6; color: #6b7280;">
+      <%= act.status %>
+    </span>
+  </div>
+  <div class="text-sm text-gray-600"><%= act.items.count %></div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to "PDF", act_act_path(act, format: :pdf), class: "px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", target: '_blank' %>
+    <%= link_to_edit edit_act_path(act), data: { turbo: false } %>
+    <%= link_to_delete act_path(act), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+  </div>
+<% end %>
+

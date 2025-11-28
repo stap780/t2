@@ -1,0 +1,16 @@
+<%= turbo_frame_tag dom_id(item_status), class: "grid grid-cols-[50px_1fr_100px_200px] gap-4 p-4 border-t hover:bg-gray-50" do %>
+  <div><%= item_status.id %></div>
+  <div>
+    <%= link_to item_status.title, item_status_path(item_status), class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %>
+  </div>
+  <div>
+    <% if item_status.color.present? %>
+      <span class="inline-block w-6 h-6 rounded-full" style="background-color: <%= item_status.color %>"></span>
+    <% end %>
+  </div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to_edit edit_item_status_path(item_status), data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    <%= link_to_delete item_status_path(item_status), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+  </div>
+<% end %>
+

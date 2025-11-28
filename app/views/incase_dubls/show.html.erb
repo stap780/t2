@@ -1,0 +1,143 @@
+<div class="mb-4">
+  <%= link_to t('.back'), incase_dubls_path, class: "text-blue-600 hover:underline" %>
+</div>
+
+<% if @existing_incase.blank? %>
+  <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+    <p class="text-yellow-800"><%= t('.incase_not_found') %></p>
+  </div>
+<% end %>
+
+<div class="grid grid-cols-2 gap-6">
+  <!-- Существующий убыток -->
+  <div class="bg-white rounded-lg shadow border-2 border-blue-500 p-6">
+    <h2 class="text-lg font-semibold mb-4 text-blue-700"><%= t('.existing_incase') %></h2>
+    
+    <% if @existing_incase.present? %>
+      <div class="space-y-3 mb-6">
+        <div>
+          <span class="font-medium"><%= t('.unumber') %>:</span>
+          <span><%= @existing_incase.unumber %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.date') %>:</span>
+          <span><%= @existing_incase.date&.strftime('%d.%m.%Y') %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.company') %>:</span>
+          <span><%= @existing_incase.company&.short_title %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.strah') %>:</span>
+          <span><%= @existing_incase.strah&.short_title %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.carnumber') %>:</span>
+          <span><%= @existing_incase.carnumber %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.modelauto') %>:</span>
+          <span><%= @existing_incase.modelauto %></span>
+        </div>
+        <div>
+          <span class="font-medium"><%= t('.region') %>:</span>
+          <span><%= @existing_incase.region %></span>
+        </div>
+      </div>
+      
+      <h3 class="font-medium mb-2"><%= t('.items') %></h3>
+      <div class="space-y-2">
+        <% @existing_incase.items.each do |item| %>
+          <div class="p-2 bg-gray-50 rounded border">
+            <div class="text-sm"><%= item.title %></div>
+            <div class="text-xs text-gray-600">
+              <%= t('.katnumber') %>: <%= item.katnumber %> | 
+              <%= t('.quantity') %>: <%= item.quantity %> | 
+              <%= t('.price') %>: <%= item.price %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500"><%= t('.no_incase') %></p>
+    <% end %>
+  </div>
+  
+  <!-- Дублирующий убыток -->
+  <div class="bg-white rounded-lg shadow border-2 border-red-500 p-6">
+    <h2 class="text-lg font-semibold mb-4 text-red-700"><%= t('.dubl_incase') %></h2>
+    
+    <div class="space-y-3 mb-6">
+      <div>
+        <span class="font-medium"><%= t('.unumber') %>:</span>
+        <span><%= @incase_dubl.unumber %></span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.date') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:date] %>">
+          <%= @incase_dubl.date&.strftime('%d.%m.%Y') %>
+        </span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.company') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:company_id] %>">
+          <%= @incase_dubl.company&.short_title %>
+        </span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.strah') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:strah_id] %>">
+          <%= @incase_dubl.strah&.short_title %>
+        </span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.carnumber') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:carnumber] %>">
+          <%= @incase_dubl.carnumber %>
+        </span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.modelauto') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:modelauto] %>">
+          <%= @incase_dubl.modelauto %>
+        </span>
+      </div>
+      <div>
+        <span class="font-medium"><%= t('.region') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:region] %>">
+          <%= @incase_dubl.region %>
+        </span>
+      </div>
+    </div>
+    
+    <h3 class="font-medium mb-2"><%= t('.items') %></h3>
+    <%= form_with url: merge_incase_dubl_path(@incase_dubl), method: :post, local: true do |f| %>
+      <div class="space-y-2 mb-4">
+        <% @incase_dubl.incase_item_dubls.each do |item_dubl| %>
+          <div class="p-2 bg-gray-50 rounded border">
+            <label class="flex items-start space-x-2 cursor-pointer">
+              <%= check_box_tag "item_ids[]", item_dubl.id, false, class: "mt-1" %>
+              <div class="flex-1">
+                <div class="text-sm"><%= item_dubl.title %></div>
+                <div class="text-xs text-gray-600">
+                  <%= t('.katnumber') %>: <%= item_dubl.katnumber %> | 
+                  <%= t('.quantity') %>: <%= item_dubl.quantity %> | 
+                  <%= t('.price') %>: <%= item_dubl.price %>
+                </div>
+              </div>
+            </label>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="flex space-x-3">
+        <%= f.submit t('.merge_selected'), class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+        <%# link_to t('.delete_dubl'), incase_dubl_path(@incase_dubl), 
+            method: :delete, 
+            data: { turbo_method: :delete, turbo_confirm: t('.delete_confirm'), turbo: false },
+            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+

@@ -37,6 +37,7 @@ en:
     exports: "Exports"
     products: "Products"
     detals: "Detals"
+    incases: "Incases"
     parameters: "Parameters"
     jobs_monitor: "Jobs Monitor"
     settings: "Settings"
@@ -184,6 +185,27 @@ en:
       moysklad:
         one: "Moysklad"
         other: "Moysklads"
+      incase:
+        one: "Incase"
+        other: "Incases"
+      item:
+        one: "Item"
+        other: "Items"
+      incase_status:
+        one: "Incase Status"
+        other: "Incase Statuses"
+      incase_tip:
+        one: "Incase Type"
+        other: "Incase Types"
+      item_status:
+        one: "Item Status"
+        other: "Item Statuses"
+      company:
+        one: "Company"
+        other: "Companies"
+      comment:
+        one: "Comment"
+        other: "Comments"
     attributes:
       export:
         name: "Name"
@@ -319,6 +341,86 @@ en:
       success: "Feature was successfully updated."
     destroy:
       success: "Feature was successfully destroyed."
+  incases:
+    index:
+      title: "Incases"
+      heading: "Incases"
+      new: "New Incase"
+      search: "Search"
+      clear: "Clear"
+    new:
+      title: "New Incase"
+      heading: "New Incase"
+    edit:
+      title: "Edit Incase"
+      heading: "Edit Incase"
+    show:
+      title: "Incase"
+      heading: "Incase Details"
+    create:
+      success: "Incase successfully created"
+    update:
+      success: "Incase successfully updated"
+    destroy:
+      success: "Incase successfully deleted"
+  incase_statuses:
+    index:
+      title: "Incase Statuses"
+      heading: "Incase Statuses"
+      new: "New Status"
+    new:
+      title: "New Status"
+    edit:
+      title: "Edit Status"
+    create:
+      success: "Status successfully created"
+    update:
+      success: "Status successfully updated"
+    destroy:
+      success: "Status successfully deleted"
+    check_presence_in_incases: "Cannot delete status. There are incases with this status."
+  incase_tips:
+    index:
+      title: "Incase Types"
+      heading: "Incase Types"
+      new: "New Type"
+    new:
+      title: "New Type"
+    edit:
+      title: "Edit Type"
+    create:
+      success: "Type successfully created"
+    update:
+      success: "Type successfully updated"
+    destroy:
+      success: "Type successfully deleted"
+    check_presence_in_incases: "Cannot delete type. There are incases with this type."
+  item_statuses:
+    index:
+      title: "Item Statuses"
+      heading: "Item Statuses"
+      new: "New Status"
+    new:
+      title: "New Status"
+    edit:
+      title: "Edit Status"
+    create:
+      success: "Status successfully created"
+    update:
+      success: "Status successfully updated"
+    destroy:
+      success: "Status successfully deleted"
+  items:
+    new:
+      title: "New Item"
+    edit:
+      title: "Edit Item"
+    create:
+      success: "Item successfully created"
+    update:
+      success: "Item successfully updated"
+    destroy:
+      success: "Item successfully deleted"
   moysklads:
     index:
       title: "Moysklad"

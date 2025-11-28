@@ -7,12 +7,22 @@ ru:
     exports: "Экспорты"
     products: "Товары"
     detals: "Детали"
+    incases: "Заявки"
+    incase_imports: "Импорт убытков"
+    incase_dubls: "Дубли"
+    companies: "Компании"
+    clients: "Клиенты"
     parameters: "Параметры"
     jobs_monitor: "Монитор задач"
     settings: "Настройки"
     insales: "InSales"
     moysklads: "Moysklad"
     users: "Пользователи"
+    incase_statuses: "Статусы заявок"
+    incase_tips: "Типы заявок"
+    item_statuses: "Статусы позиций"
+    okrugs: "Округа"
+    acts: "Акты"
   datetime:
     distance_in_words:
       half_a_minute: "меньше минуты"
@@ -196,6 +206,7 @@ ru:
       time_label: "Время (24ч, шаг 15 минут)"
       daily: "Ежедневно"
   actions:
+    continue: "Продолжить"
     edit: "Редактировать"
     run: "Запустить"
     cancel: "Отмена"
@@ -210,6 +221,9 @@ ru:
     back: "Назад"
     create: "Создать"
     delete: "Удалить"
+    delete_confirm: "Вы уверены?"
+    upload: "Загрузить"
+    view: "Просмотр"
   access_denied: "Доступ запрещён. Требуются права администратора."
   activerecord:
     models:
@@ -263,6 +277,66 @@ ru:
         few: "Варианта"
         many: "Вариантов"
         other: "Вариантов"
+      incase:
+        one: "Заявка"
+        few: "Заявки"
+        many: "Заявок"
+        other: "Заявок"
+      item:
+        one: "Позиция заявки"
+        few: "Позиции заявки"
+        many: "Позиций заявки"
+        other: "Позиций заявки"
+      incase_status:
+        one: "Статус заявки"
+        few: "Статусы заявки"
+        many: "Статусов заявки"
+        other: "Статусов заявки"
+      incase_tip:
+        one: "Тип заявки"
+        few: "Типы заявки"
+        many: "Типов заявки"
+        other: "Типов заявки"
+      item_status:
+        one: "Статус позиции"
+        few: "Статусы позиции"
+        many: "Статусов позиции"
+        other: "Статусов позиции"
+      company:
+        one: "Компания"
+        few: "Компании"
+        many: "Компаний"
+        other: "Компаний"
+      comment:
+        one: "Комментарий"
+        few: "Комментария"
+        many: "Комментариев"
+        other: "Комментариев"
+      client:
+        one: "Клиент"
+        few: "Клиента"
+        many: "Клиентов"
+        other: "Клиентов"
+      client_company:
+        one: "Связь клиента и компании"
+        few: "Связи клиента и компании"
+        many: "Связей клиента и компании"
+        other: "Связей клиента и компании"
+      company_plan_date:
+        one: "Планируемая дата компании"
+        few: "Планируемые даты компании"
+        many: "Планируемых дат компании"
+        other: "Планируемых дат компании"
+      okrug:
+        one: "Округ"
+        few: "Округа"
+        many: "Округов"
+        other: "Округов"
+      act:
+        one: "Акт"
+        few: "Акта"
+        many: "Актов"
+        other: "Актов"
     attributes:
       import:
         name: "Название"
@@ -309,7 +383,164 @@ ru:
         api_key: "API ключ"
         api_password: "API пароль"
         api_link: "API ссылка"
+      incase:
+        region: "Регион"
+        strah_id: "Страховая компания"
+        strah: "Страховая компания"
+        stoanumber: "Номер З/Н"
+        unumber: "Номер убытка"
+        company_id: "Компания"
+        company: "Компания"
+        carnumber: "Номер автомобиля"
+        date: "Дата акта"
+        modelauto: "Модель автомобиля"
+        totalsum: "Сумма"
+        incase_status_id: "Статус"
+        incase_tip_id: "Тип"
+      item:
+        title: "Название"
+        quantity: "Кол-во"
+        katnumber: "Каталожный номер"
+        supplier_code: "Код поставщика"
+        price: "Цена"
+        sum: "Сумма"
+        item_status_id: "Статус позиции"
+        variant_id: "Вариант товара"
+        vat: "НДС"
+      incase_status:
+        title: "Название"
+        color: "Цвет"
+        position: "Позиция"
+      incase_tip:
+        title: "Название"
+        color: "Цвет"
+        position: "Позиция"
+      item_status:
+        title: "Название"
+        color: "Цвет"
+        position: "Позиция"
+      company:
+        title: "Полное название"
+        short_title: "Краткое название"
+        tip: "Тип компании"
+        inn: "ИНН"
+        kpp: "КПП"
+        ur_address: "Юридический адрес"
+        fact_address: "Фактический адрес"
+        ogrn: "ОГРН"
+        okpo: "ОКПО"
+        bik: "БИК"
+        bank_title: "Название банка"
+        bank_account: "Расчётный счёт"
+        info: "Дополнительная информация"
+      comment:
+        body: "Текст комментария"
+        user_id: "Автор"
+      client:
+        surname: "Фамилия"
+        name: "Имя"
+        middlename: "Отчество"
+        phone: "Телефон"
+        email: "Email"
+        insid: "ID InSales"
+      company_plan_date:
+        date: "Дата"
+        company_id: "Компания"
+      okrug:
+        title: "Название"
+        position: "Позиция"
+      act:
+        number: "Номер"
+        date: "Дата"
+        status: "Статус"
+        company_id: "Компания"
+        strah_id: "Страховая компания"
+        okrug_id: "Округ"
+    errors:
+      models:
+        variant: {}
+        item: {}
+        incase:
+          items_required: "Заявка должна содержать хотя бы одну позицию"
+          attributes:
+            company:
+              required: "должна быть выбрана"
+            strah:
+              required: "должна быть выбрана"
+        item_status: {}
+        incase_tip: {}
+        incase_status: {}
+        comment: {}
+        company: {}
+        client: {}
+        client_company: {}
+        company_plan_date: {}
+        moysklad: {}
+        detal: {}
+        product: {}
+        property: {}
+        characteristic: {}
+        feature: {}
+        image: {}
+        varbind: {}
+        insale: {}
+        user: {}
+        import: {}
+        session: {}
+        import_schedule: {}
+        export: {}
+      messages:
+        inclusion: "не включено в список"
+        exclusion: "исключено из списка"
+        invalid: "имеет неверное значение"
+        confirmation: "не совпадает с подтверждением"
+        accepted: "должно быть принято"
+        empty: "не может быть пустым"
+        blank: "должно быть заполнено"
+        present: "должно быть пустым"
+        required: "обязательно для заполнения"
+        too_long: "слишком длинное (не более %{count} символов)"
+        too_short: "слишком короткое (не менее %{count} символов)"
+        wrong_length: "имеет неверную длину (должно быть %{count} символов)"
+        not_a_number: "не является числом"
+        not_an_integer: "должно быть целым числом"
+        greater_than: "должно быть больше %{count}"
+        greater_than_or_equal_to: "должно быть больше или равно %{count}"
+        equal_to: "должно быть равно %{count}"
+        less_than: "должно быть меньше %{count}"
+        less_than_or_equal_to: "должно быть меньше или равно %{count}"
+        other_than: "должно отличаться от %{count}"
+        odd: "должно быть нечётным"
+        even: "должно быть чётным"
+        taken: "уже существует"
+        record_invalid: "Валидация не пройдена: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "Нельзя удалить запись, так как существует зависимая %{record}"
+          has_many: "Нельзя удалить запись, так как существуют зависимые %{record}"
   helpers:
+    label:
+      incase:
+        region: "Регион"
+        strah_id: "Страховая компания"
+        stoanumber: "Номер З/Н"
+        unumber: "Номер убытка"
+        company_id: "Компания"
+        carnumber: "Номер автомобиля"
+        date: "Дата акта"
+        modelauto: "Модель автомобиля"
+        totalsum: "Общая сумма"
+        incase_status_id: "Статус"
+        incase_tip_id: "Тип"
+      item:
+        title: "Название"
+        quantity: "Кол-во"
+        katnumber: "Каталожный номер"
+        supplier_code: "Код поставщика"
+        price: "Цена"
+        sum: "Сумма"
+        item_status_id: "Статус позиции"
+        variant_id: "Вариант товара"
+        vat: "НДС"
     submit:
       saving: "Сохранение..."
       create: "Создать"
@@ -391,7 +622,7 @@ ru:
     index:
       title: "Товары"
       heading: "Товары"
-      search_by_title_sku: "Поиск по названию, артикулу"
+      search_by_title_sku: "Поиск по названию, артикулу, штрихкоду"
       search: "Поиск"
       clear: "Очистить"
       new: "Новый"
@@ -513,3 +744,295 @@ ru:
       success: "Параметр обновлен"
     destroy:
       success: "Параметр удален"
+  incases:
+    index:
+      title: "Заявки"
+      heading: "Заявки"
+      new: "Новый"
+      import: "Импорт"
+      search: "Поиск"
+      clear: "Очистить"
+      ubitok: "Убыток"
+    new:
+      title: "Новая заявка"
+      heading: "Новая заявка"
+    edit:
+      title: "Редактировать заявку"
+      heading: "Редактировать заявку"
+    show:
+      title: "Заявка"
+      heading: "Детали заявки"
+    create:
+      success: "Заявка успешно создана"
+    update:
+      success: "Заявка успешно обновлена"
+    destroy:
+      success: "Заявка успешно удалена"
+    bulk_status:
+      success: "Статусы заявок успешно обновлены"
+    comments:
+      title: "Комментарии"
+      add_comment: "Добавить комментарий"
+      comment_placeholder: "Введите комментарий..."
+      no_comments: "Комментариев пока нет"
+      new:
+        heading: "Новый комментарий"
+      create:
+        success: "Комментарий успешно добавлен"
+      destroy:
+        success: "Комментарий успешно удален"
+  incase_statuses:
+    index:
+      title: "Статусы заявок"
+      heading: "Статусы заявок"
+      new: "Новый статус"
+    new:
+      title: "Новый статус"
+    edit:
+      title: "Редактировать статус"
+    create:
+      success: "Статус успешно создан"
+    update:
+      success: "Статус успешно обновлен"
+    destroy:
+      success: "Статус успешно удален"
+    check_presence_in_incases: "Невозможно удалить статус. Существуют заявки с этим статусом."
+    import: "Импорт"
+  okrugs:
+    index:
+      title: "Округа"
+      heading: "Округа"
+      new: "Новый округ"
+    new:
+      heading: "Новый округ"
+    edit:
+      heading: "Редактировать округ"
+    create:
+      success: "Округ успешно создан"
+    update:
+      success: "Округ успешно обновлен"
+    destroy:
+      success: "Округ успешно удален"
+  acts:
+    index:
+      heading: "Акты"
+      search: "Поиск"
+      new: "Новый акт"
+    new:
+      heading: "Создание акта"
+    form:
+      okrug: "Округ"
+      item_statuses: "Статусы позиций"
+      select_all: "Выбрать всё"
+    create_multi:
+      heading: "Выбор позиций для создания актов"
+    update_multi:
+      success: "Акты успешно созданы"
+  incase_imports:
+    index:
+      heading: "Импорты заявок"
+      new: "Новый импорт"
+      search: "Поиск"
+      clear: "Очистить"
+      file: "Файл"
+      created_at: "Дата создания"
+      status: "Статус"
+      total_rows: "Всего строк"
+      success_count: "Успешно"
+      failed_count: "Ошибок"
+      user: "Пользователь"
+      all_statuses: "Все статусы"
+    new:
+      heading: "Новый импорт заявок"
+      upload_file: "Загрузить файл"
+      or_drag: "или перетащите файл сюда"
+      file_formats: "Поддерживаемые форматы: XLSX, XLS, CSV"
+    show:
+      heading: "Детали импорта"
+      back: "Назад"
+      file: "Файл"
+      status: "Статус"
+      total_rows: "Всего строк"
+      success_count: "Успешно обработано"
+      failed_count: "Ошибок"
+      user: "Пользователь"
+      created_at: "Создан"
+      imported_at: "Завершен"
+      error_message: "Сообщение об ошибке"
+      errors: "Ошибки импорта"
+      row: "Строка"
+      unumber: "Номер дела"
+      dubls: "Дубли"
+      dubls_message: "Найдено %{count} дублей для обработки"
+      view_dubls: "Просмотреть дубли"
+    create:
+      success: "Импорт успешно создан и запущен"
+    destroy:
+      success: "Импорт успешно удален"
+    status:
+      pending: "Ожидает"
+      processing: "Обработка"
+      completed: "Завершен"
+      failed: "Ошибка"
+  incase_dubls:
+    index:
+      heading: "Дубли заявок"
+      search: "Поиск"
+      clear: "Очистить"
+      unumber: "Номер дела"
+      company: "Контрагент"
+      existing_date: "Дата существующего"
+      dubl_date: "Дата дубля"
+      differences: "Отличия"
+      import: "Импорт"
+      has_differences: "Есть отличия"
+    show:
+      back: "Назад"
+      existing_incase: "Существующий убыток"
+      dubl_incase: "Дублирующий убыток"
+      unumber: "Номер дела"
+      date: "Дата"
+      company: "Контрагент"
+      strah: "Страховая компания"
+      carnumber: "Гос номер"
+      modelauto: "Марка и модель"
+      region: "Регион"
+      items: "Позиции"
+      katnumber: "Каталожный номер"
+      quantity: "Количество"
+      price: "Цена"
+      merge_selected: "Добавить выбранные"
+      delete_dubl: "Удалить дубль"
+      delete_confirm: "Вы уверены, что хотите удалить этот дубль?"
+      incase_not_found: "Существующий убыток не найден"
+      no_incase: "Убыток не найден"
+    merge:
+      success: "Успешно добавлено %{count} позиций"
+      incase_not_found: "Существующий убыток не найден"
+      no_items_selected: "Выберите хотя бы одну позицию для добавления"
+      error: "Ошибка при объединении: %{message}"
+    destroy:
+      success: "Дубль успешно удален"
+  incase_tips:
+    index:
+      title: "Типы заявок"
+      heading: "Типы заявок"
+      new: "Новый тип"
+    new:
+      title: "Новый тип"
+    edit:
+      title: "Редактировать тип"
+    create:
+      success: "Тип успешно создан"
+    update:
+      success: "Тип успешно обновлен"
+    destroy:
+      success: "Тип успешно удален"
+    check_presence_in_incases: "Невозможно удалить тип. Существуют заявки с этим типом."
+  item_statuses:
+    index:
+      title: "Статусы позиций"
+      heading: "Статусы позиций"
+      new: "Новый статус"
+    new:
+      title: "Новый статус"
+    edit:
+      title: "Редактировать статус"
+    create:
+      success: "Статус успешно создан"
+    update:
+      success: "Статус успешно обновлен"
+    destroy:
+      success: "Статус успешно удален"
+  items:
+    new:
+      title: "Новая позиция"
+    edit:
+      title: "Редактировать позицию"
+    create:
+      success: "Позиция успешно создана"
+    update:
+      success: "Позиция успешно обновлена"
+    destroy:
+      success: "Позиция успешно удалена"
+  incases/comments:
+    create:
+      success: "Комментарий успешно создан"
+    update:
+      success: "Комментарий успешно обновлен"
+    destroy:
+      success: "Комментарий успешно удален"
+  clients:
+    index:
+      heading: "Клиенты"
+      search: "Поиск"
+      clear: "Очистить"
+      new: "Новый клиент"
+    new:
+      heading: "Новый клиент"
+    edit:
+      heading: "Редактировать клиента"
+    show:
+      heading: "Клиент"
+    create:
+      success: "Клиент успешно создан"
+    update:
+      success: "Клиент успешно обновлён"
+    destroy:
+      success: "Клиент успешно удалён"
+  companies:
+    index:
+      title: "Компании"
+      heading: "Компании"
+      search: "Поиск"
+      clear: "Очистить"
+      new: "Новая компания"
+    new:
+      title: "Новая компания"
+      heading: "Новая компания"
+    edit:
+      title: "Редактировать компанию"
+      heading: "Редактировать компанию"
+    show:
+      title: "Компания"
+      heading: "Детали компании"
+    create:
+      success: "Компания успешно создана"
+    update:
+      success: "Компания успешно обновлена"
+    destroy:
+      success: "Компания успешно удалена"
+    tip:
+      standart: "Стандартная"
+      strah: "Страховая"
+      our: "Наша"
+    form:
+      weekdays_title: "Дни недели для визитов"
+      weekdays_description: "Выберите дни недели, когда компания готова принимать визиты. Конкретные даты можно добавить ниже."
+  weekdays:
+    monday: "Понедельник"
+    tuesday: "Вторник"
+    wednesday: "Среда"
+    thursday: "Четверг"
+    friday: "Пятница"
+    saturday: "Суббота"
+    sunday: "Воскресенье"
+  client_companies:
+    title: "Контакты компании"
+    add_client: "Добавить контакт"
+    select_client: "Выберите контакт"
+    create:
+      success: "Контакт успешно добавлен к компании"
+    destroy:
+      success: "Контакт успешно удалён из компании"
+  company_plan_dates:
+    title: "Планируемые даты"
+    add_date: "Добавить планируемую дату"
+    date: "Дата"
+    comment: "Комментарий"
+    comment_placeholder: "Введите комментарий..."
+    select_date: "Выберите дату"
+    create:
+      success: "Планируемая дата успешно добавлена"
+    destroy:
+      success: "Планируемая дата успешно удалена"

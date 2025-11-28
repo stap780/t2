@@ -101,13 +101,33 @@ export default class extends Controller {
               // Создаем URL объект для правильной обработки параметров
               const urlObj = new URL(nestedUrl, window.location.origin)
               
-              urlObj.searchParams.append("property_id", newVal[0].value)
-              urlObj.searchParams.append("turbo_frame_id", turboFrameId)
-              
-              const productId = this.element.dataset.productId
-              
-              if (productId) {
-                urlObj.searchParams.append("product_id", productId)
+              // Определяем тип параметра по имени поля
+              const fieldName = this.element.name
+              if (fieldName && fieldName.includes('property_id')) {
+                urlObj.searchParams.append("property_id", newVal[0].value)
+                urlObj.searchParams.append("turbo_frame_id", turboFrameId)
+                
+                const productId = this.element.dataset.productId
+                if (productId) {
+                  urlObj.searchParams.append("product_id", productId)
+                }
+              } else if (fieldName && fieldName.includes('variant_id')) {
+                urlObj.searchParams.append("variant_id", newVal[0].value)
+                urlObj.searchParams.append("turbo_frame_id", turboFrameId)
+                
+                const incaseId = this.element.dataset.incaseId
+                if (incaseId) {
+                  urlObj.searchParams.append("incase_id", incaseId)
+                }
+              } else {
+                // Fallback для обратной совместимости
+                urlObj.searchParams.append("property_id", newVal[0].value)
+                urlObj.searchParams.append("turbo_frame_id", turboFrameId)
+                
+                const productId = this.element.dataset.productId
+                if (productId) {
+                  urlObj.searchParams.append("product_id", productId)
+                }
               }
               
               const url = urlObj.pathname + urlObj.search

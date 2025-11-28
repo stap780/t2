@@ -1,0 +1,37 @@
+<%= form_with model: incase_import, local: true, multipart: true do |f| %>
+  <%= render "shared/errors", object: incase_import if incase_import.errors.any? %>
+
+  <div class="space-y-4">
+    <div>
+      <%= f.label :file, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors" 
+           data-controller="file-upload" 
+           data-action="dragover->file-upload#highlight drop->file-upload#handleDrop">
+        <div class="space-y-1 text-center">
+          <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="flex text-sm text-gray-600">
+            <label for="incase_import_file" class="relative cursor-pointer bg-white rounded-md font-medium text-violet-600 hover:text-violet-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-violet-500">
+              <span><%= t('.upload_file') %></span>
+              <%= f.file_field :file, 
+                  accept: ".xlsx,.xls,.csv", 
+                  class: "sr-only",
+                  required: true,
+                  data: { "file-upload-target": "input", action: "change->file-upload#handleFileSelect" } %>
+            </label>
+            <p class="pl-1"><%= t('.or_drag') %></p>
+          </div>
+          <p class="text-xs text-gray-500"><%= t('.file_formats') %></p>
+          <p class="text-xs text-gray-500" data-file-upload-target="filename"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex justify-end space-x-3">
+    <%= f.submit t('actions.upload'), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+    <%= link_to t('actions.cancel'), "#", class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { action: "click->offcanvas#close" } %>
+  </div>
+<% end %>
+

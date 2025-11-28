@@ -23,6 +23,10 @@ gem "bcrypt", "~> 3.1.7"
 # Zip file handling for imports
 gem "rubyzip", "~> 2.3"
 
+# Excel/CSV file parsing for imports
+gem "roo", "~> 2.10"
+gem "csv" # Required for Ruby 3.4+
+
 # Excel file generation for exports
 gem "caxlsx", "~> 4.0"
 gem 'caxlsx_rails'

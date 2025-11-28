@@ -8,3 +8,21 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Prevent content shift when scrollbar appears */
+/* Apply only to main content area with overflow, not globally */
+main.overflow-y-auto {
+  scrollbar-gutter: stable;
+}
+.status-red {
+  background: rgba(255, 0, 0, 0.3);
+}
+.status-green {
+  background: rgba(0, 128, 0, 0.3)
+}
+.status-yellow {
+  background: rgba(255, 255, 0, 0.3);
+}
+.status-graphite {
+  background: rgba(56, 52, 40, 0.18);
+}

@@ -2,13 +2,14 @@ class CreateZipXlsxJob < ApplicationJob
   queue_as :default
 
   def perform(collection_ids, options = {})
-    model = options[:model]
-    items = model.camelize.constantize.where(id: collection_ids)
+    model_name = options[:model] # 'products' or 'detals'
+    model_class = model_name.singularize.camelize.constantize # 'Product' or 'Detal'
+    items = model_class.where(id: collection_ids)
 
-    success, content = ZipXlsxService.new(items, {model: model}).call
+    success, content = ZipXlsxService.new(items, {model: model_name}).call
     message = success ? 'Success' : 'Error'
     Turbo::StreamsChannel.broadcast_update_to(
-      'products',
+      model_name,
       target: 'bulk_dialog',
       partial: 'shared/pending_bulk',
       layout: false,
@@ -16,9 +17,9 @@ class CreateZipXlsxJob < ApplicationJob
     )
 
     if success
-      Rails.logger.info "CreateZipXlsxJob: Success for #{model}: #{collection_ids.count} items"
+      Rails.logger.info "CreateZipXlsxJob: Success for #{model_name}: #{collection_ids.count} items"
     else
-      Rails.logger.error "CreateZipXlsxJob: Failed for #{model}: #{content.inspect}"
+      Rails.logger.error "CreateZipXlsxJob: Failed for #{model_name}: #{content.inspect}"
     end
   end
 end

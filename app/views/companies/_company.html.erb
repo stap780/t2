@@ -1,0 +1,27 @@
+<%= turbo_frame_tag dom_id(company), class: "grid grid-cols-[30px_80px_1fr_150px_200px_200px_150px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+  <div>
+    <%= check_box_tag "company_ids[]", company.id, false, {
+      class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
+      data: { 'selectall_target': 'checkbox', action: "change->selectall#toggleParent"}, 
+      form: :bulk_action_form 
+    } %>
+  </div>
+  <div><%= company.id %></div>
+  <div>
+    <%= link_to company.short_title, edit_company_path(company), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
+  </div>
+  <div>
+    <% if company.tip.present? %>
+      <span class="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-800">
+        <%= t(company.tip, scope: %i[company tip], default: company.tip.humanize) %>
+      </span>
+    <% end %>
+  </div>
+  <div class="text-sm text-gray-600"><%= company.title %></div>
+  <div class="text-sm text-gray-600"><%= company.company_plan_dates_data %></div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to_edit edit_company_path(company), data: { turbo: false } %>
+    <%= link_to_delete company_path(company), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+  </div>
+<% end %>
+

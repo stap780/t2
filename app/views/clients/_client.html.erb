@@ -1,0 +1,21 @@
+<%= turbo_frame_tag dom_id(client), class: "grid grid-cols-[30px_80px_1fr_1fr_1fr_200px_150px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+  <div>
+    <%= check_box_tag "client_ids[]", client.id, false, {
+      class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
+      data: { 'selectall_target': 'checkbox', action: "change->selectall#toggleParent"}, 
+      form: :bulk_action_form 
+    } %>
+  </div>
+  <div><%= client.id %></div>
+  <div><%= client.surname %></div>
+  <div>
+    <%= link_to client.name, edit_client_path(client), class: "text-blue-600 hover:text-blue-800", data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+  </div>
+  <div><%= client.middlename %></div>
+  <div><%= client.email %></div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to_edit edit_client_path(client), data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    <%= link_to_delete client_path(client), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
+  </div>
+<% end %>
+

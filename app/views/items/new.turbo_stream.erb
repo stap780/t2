@@ -1,0 +1,3 @@
+<%= turbo_stream.append "items",
+    partial: "items/item",
+    locals: { item: @item, incase: @incase } %>

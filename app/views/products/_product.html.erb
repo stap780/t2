@@ -18,7 +18,7 @@
   <div>
     <%= link_to product.title, edit_product_path(product), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
   </div>
-  <div><%= product.variants.first.price %></div>
+  <div><%= product.variants&.first&.price %></div>
   <div class="flex justify-end space-x-2">
     <%= link_to_delete product_path(product), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
   </div>

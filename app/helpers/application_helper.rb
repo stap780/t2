@@ -65,6 +65,13 @@ module ApplicationHelper
     end
   end
 
+  def link_to_back(path, **options)
+    options[:class] ||= "text-gray-600 hover:text-gray-900 flex items-center gap-1 text-sm"
+    link_to path, options do
+      raw('<span class="mr-1">&#8592;</span>') + t("common.back")
+    end
+  end
+
   def prepend_flash
     turbo_stream.prepend "our_flash", partial: "shared/flash"
   end

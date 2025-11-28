@@ -1,0 +1,33 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t('.heading') %></h1>
+  <div class="flex space-x-2">
+    <%= search_form_for @search, url: acts_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+      <%= f.search_field :number_cont, placeholder: t('.search'), class: "px-2 py-1 border rounded" %>
+      <%= f.submit t('.search'), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+    <% end %>
+  </div>
+
+  <div class="flex space-x-2 items-center">
+    <%= link_to t('.new'), new_act_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+  </div>
+</div>
+
+<%= turbo_stream_from "acts" %>
+
+<div class="bg-white rounded-lg shadow divide-y">
+  <div class="grid grid-cols-[50px_100px_150px_150px_150px_120px_100px_150px] gap-4 p-4 font-medium text-gray-700">
+    <div>#</div>
+    <div><%= t('activerecord.attributes.act.number') %></div>
+    <div><%= t('activerecord.attributes.act.date') %></div>
+    <div><%= t('activerecord.attributes.act.company_id') %></div>
+    <div><%= t('activerecord.attributes.act.strah_id') %></div>
+    <div><%= t('activerecord.attributes.act.status') %></div>
+    <div>К-во позиций</div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "acts" do %>
+    <%= render @acts %>
+  <% end %>
+  <%= render "shared/paginate", f: @acts %>
+</div>
+

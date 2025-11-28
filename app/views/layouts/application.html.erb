@@ -40,7 +40,7 @@
     <% if Current.user %>
       <%= render "shared/flash" %>
       <!-- Sidebar -->
-      <div class="w-64 bg-gradient-to-b from-violet-600 to-purple-700 flex flex-col">
+      <div class="w-50 bg-gradient-to-b from-violet-600 to-purple-700 flex flex-col">
         <!-- Logo/Brand -->
         <div class="flex items-center flex-shrink-0 px-6 py-4">
           <div class="flex items-center">
@@ -61,7 +61,7 @@
         <nav class="flex-1 px-4 pb-4 space-y-1">
           <!-- Dashboard -->
           <%= link_to dashboard_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == dashboard_path}" do %>
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == dashboard_path}" do %>
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z" />
@@ -69,11 +69,103 @@
             <%= t("nav.dashboard") %>
           <% end %>
 
+          <!-- Incases (collapsible) -->
+          <details class="group" <%= 'open' if request.path.start_with?('/incases') || request.path.start_with?('/incase_imports') || request.path.start_with?('/incase_dubls') %>>
+            <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+              <%= link_to incases_path, 
+                  class: "flex items-center text-sm font-medium text-white" do %>
+                <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <%= t("nav.incases") %>
+              <% end %>
+              <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="mt-1 space-y-1">
+              <%= link_to incase_imports_path,
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_imports')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                </svg>
+                <%= t("nav.incase_imports") %>
+              <% end %>
+              <%= link_to incase_dubls_path,
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_dubls')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                <%= t("nav.incase_dubls") %>
+              <% end %>
+            </div>
+          </details>
+          <!-- Acts -->
+          <%= link_to acts_path,
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/acts')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 8h10m2 11H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2z" />
+            </svg>
+            <%= t("nav.acts") %>
+          <% end %>
+          <!-- Products -->
+          <%= link_to products_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/products')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <%= t("nav.products") %>
+          <% end %>
+
+          <!-- Detals -->
+          <%= link_to detals_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/detals')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <%= t("nav.detals") %>
+          <% end %>
+
+          <!-- Companies -->
+          <%= link_to companies_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/companies')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            <%= t("nav.companies") %>
+          <% end %>
+
+          <!-- Clients -->
+          <%= link_to clients_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/clients')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <%= t("nav.clients") %>
+          <% end %>
+
+          <!-- Parameters (Properties & Characteristics) -->
+          <%= link_to properties_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/properties') || request.path.start_with?('/characteristics')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <%= t("nav.parameters") %>
+          <% end %>
+
+          <!-- Okrugs -->
+          <%= link_to okrugs_path, 
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/okrugs')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <%= t("nav.okrugs") %>
+          <% end %>
           <!-- Imports (collapsible) -->
           <details class="group" <%= 'open' if request.path.start_with?(imports_path) || request.path.start_with?(import_schedules_path) %>>
-            <summary class="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+            <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
               <%= link_to imports_path, 
-                  class: "flex-1 flex items-center text-sm font-medium #{ request.path.start_with?(imports_path) && !request.path.start_with?(import_schedules_path) ? 'text-white' : 'text-white' }" do %>
+                  class: " flex items-center text-sm font-medium #{ request.path.start_with?(imports_path) && !request.path.start_with?(import_schedules_path) ? 'text-white' : 'text-white' }" do %>
                 <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
@@ -85,7 +177,7 @@
             </summary>
             <div class="mt-1 space-y-1">
               <%= link_to import_schedules_path,
-                  class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?(import_schedules_path)}" do %>
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?(import_schedules_path)}" do %>
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -96,43 +188,15 @@
 
           <!-- Exports -->
           <%= link_to exports_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == exports_path}" do %>
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == exports_path}" do %>
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 7l3 3m0 0l-3 3m3-3H9" />
             </svg>
             <%= t("nav.exports") %>
           <% end %>
-
-          <!-- Products -->
-          <%= link_to products_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/products')}" do %>
-            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-            <%= t("nav.products") %>
-          <% end %>
-
-          <!-- Detals -->
-          <%= link_to detals_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/detals')}" do %>
-            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <%= t("nav.detals") %>
-          <% end %>
-
-          <!-- Parameters (Properties & Characteristics) -->
-          <%= link_to properties_path, 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/properties') || request.path.start_with?('/characteristics')}" do %>
-            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <%= t("nav.parameters") %>
-          <% end %>
-
           <!-- Jobs Monitor -->
           <%= link_to "/jobs", 
-              class: "group flex items-center px-3 py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/jobs')}", target: "_blank" do %>
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/jobs')}", target: "_blank" do %>
             <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -142,9 +206,9 @@
 
         <!-- Settings at bottom (collapsible) -->
         <div class="flex-shrink-0 px-4 pb-4">
-          <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/users') %>>
-            <summary class="flex items-center px-3 py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
-              <div class="flex-1 flex items-center text-sm font-medium text-violet-100">
+          <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/users') || request.path.start_with?('/incase_statuses') || request.path.start_with?('/incase_tips') || request.path.start_with?('/item_statuses') %>>
+            <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+              <div class=" flex items-center text-sm font-medium text-violet-100">
                 <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -157,25 +221,46 @@
             </summary>
             <div class="mt-1 space-y-1">
               <%= link_to insales_path,
-                  class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/insales')}" do %>
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/insales')}" do %>
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
                 <%= t("nav.insales") %>
               <% end %>
               <%= link_to moysklads_path,
-                  class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklads')}" do %>
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklads')}" do %>
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                 </svg>
                 <%= t("nav.moysklads") %>
               <% end %>
               <%= link_to users_path,
-                  class: "group flex items-center pl-10 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/users')}" do %>
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/users')}" do %>
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 <%= t("nav.users") %>
+              <% end %>
+              <%= link_to incase_statuses_path,
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_statuses')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                <%= t("nav.incase_statuses", default: "Статусы заявок") %>
+              <% end %>
+              <%= link_to incase_tips_path,
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_tips')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                <%= t("nav.incase_tips", default: "Типы заявок") %>
+              <% end %>
+              <%= link_to item_statuses_path,
+                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/item_statuses')}" do %>
+                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                <%= t("nav.item_statuses", default: "Статусы позиций") %>
               <% end %>
             </div>
           </details>
@@ -199,7 +284,7 @@
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                       </svg>
                       </div>
-                      <input id="search" name="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 sm:text-sm" placeholder="Search" type="search">
+                      <input id="search" name="search" class="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-violet-500 focus:border-violet-500 sm:text-sm" placeholder="Search" type="search">
                     </div>
                     </div>
                 </div>
@@ -214,7 +299,7 @@
                 </button>
 
               <!-- Locale switcher hidden-->
-              <div class="ml-3 flex items-center space-x-1 hidden">
+              <div class="ml-3 flex items-center space-x-1">
                 <% en_active = I18n.locale.to_s == 'en' %>
                 <% ru_active = I18n.locale.to_s == 'ru' %>
                 <%= link_to "EN", url_for(locale: :en),

@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy delete_image sort_image add_image ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image ]
   include ActionView::RecordIdentifier
   include DownloadExcel
   include BulkDelete
@@ -7,7 +7,7 @@ class ProductsController < ApplicationController
   def index
     @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(params[:q])
     @search.sorts = "id desc" if @search.sorts.empty?
-    @products = @search.result(distinct: true).paginate(page: params[:page], per_page: Rails.env.development? ? 30 : 100)
+    @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
 
   def search
@@ -108,49 +108,6 @@ class ProductsController < ApplicationController
     head :ok
   end
 
-  def add_image
-    @image = @product.images.build
-    
-    # Прикрепляем файл из signed_id (Direct Upload)
-    if params[:file].present?
-      @image.file.attach(params[:file])
-    end
-    
-    respond_to do |format|
-      if @image.save
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.append(
-            dom_id(@product, :images),
-            partial: "images/image",
-            locals: { product: @product, image: @image }
-          )
-        end
-        format.json { render json: { success: true, image_id: @image.id }, status: :created }
-      else
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.update(
-            "image-errors",
-            partial: "shared/errors",
-            locals: { object: @image }
-          )
-        end
-        format.json { render json: { success: false, errors: @image.errors.full_messages }, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  def delete_image
-    @image = @product.images.find(params[:image_id])
-    @image.destroy
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.remove(dom_id(@image))
-      end
-      format.html { redirect_to edit_product_path(@product), notice: 'Image deleted.' }
-      format.json { head :no_content }
-    end
-  end
-
   def price_edit
     if params[:product_ids]
       @products = Product.where(id: params[:product_ids])
@@ -192,7 +149,8 @@ class ProductsController < ApplicationController
     if check_destroy == true
       flash.now[:success] = t('.success')
     else
-      flash.now[:notice] = @product.errors.full_messages.join(' ')
+      error_message = @product.errors.full_messages.join(' ')
+      flash.now[:error] = error_message.presence || t('.error')
     end
     respond_to do |format|
       format.turbo_stream do

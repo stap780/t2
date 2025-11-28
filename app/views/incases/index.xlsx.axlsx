@@ -1,0 +1,17 @@
+wb = xlsx_package.workbook
+inc_attributes = Incase.attribute_names
+item_attributes = Item.attribute_names
+all_attributes = inc_attributes + item_attributes
+check_int = ["id","price","quantity","cost_price"]
+wb.add_worksheet(name: "Incase") do |sheet|
+  sheet.add_row all_attributes
+  types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
+  collection.find_each(batch_size: 1000) do |item|
+    inc_values = inc_attributes.map { |attr| item.send(attr) }
+    item.items.each do |it|
+      it_values = item_attributes.map { |attr| it.send(attr) }
+      values = inc_values + it_values
+      sheet.add_row values, types: types
+    end
+  end
+end
