@@ -106,35 +106,14 @@ class Product::ImportSaveData
   end
   
   def find_existing_product
-    product = nil
+    # Поиск только по штрихкоду варианта
+    return nil unless @variant_data[:barcode].present?
     
-    # Поиск по штрихкоду/SKU варианта
-    if @variant_data[:barcode].present? || @variant_data[:sku].present?
-      conditions = []
-      params = {}
-      
-      if @variant_data[:barcode].present?
-        conditions << "variants.barcode = :barcode"
-        params[:barcode] = @variant_data[:barcode]
-      end
-      
-      if @variant_data[:sku].present?
-        conditions << "variants.sku = :sku"
-        params[:sku] = @variant_data[:sku]
-      end
-      
-      variant = Variant.joins(:product)
-                      .where(conditions.join(' OR '), params)
-                      .first
-      product = variant&.product
-    end
+    variant = Variant.joins(:product)
+                    .where(barcode: @variant_data[:barcode])
+                    .first
     
-    # Fallback на поиск по названию
-    if product.nil? && @product_data[:title].present?
-      product = Product.find_by(title: @product_data[:title])
-    end
-    
-    product
+    variant&.product
   end
   
   def prepare_variants_attributes(existing_product)
