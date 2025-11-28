@@ -10,7 +10,7 @@ class BulkDeleteService
     if @error_message.count.positive?
       [false, @error_message]
     else
-      [true, t('bulk_delete.success')]
+      [true, 'Success']
     end
   end
 
