@@ -16,4 +16,4 @@ production:
   
   product_import:
     class: ProductImportJob
-    schedule: at 19:10 every day
+    schedule: at 20:20 every day
