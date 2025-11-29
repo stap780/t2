@@ -7,9 +7,9 @@ class Image < ApplicationRecord
 
   belongs_to :product
   has_one_attached :file do |attachable|
-    attachable.variant :thumb, resize_to_limit: [200, 200]
+    attachable.variant :thumb, resize_to_limit: [400, 400]
     attachable.variant :default, saver: {strip: true}
-    attachable.variant :thumb_webp, resize_to_limit: [200, 200], format: 'webp'
+    attachable.variant :thumb_webp, resize_to_limit: [400, 400], format: 'webp'
   end
   
   validates :position, uniqueness: { scope: :product }

@@ -1,6 +1,7 @@
 <%  signed_id = blob.signed_id
     display_name = blob.filename.to_s
-    blob_path = rails_blob_path(blob, disposition: "attachment") %>
+    blob_path = rails_blob_path(blob, disposition: "attachment") 
+    blob_exists = blob.service.exist?(blob.key) %>
 
 <div id="<%= signed_id %>" 
      class="w-full sm:w-1/3 md:w-1/4 p-2 flex flex-col border border-blue-400 rounded-md shadow-sm bg-white image-item"
@@ -41,14 +42,17 @@
   
   <!-- Изображение -->
   <div class="w-full flex items-center justify-center bg-gray-50 rounded aspect-square mb-2 overflow-hidden" data-original-image-url="<%= img_def_url %>">
-    <% not_uploaded_img = image_id.present? && blob.service.exist?(blob.key) ? blob : nil %>
-    <% img = not_uploaded_img.present? ? blob.variant(:thumb_webp).processed.url : url_for(blob) %>
-    <% if blob.service.exist?(blob.key) %>
+    <% if blob_exists %>
+      <% 
+        # Используем оригинальное изображение для быстрой загрузки
+        # Вариант thumb_webp будет создан асинхронно при необходимости
+        img = url_for(blob)
+      %>
       <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
         <div class="img-ratio__inner w-full h-full">
           <%= picture_tag(class: "block w-full h-full") do %>
             <%= tag(:source, srcset: img) %>
-            <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md") %>
+            <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md", loading: "lazy") %>
           <% end %>
         </div>
       <% end %>

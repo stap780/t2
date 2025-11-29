@@ -8,8 +8,9 @@
   </div>
   <div><%= product.id %></div>
   <div>
-    <% if product.images.first&.file&.attached? %>
-      <%= image_tag product.images.first.file, alt: product.title, class: "w-16 h-16 object-cover rounded" %>
+    <% first_image = product.images.first %>
+    <% if first_image&.file&.attached? %>
+      <%= image_tag first_image.s3_url, alt: product.title, class: "w-16 h-16 object-cover rounded" %>
     <% else %>
       <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No image</div>
     <% end %>

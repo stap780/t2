@@ -13,12 +13,18 @@ class Product::ImportSaveData
     @variant_data = extract_variant_data
     @properties_data = extract_properties_data
     @images_urls = extract_images_urls
+    @msid = normalize_text(@data[:msid] || @data['msid'])
+    @insid = normalize_text(@data[:insid] || @data['insid'])
     @product = nil
+    @existing_variant = nil  # Кэш для найденного варианта
   end
   
   def call
     # Находим или создаем товар одним запросом с nested attributes
     product = find_or_create_product_with_nested
+    
+    # Создаем varbinds для варианта после создания/обновления
+    create_varbinds_for_variant(product) if product.persisted?
     
     {
       success: true,
@@ -109,25 +115,19 @@ class Product::ImportSaveData
     # Поиск только по штрихкоду варианта
     return nil unless @variant_data[:barcode].present?
     
-    variant = Variant.joins(:product)
-                    .where(barcode: @variant_data[:barcode])
-                    .first
+    @existing_variant = Variant.joins(:product)
+                              .where(barcode: @variant_data[:barcode])
+                              .first
     
-    variant&.product
+    @existing_variant&.product
   end
   
   def prepare_variants_attributes(existing_product)
-    return [] if @variant_data[:barcode].blank? && @variant_data[:sku].blank?
+    return [] if @variant_data[:barcode].blank?
     
-    # Если товар существует, ищем существующий вариант
+    # Если товар существует, используем уже найденный вариант (только по штрихкоду)
     if existing_product
-      variant = if @variant_data[:barcode].present?
-                  existing_product.variants.find_by(barcode: @variant_data[:barcode])
-                elsif @variant_data[:sku].present?
-                  existing_product.variants.find_by(sku: @variant_data[:sku])
-                else
-                  nil
-                end
+      variant = @existing_variant
       
       if variant
         # Обновляем существующий вариант
@@ -213,6 +213,36 @@ class Product::ImportSaveData
     characteristic = property.characteristics.find_or_create_by!(title: title)
     @characteristics_cache[cache_key] = characteristic
     characteristic
+  end
+  
+  def create_varbinds_for_variant(product)
+    # Используем уже найденный вариант, если он есть
+    # Иначе ищем вариант в товаре по штрихкоду (после создания/обновления через nested attributes)
+    variant = @existing_variant || (@variant_data[:barcode].present? ? product.variants.find_by(barcode: @variant_data[:barcode]) : nil)
+    
+    return unless variant
+    
+    # Создаем varbind для insid (InSales)
+    if @insid.present?
+      insale = Insale.first
+      if insale
+        variant.bindings.find_or_create_by!(
+          bindable: insale,
+          value: @insid
+        )
+      end
+    end
+    
+    # Создаем varbind для msid (MoySklad)
+    if @msid.present?
+      moysklad = Moysklad.first
+      if moysklad
+        variant.bindings.find_or_create_by!(
+          bindable: moysklad,
+          value: @msid
+        )
+      end
+    end
   end
   
   # Helper методы
