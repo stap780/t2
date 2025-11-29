@@ -4,7 +4,7 @@
     blob_exists = blob.service.exist?(blob.key) %>
 
 <div id="<%= signed_id %>" 
-     class="w-full sm:w-1/3 md:w-1/4 p-2 flex flex-col border border-blue-400 rounded-md shadow-sm bg-white image-item"
+     class="flex flex-col border border-blue-400 rounded-md shadow-sm bg-white image-item flex-grow flex-shrink basis-[calc(33.333%-20px)]"
      data-sort-item-id="<%= image_id%>" 
      data-sort-url="/products/<%= product_id%>/sort_image"
      data-signed-id="<%= signed_id %>" 

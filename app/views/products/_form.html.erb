@@ -128,7 +128,7 @@
         </div>
 
         <!-- Список изображений -->
-        <%= turbo_frame_tag "images", class: "flex flex-wrap gap-3", data: { controller: "sortable" } do %>
+        <%= turbo_frame_tag "images", class: "flex flex-wrap gap-1", data: { controller: "sortable" } do %>
           <%= f.fields_for :images do |form| %>
             <%= render partial: "images/image", 
                 locals: { 
