@@ -14,11 +14,6 @@ class Product::Import
   # Поля варианта
   VARIANT_FIELDS = %w[code article sale_price quantity].freeze
   
-  # Поля параметров
-  PROPERTY_FIELDS = %w[
-    pathname station marka model god detal externalcode dtype diametr shob kotv dotv 
-    vilet analog weight stupica sdiameter stype swidth sratio video guaranty material avitocat_file
-  ].freeze
   
   def initialize
     @created_count = 0

@@ -5,10 +5,10 @@ class Company < ApplicationRecord
   belongs_to :okrug, optional: true
   
   has_many :incases
-  has_many :client_companies
+  has_many :client_companies, dependent: :destroy
   has_many :clients, through: :client_companies
   accepts_nested_attributes_for :client_companies, allow_destroy: true
-  has_many :company_plan_dates
+  has_many :company_plan_dates, dependent: :destroy
   accepts_nested_attributes_for :company_plan_dates, allow_destroy: true
   
   validates :short_title, presence: true
@@ -92,10 +92,10 @@ class Company < ApplicationRecord
   
   def check_relations_present
     if incases.count.positive?
-      errors.add(:base, "Cannot delete Company. You have #{I18n.t('incases')} with it.")
+      errors.add(:base, "Cannot delete Company. You have incases with it.")
     end
     if clients.count.positive?
-      errors.add(:base, "Cannot delete Company. You have #{I18n.t('clients')} with it.")
+      errors.add(:base, "Cannot delete Company. You have clients with it.")
     end
     
     throw(:abort) if errors.present?

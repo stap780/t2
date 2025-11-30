@@ -1,9 +1,31 @@
 class Product::ImportSaveData
-  # Поля параметров
-  PROPERTY_FIELDS = %w[
-    pathname station marka model god detal externalcode dtype diametr shob kotv dotv 
-    vilet analog weight stupica sdiameter stype swidth sratio video guaranty material avitocat_file
-  ].freeze
+  # Маппинг полей CSV на названия свойств (Property)
+  PROPERTY_MAPPING = {
+    'pathname' => 'Путь',
+    'station' => 'Станция',
+    'marka' => 'Марка',
+    'model' => 'Модель',
+    'god' => 'Год',
+    'detal' => 'Деталь',
+    'externalcode' => 'Внешний код',
+    'dtype' => 'Тип диска',
+    'diametr' => 'Диаметр',
+    'shob' => 'Ширина обода',
+    'kotv' => 'К-во отверстий',
+    'dotv' => 'Диаметр отверстий',
+    'vilet' => 'Вылет',
+    'analog' => 'Аналог',
+    'weight' => 'Вес',
+    'stupica' => 'Ступица (DIA)',
+    'sdiameter' => 'Диаметр, дюймы',
+    'stype' => 'Сезонность шин',
+    'swidth' => 'Ширина профиля шины',
+    'sratio' => 'Высота профиля шины',
+    'video' => 'Видео',
+    'guaranty' => 'Гарантия',
+    'material' => 'Материал',
+    'avitocat_file' => 'Avito категория'
+  }.freeze
   
   def initialize(data, properties_cache: {}, characteristics_cache: {})
     @data = data
@@ -59,12 +81,15 @@ class Product::ImportSaveData
   end
   
   def extract_properties_data
-    # Извлечение свойств из данных
+    # Извлечение свойств из данных с использованием маппинга
     properties = {}
-    PROPERTY_FIELDS.each do |field|
-      value = normalize_text(@data[field.to_sym] || @data[field])
-      properties[field] = value if value.present?
+    
+    # Используем маппинг: CSV поле -> Property название
+    PROPERTY_MAPPING.each do |csv_field, property_title|
+      value = normalize_text(@data[csv_field.to_sym] || @data[csv_field])
+      properties[property_title] = value if value.present?
     end
+    
     properties
   end
   

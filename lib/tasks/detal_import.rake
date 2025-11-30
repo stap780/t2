@@ -14,7 +14,15 @@ module DetalJsonImporter
     'sdiameter' => 'Диаметр, дюймы',
     'stype' => 'Сезонность шин',
     'swidth' => 'Ширина профиля шины',
-    'sratio' => 'Высота профиля шины'
+    'sratio' => 'Высота профиля шины',
+    'video' => 'Видео',
+    'guaranty' => 'Гарантия',
+    'material' => 'Материал',
+    'avitocat_code' => 'Avito код',
+    'analog' => 'Аналог',
+    'weight' => 'Вес',
+    'avitocat_name' => 'Avito категория',
+    'avitotype' => 'Avito тип'
   }.freeze
   
   def self.run(url = nil, email = nil, password = nil, page = 1)
