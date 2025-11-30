@@ -7,10 +7,6 @@ class Product::Import
   CSV_URL = 'http://138.197.52.153/exports/products.csv'
   CSV_FILE_PATH = Rails.root.join('..', 'products.csv').to_s
   
-  # Пороги для определения стратегии обработки
-  SYNC_THRESHOLD = 1000    # Синхронная обработка до 1000 товаров
-  SPLIT_THRESHOLD = 10_000 # Разделение CSV при > 10000 товаров
-  BATCH_SIZE = 10          # Размер батча для асинхронной обработки
   
   # Поля товара
   PRODUCT_FIELDS = %w[name description].freeze
@@ -53,20 +49,8 @@ class Product::Import
       # Предзагружаем все Properties и Characteristics в память
       preload_properties_and_characteristics
       
-      # Проверяем, нужно ли разделять файл для очень больших объемов
-      if rows_to_process.count > SPLIT_THRESHOLD
-        # Разделяем CSV на несколько файлов для параллельной обработки
-        split_files = split_csv_if_needed
-        if split_files.present?
-          process_split_files(split_files)
-        else
-          # Если разделение не удалось, обрабатываем как обычно
-          process_rows(rows_to_process)
-        end
-      else
-        # Обычная обработка без разделения
-        process_rows(rows_to_process)
-      end
+      # Обрабатываем все товары асинхронно через Solid Queue
+      process_asynchronously(rows_to_process)
       
       Rails.logger.info "📦 ProductService: Completed. Created: #{@created_count}, Updated: #{@updated_count}, Errors: #{@errors.count}"
       
@@ -130,106 +114,21 @@ class Product::Import
     CSV.parse(safe_content, headers: true)
   end
   
-  def split_csv_if_needed
-    # Определяем путь к файлу для разделения
-    file_path = if Rails.env.development? && File.exist?(CSV_FILE_PATH)
-                  CSV_FILE_PATH
-                else
-                  # Если файл не существует локально, сохраняем загруженный контент во временный файл
-                  temp_file = Rails.root.join('tmp', 'csv_imports', "products-#{Time.now.to_i}.csv").to_s
-                  FileUtils.mkdir_p(File.dirname(temp_file))
-                  File.write(temp_file, @csv_content || load_csv)
-                  temp_file
-                end
-    
-    # Используем SplitCsvFile для разделения
-    Product::SplitCsvFile.new(file_path).call
-  end
-  
-  def process_split_files(split_files)
-    # Обрабатываем каждый разделенный файл асинхронно
-    split_files.each do |file_path|
-      Rails.logger.info "📦 ProductService: Processing split file: #{file_path}"
-      
-      # Парсим разделенный файл
-      rows = CSV.parse(File.read(file_path), headers: true)
-      
-      # Обрабатываем асинхронно
-      process_asynchronously(rows)
-    end
-    
-    Rails.logger.info "📦 ProductService: Processing #{split_files.count} split files"
-  end
-  
-  def process_rows(rows)
-    # Определяем стратегию обработки
-    if rows.count < SYNC_THRESHOLD
-      # Синхронная обработка для маленьких объемов
-      process_synchronously(rows)
-    else
-      # Асинхронная обработка для больших объемов
-      process_asynchronously(rows)
-    end
-  end
-  
-  def process_synchronously(rows)
-    # Синхронная обработка для маленьких объемов (< 1000)
-    rows.each_slice(BATCH_SIZE) do |batch|
-      ActiveRecord::Base.transaction do
-        batch.each_with_index do |row, batch_index|
-          process_product(row, batch_index + 1)
-        end
-      end
-    end
-  end
-  
   def process_asynchronously(rows)
-    # Асинхронная обработка для больших объемов (>= 1000)
-    # Разделяем на батчи и отправляем в очередь
-    rows.each_slice(BATCH_SIZE) do |batch|
+    # Асинхронная обработка через Solid Queue
+    # Отправляем каждый товар отдельно в очередь
+    rows.each_with_index do |row, index|
       # Преобразуем CSV::Row в Hash для сериализации
-      batch_data = batch.map(&:to_h)
+      data = row.to_h
       
       ProductImportBatchJob.perform_later(
-        batch_data,
+        data,
         properties_cache: @properties_cache,
         characteristics_cache: @characteristics_cache
       )
     end
     
-    Rails.logger.info "📦 ProductService: Enqueued #{(rows.count.to_f / BATCH_SIZE).ceil} batch jobs"
-  end
-  
-  def process_product(row, index)
-    begin
-      data = row.to_h
-      result = Product::ImportSaveData.new(
-        data,
-        properties_cache: @properties_cache,
-        characteristics_cache: @characteristics_cache
-      ).call
-      
-      if result[:success]
-        # Загружаем изображения асинхронно (не блокируем основной процесс)
-        if result[:images_urls].present?
-          ProductImageJob.perform_later(result[:product].id, result[:images_urls])
-        end
-        
-        if result[:created]
-          @created_count += 1
-        else
-          @updated_count += 1
-        end
-        
-        Rails.logger.debug "📦 ProductService: Processed product ##{index}: #{result[:product].title}"
-      else
-        @errors << "Row #{index}: #{result[:error]}"
-      end
-    rescue => e
-      error_msg = "Row #{index}: #{e.class} - #{e.message}"
-      Rails.logger.error "📦 ProductService ERROR: #{error_msg}"
-      @errors << error_msg
-    end
+    Rails.logger.info "📦 ProductService: Enqueued #{rows.count} product import jobs"
   end
   
   def preload_properties_and_characteristics

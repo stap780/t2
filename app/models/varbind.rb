@@ -15,12 +15,12 @@ class Varbind < ApplicationRecord
   }
 
   def self.int_types
-    [['insales','Insale'],['avitos','Avito']]
+    [['insales','Insale'],['avitos','Avito'],['moysklads','Moysklad']]
   end
 
   def self.int_ids
     return [] unless defined?(Insale) && Insale.exists?
-    Insale.all.map { |i| ["InSale #{i.id}", i.id] }
+    Insale.all.map { |i| ["InSale #{i.id}", i.id] } + Moysklad.all.map { |m| ["Moysklad #{m.id}", m.id] }
     # Avito.all.map { |a| ["Avito #{a.id}", a.id] }
   end
 

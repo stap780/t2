@@ -8,73 +8,57 @@ class ProductImportBatchJob < ApplicationJob
   # Не повторять при ошибках валидации
   discard_on ActiveRecord::RecordInvalid
   
-  def perform(batch_data, properties_cache: {}, characteristics_cache: {})
-    Rails.logger.info "📦 ProductImportBatchJob: Processing batch of #{batch_data.count} products"
+  def perform(product_data, properties_cache: {}, characteristics_cache: {})
+    # Обрабатываем один товар: данные собираются сразу, товар создаётся/обновляется
+    Rails.logger.info "📦 ProductImportBatchJob: Processing product"
     
-    created_count = 0
-    updated_count = 0
-    errors = []
-    
-    # Обрабатываем батч в одной транзакции для консистентности
-    ActiveRecord::Base.transaction do
-      batch_data.each_with_index do |row, index|
-        begin
-          result = process_single_product(row, properties_cache, characteristics_cache)
-          
-          if result[:success]
-            if result[:created]
-              created_count += 1
-            else
-              updated_count += 1
-            end
-            
-            # Запускаем загрузку изображений асинхронно
-            if result[:images_urls].present?
-              ProductImageJob.perform_later(result[:product].id, result[:images_urls])
-            end
-          else
-            errors << { row: index, error: result[:error] }
-          end
-        rescue => e
-          error_msg = "Row #{index}: #{e.class} - #{e.message}"
-          Rails.logger.error "📦 ProductImportBatchJob ERROR: #{error_msg}"
-          errors << { row: index, error: error_msg }
+    begin
+      result = process_single_product(product_data, properties_cache, characteristics_cache)
+      
+      if result[:success]
+        # Запускаем загрузку изображений асинхронно
+        if result[:images_urls].present?
+          ProductImageJob.perform_later(result[:product].id, result[:images_urls])
         end
+        
+        status = result[:created] ? 'created' : 'updated'
+        Rails.logger.info "📦 ProductImportBatchJob: Product #{status} - #{result[:product].title}"
+        
+        {
+          success: true,
+          created: result[:created],
+          product: result[:product]
+        }
+      else
+        Rails.logger.error "📦 ProductImportBatchJob ERROR: #{result[:error]}"
+        {
+          success: false,
+          error: result[:error]
+        }
       end
+    rescue => e
+      error_msg = "#{e.class} - #{e.message}"
+      Rails.logger.error "📦 ProductImportBatchJob ERROR: #{error_msg}"
+      {
+        success: false,
+        error: error_msg
+      }
     end
-    
-    Rails.logger.info "📦 ProductImportBatchJob: Completed. Created: #{created_count}, Updated: #{updated_count}, Errors: #{errors.count}"
-    
-    {
-      created: created_count,
-      updated: updated_count,
-      errors: errors
-    }
   end
   
   private
   
-  def process_single_product(row, properties_cache, characteristics_cache)
-    # Преобразуем CSV row в hash
-    data = row.is_a?(Hash) ? row : row.to_h
+  def process_single_product(product_data, properties_cache, characteristics_cache)
+    # Данные уже в формате Hash
+    data = product_data.is_a?(Hash) ? product_data : product_data.to_h
     
     # Используем Product::ImportSaveData для обработки
-    result = Product::ImportSaveData.new(
+    # Данные собираются сразу, товар создаётся/обновляется
+    Product::ImportSaveData.new(
       data,
       properties_cache: properties_cache,
       characteristics_cache: characteristics_cache
     ).call
-    
-    if result[:success]
-      {
-        success: true,
-        product: result[:product],
-        created: result[:created],
-        images_urls: result[:images_urls]
-      }
-    else
-      result
-    end
   end
 end
 

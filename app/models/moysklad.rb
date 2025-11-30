@@ -19,5 +19,6 @@ class Moysklad < ApplicationRecord
     end
     message.size.positive? ? [false, message] : [true, ""]
   end
+  
 end
 
