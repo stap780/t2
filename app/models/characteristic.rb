@@ -7,4 +7,9 @@ class Characteristic < ApplicationRecord
 
   validates :title, presence: true
   validates :title, uniqueness: { scope: :property_id }
+
+  def self.ransackable_attributes(auth_object = nil)
+    attribute_names
+  end
+
 end

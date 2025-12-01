@@ -456,6 +456,11 @@ ru:
         company_id: "Компания"
         strah_id: "Страховая компания"
         okrug_id: "Округ"
+      product:
+        title: "Название"
+        description: "Описание"
+        status: "Статус"
+        tip: "Тип"
     errors:
       models:
         variant: {}
@@ -669,6 +674,9 @@ ru:
     index:
       title: "Параметры"
       heading: "Параметры"
+    show:
+      add_characteristic: "Добавить характеристику"
+      search: "Поиск"
     new:
       title: "Новый параметр"
     edit:
@@ -680,6 +688,10 @@ ru:
     destroy:
       success: "Параметр удален"
   characteristics:
+    new:
+      title: "Новая характеристика"
+    edit:
+      title: "Редактировать характеристику"
     create:
       success: "Значение создано"
     update:

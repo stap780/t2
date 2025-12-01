@@ -1,23 +1,26 @@
-<div class="max-w-1xl mx-auto">
-  <div class="flex items-center justify-between mb-4">
-    <h1 class="text-2xl font-semibold"><%= @property.title %></h1>
-    <div class="flex space-x-2">
-      <%# link_to "Edit", edit_property_path(@property), 
-          class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700",
-          data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
-      <%= link_to t("actions.back"), properties_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+  <div class="flex items-center mb-4 gap-4">
+    <%= link_to_back properties_path %>
+    <div class="text-2xl font-semibold"><%= @property.title %> <small class="text-sm text-gray-500"><%= @characteristics.count %></small></div>
+    <div class="ml-auto flex items-center space-x-2">
+      <%= search_form_for @search, url: property_path(@property), method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+        <%= f.search_field :title_cont , placeholder: 'Название', class: "px-2 py-1 border rounded", style: "width: 350px;" %>
+        <%= f.submit t("properties.show.search"), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+        <%= link_to property_path(@property), class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        <% end %>
+      <% end %>
+      <%= link_to t('.add_characteristic'), new_property_characteristic_path(@property), 
+          data: { turbo_frame: :offcanvas }, 
+          class: "p-2 rounded-md bg-blue-300 hover:bg-blue-400" %>
     </div>
   </div>
 
   <div class="bg-white rounded-lg shadow p-6 mb-4">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold">Characteristics</h2>
-      <%= link_to "Add a Characteristic", new_property_characteristic_path(@property), 
-          data: { turbo_frame: :offcanvas }, 
-          class: "p-2 rounded-md bg-blue-300 hover:bg-blue-400" %>
-    </div>
     <%= turbo_frame_tag "property_characteristics" do %>
-      <%= render @property.characteristics, property: @property %>
+      <%= render @characteristics, property: @property %>
+      <%= render "shared/paginate", f: @characteristics %>
     <% end %>
 
   </div>

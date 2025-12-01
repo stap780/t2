@@ -1,7 +1,7 @@
 class Product::ImportSaveData
   # Маппинг полей CSV на названия свойств (Property)
   PROPERTY_MAPPING = {
-    'pathname' => 'Путь',
+    'pathname' => 'Состояние',
     'station' => 'Станция',
     'marka' => 'Марка',
     'model' => 'Модель',
@@ -24,7 +24,9 @@ class Product::ImportSaveData
     'video' => 'Видео',
     'guaranty' => 'Гарантия',
     'material' => 'Материал',
-    'avitocat_file' => 'Avito категория'
+    'avitocat_file' => 'Avito категория',
+    'avitocat_code' => 'Avito код',
+    'avitocat_name' => 'Avito название'
   }.freeze
   
   def initialize(data, properties_cache: {}, characteristics_cache: {})
@@ -35,8 +37,8 @@ class Product::ImportSaveData
     @variant_data = extract_variant_data
     @properties_data = extract_properties_data
     @images_urls = extract_images_urls
-    @msid = normalize_text(@data[:msid] || @data['msid'])
-    @insid = normalize_text(@data[:insid] || @data['insid'])
+    @msid = normalize_text(@data[:msid])
+    @insid = normalize_text(@data[:insid])
     @product = nil
     @existing_variant = nil  # Кэш для найденного варианта
   end
@@ -66,16 +68,18 @@ class Product::ImportSaveData
   
   def extract_product_data
     {
-      title: normalize_text(@data[:title] || @data['name']),
-      description: normalize_text(@data[:description] || @data['description'])
+      # из CSV приходит "name" и "description"
+      title: normalize_text(@data[:title] || @data[:name]),
+      description: normalize_text(@data[:description])
     }
   end
   
   def extract_variant_data
     {
-      barcode: normalize_text(@data[:barcode] || @data['code']),
-      sku: normalize_text(@data[:sku] || @data['article']),
-      price: parse_decimal(@data[:price] || @data['sale_price']),
+      # из CSV приходят "code", "article", "sale_price", "quantity"
+      barcode: normalize_text(@data[:barcode] || @data[:code]),
+      sku: normalize_text(@data[:sku] || @data[:article]),
+      price: parse_decimal(@data[:price] || @data[:sale_price]),
       quantity: parse_integer(@data[:quantity]) || 0
     }
   end
@@ -86,7 +90,8 @@ class Product::ImportSaveData
     
     # Используем маппинг: CSV поле -> Property название
     PROPERTY_MAPPING.each do |csv_field, property_title|
-      value = normalize_text(@data[csv_field.to_sym] || @data[csv_field])
+      # thanks to with_indifferent_access достаточно строкового ключа
+      value = normalize_text(@data[csv_field])
       properties[property_title] = value if value.present?
     end
     
@@ -94,7 +99,7 @@ class Product::ImportSaveData
   end
   
   def extract_images_urls
-    urls_string = normalize_text(@data[:images_urls] || @data['images_urls'])
+    urls_string = normalize_text(@data[:images_urls])
     return [] if urls_string.blank?
     urls_string.split(',').map(&:strip).reject(&:blank?)
   end

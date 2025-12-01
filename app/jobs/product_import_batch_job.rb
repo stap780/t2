@@ -49,8 +49,9 @@ class ProductImportBatchJob < ApplicationJob
   private
   
   def process_single_product(product_data, properties_cache, characteristics_cache)
-    # Данные уже в формате Hash
-    data = product_data.is_a?(Hash) ? product_data : product_data.to_h
+    # Данные уже в формате Hash (от CSV::Row), приводим к HashWithIndifferentAccess,
+    # чтобы можно было обращаться и по строковым, и по символьным ключам
+    data = (product_data.is_a?(Hash) ? product_data : product_data.to_h).with_indifferent_access
     
     # Используем Product::ImportSaveData для обработки
     # Данные собираются сразу, товар создаётся/обновляется

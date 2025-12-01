@@ -58,6 +58,20 @@ class Product < ApplicationRecord
   STATUS = %w[draft active archived].freeze
   TIP = %w[product service kit].freeze
 
+  # Ransack для поиска
+  def self.ransackable_attributes(auth_object = nil)
+    attribute_names
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[associated_audits audits variants images properties features rich_text_description bindings varbinds]
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images]
+  end
+
+
   # Bindable methods
   def broadcast_target_for_bindings
     [self, :bindings]
@@ -141,26 +155,7 @@ class Product < ApplicationRecord
     Product.where('id < ?', id).order(id: :desc).first || Product.last
   end
 
-  # Импорт из файла
-  def self.import_from_file
-    files = Product::SplitCsvFile.call if defined?(Product::SplitCsvFile)
-    files.each do |file|
-      ProductImportCsvJob.perform_later(file) if defined?(ProductImportCsvJob)
-    end
-  end
 
-  # Ransack для поиска
-  def self.ransackable_attributes(auth_object = nil)
-    Product.attribute_names
-  end
-
-  def self.ransackable_associations(auth_object = nil)
-    %w[associated_audits audits variants images properties features rich_text_description bindings varbinds]
-  end
-
-  def self.ransackable_scopes(auth_object = nil)
-    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images]
-  end
 
   private
 
@@ -254,4 +249,5 @@ class Product < ApplicationRecord
 
     [true, { product: self, variant: variant }]
   end
+  
 end

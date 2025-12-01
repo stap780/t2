@@ -36,7 +36,7 @@ class Product::Import
       rows = parse_csv(@csv_content)
       
       # В development режиме ограничиваем до 300 товаров
-      limit = Rails.env.development? ? 50 : rows.count
+      limit = Rails.env.development? ? 100 : rows.count
       rows_to_process = rows.first(limit)
       
       Rails.logger.info "📦 ProductService: Processing #{rows_to_process.count} products (limit: #{limit})"
