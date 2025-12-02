@@ -1,6 +1,8 @@
 class ProductImportBatchJob < ApplicationJob
   queue_as :product_import
   
+  LOGGER = Logger.new(Rails.root.join("log", "product_import.log"))
+  
   # Retry при временных ошибках
   retry_on ActiveRecord::Deadlocked, wait: 5.seconds, attempts: 3
   retry_on ActiveRecord::LockWaitTimeout, wait: 5.seconds, attempts: 3
@@ -16,7 +18,7 @@ class ProductImportBatchJob < ApplicationJob
     batch_size = products.size
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-    Rails.logger.info "📦 ProductImportBatchJob: Processing batch of #{batch_size} products"
+    LOGGER.info "📦 ProductImportBatchJob: Processing batch of #{batch_size} products"
 
     products.each_with_index do |data, index|
       begin
@@ -29,18 +31,18 @@ class ProductImportBatchJob < ApplicationJob
           end
 
           status = result[:created] ? 'created' : 'updated'
-          Rails.logger.info "📦 ProductImportBatchJob: [#{index + 1}/#{batch_size}] Product #{status} - #{result[:product].title}"
+          LOGGER.info "📦 ProductImportBatchJob: [#{index + 1}/#{batch_size}] Product #{status} - #{result[:product].title}"
         else
-          Rails.logger.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{result[:error]}"
+          LOGGER.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{result[:error]}"
         end
       rescue => e
         error_msg = "#{e.class} - #{e.message}"
-        Rails.logger.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{error_msg}"
+        LOGGER.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{error_msg}"
       end
     end
 
     duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
-    Rails.logger.info "📦 ProductImportBatchJob: Finished batch of #{batch_size} products in #{(duration * 1000).round}ms"
+    LOGGER.info "📦 ProductImportBatchJob: Finished batch of #{batch_size} products in #{(duration * 1000).round}ms"
   end
   
   private

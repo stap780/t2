@@ -18,12 +18,8 @@ class Product::Import
   
   
   def initialize
-    @created_count = 0
-    @updated_count = 0
-    @errors = []
-    # Кэш для Properties и Characteristics (избегаем N+1 запросов)
-    @properties_cache = {}
-    @characteristics_cache = {}
+    @enqueued_jobs = 0
+    @enqueued_products = 0
   end
   
   def call
@@ -38,7 +34,7 @@ class Product::Import
       rows = parse_csv(@csv_content)
       
       # В development режиме ограничиваем до 100 товаров
-      limit = Rails.env.development? ? 100 : 100 #rows.count
+      limit = Rails.env.development? ? 100 : 1000 #rows.count
       rows_to_process = rows.first(limit)
       
       LOGGER.info "📦 ProductService: Processing #{rows_to_process.count} products (limit: #{limit})"
@@ -46,14 +42,13 @@ class Product::Import
       # Обрабатываем все товары асинхронно через Solid Queue
       process_asynchronously(rows_to_process)
       
-      LOGGER.info "📦 ProductService: Completed. Created: #{@created_count}, Updated: #{@updated_count}, Errors: #{@errors.count}"
+      LOGGER.info "📦 ProductService: Completed. Enqueued #{@enqueued_jobs} jobs for #{@enqueued_products} products"
       
       {
         success: true,
-        created: @created_count,
-        updated: @updated_count,
-        errors: @errors.count,
-        error_details: @errors
+        enqueued_jobs: @enqueued_jobs,
+        enqueued_products: @enqueued_products,
+        message: "Enqueued #{@enqueued_jobs} jobs for #{@enqueued_products} products. Check job logs for actual created/updated counts."
       }
     rescue => e
       LOGGER.error "📦 ProductService ERROR: #{e.class} - #{e.message}"
@@ -62,9 +57,8 @@ class Product::Import
       {
         success: false,
         error: "#{e.class}: #{e.message}",
-        created: @created_count,
-        updated: @updated_count,
-        errors: @errors.count
+        enqueued_jobs: @enqueued_jobs,
+        enqueued_products: @enqueued_products
       }
     end
   end
@@ -119,6 +113,9 @@ class Product::Import
       ProductImportBatchJob.perform_later(batch_data)
       batch_count += 1
     end
+    
+    @enqueued_jobs = batch_count
+    @enqueued_products = total_rows
     
     LOGGER.info "📦 ProductService: Enqueued #{batch_count} product import jobs for #{total_rows} products (batch size: #{JOB_BATCH_SIZE})"
   end
