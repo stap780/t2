@@ -8,42 +8,39 @@ class ProductImportBatchJob < ApplicationJob
   # Не повторять при ошибках валидации
   discard_on ActiveRecord::RecordInvalid
   
+  # product_data может быть:
+  # - Hash (один товар) — для совместимости со старыми job'ами
+  # - Array<Hash> (батч товаров) — новый формат
   def perform(product_data, properties_cache: {}, characteristics_cache: {})
-    # Обрабатываем один товар: данные собираются сразу, товар создаётся/обновляется
-    Rails.logger.info "📦 ProductImportBatchJob: Processing product"
-    
-    begin
-      result = process_single_product(product_data, properties_cache, characteristics_cache)
-      
-      if result[:success]
-        # Запускаем загрузку изображений асинхронно
-        if result[:images_urls].present?
-          ProductImageJob.perform_later(result[:product].id, result[:images_urls])
+    products = product_data.is_a?(Array) ? product_data : [product_data]
+    batch_size = products.size
+    started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+    Rails.logger.info "📦 ProductImportBatchJob: Processing batch of #{batch_size} products"
+
+    products.each_with_index do |data, index|
+      begin
+        result = process_single_product(data, properties_cache, characteristics_cache)
+
+        if result[:success]
+          # Запускаем загрузку изображений асинхронно
+          if result[:images_urls].present?
+            ProductImageJob.perform_later(result[:product].id, result[:images_urls])
+          end
+
+          status = result[:created] ? 'created' : 'updated'
+          Rails.logger.info "📦 ProductImportBatchJob: [#{index + 1}/#{batch_size}] Product #{status} - #{result[:product].title}"
+        else
+          Rails.logger.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{result[:error]}"
         end
-        
-        status = result[:created] ? 'created' : 'updated'
-        Rails.logger.info "📦 ProductImportBatchJob: Product #{status} - #{result[:product].title}"
-        
-        {
-          success: true,
-          created: result[:created],
-          product: result[:product]
-        }
-      else
-        Rails.logger.error "📦 ProductImportBatchJob ERROR: #{result[:error]}"
-        {
-          success: false,
-          error: result[:error]
-        }
+      rescue => e
+        error_msg = "#{e.class} - #{e.message}"
+        Rails.logger.error "📦 ProductImportBatchJob ERROR: [#{index + 1}/#{batch_size}] #{error_msg}"
       end
-    rescue => e
-      error_msg = "#{e.class} - #{e.message}"
-      Rails.logger.error "📦 ProductImportBatchJob ERROR: #{error_msg}"
-      {
-        success: false,
-        error: error_msg
-      }
     end
+
+    duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
+    Rails.logger.info "📦 ProductImportBatchJob: Finished batch of #{batch_size} products in #{(duration * 1000).round}ms"
   end
   
   private

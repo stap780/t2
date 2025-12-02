@@ -6,6 +6,8 @@ require 'open-uri'
 class Product::Import
   CSV_URL = 'http://138.197.52.153/exports/products.csv'
   CSV_FILE_PATH = Rails.root.join('..', 'products.csv').to_s
+  JOB_BATCH_SIZE = 50
+  LOGGER = Logger.new(Rails.root.join("log", "product_import.log"))
   
   
   # Поля товара
@@ -26,9 +28,9 @@ class Product::Import
   
   def call
     if Rails.env.development?
-      Rails.logger.info "📦 ProductService: Starting import from local file #{CSV_FILE_PATH}"
+      LOGGER.info "📦 ProductService: Starting import from local file #{CSV_FILE_PATH}"
     else
-      Rails.logger.info "📦 ProductService: Starting import from #{CSV_URL}"
+      LOGGER.info "📦 ProductService: Starting import from #{CSV_URL}"
     end
     
     begin
@@ -36,18 +38,15 @@ class Product::Import
       rows = parse_csv(@csv_content)
       
       # В development режиме ограничиваем до 100 товаров
-      limit = Rails.env.development? ? 100 : rows.count
+      limit = Rails.env.development? ? 100 : 100 #rows.count
       rows_to_process = rows.first(limit)
       
-      Rails.logger.info "📦 ProductService: Processing #{rows_to_process.count} products (limit: #{limit})"
-      
-      # Предзагружаем все Properties и Characteristics в память
-      preload_properties_and_characteristics
+      LOGGER.info "📦 ProductService: Processing #{rows_to_process.count} products (limit: #{limit})"
       
       # Обрабатываем все товары асинхронно через Solid Queue
       process_asynchronously(rows_to_process)
       
-      Rails.logger.info "📦 ProductService: Completed. Created: #{@created_count}, Updated: #{@updated_count}, Errors: #{@errors.count}"
+      LOGGER.info "📦 ProductService: Completed. Created: #{@created_count}, Updated: #{@updated_count}, Errors: #{@errors.count}"
       
       {
         success: true,
@@ -57,8 +56,8 @@ class Product::Import
         error_details: @errors
       }
     rescue => e
-      Rails.logger.error "📦 ProductService ERROR: #{e.class} - #{e.message}"
-      Rails.logger.error e.backtrace.join("\n")
+      LOGGER.error "📦 ProductService ERROR: #{e.class} - #{e.message}"
+      LOGGER.error e.backtrace.join("\n")
       
       {
         success: false,
@@ -111,30 +110,17 @@ class Product::Import
   
   def process_asynchronously(rows)
     # Асинхронная обработка через Solid Queue
-    # Отправляем каждый товар отдельно в очередь
-    rows.each_with_index do |row, index|
-      # Преобразуем CSV::Row в Hash для сериализации
-      data = row.to_h
-      
-      ProductImportBatchJob.perform_later(
-        data,
-        properties_cache: @properties_cache,
-        characteristics_cache: @characteristics_cache
-      )
+    # Группируем строки в батчи, чтобы уменьшить количество job'ов
+    total_rows = rows.size
+    batch_count = 0
+
+    rows.each_slice(JOB_BATCH_SIZE) do |batch|
+      batch_data = batch.map(&:to_h)
+      ProductImportBatchJob.perform_later(batch_data)
+      batch_count += 1
     end
     
-    Rails.logger.info "📦 ProductService: Enqueued #{rows.count} product import jobs"
-  end
-  
-  def preload_properties_and_characteristics
-    # Предзагружаем все существующие Properties и Characteristics в память
-    Property.includes(:characteristics).find_each do |property|
-      @properties_cache[property.title] = property
-      property.characteristics.each do |characteristic|
-        cache_key = "#{property.id}_#{characteristic.title}"
-        @characteristics_cache[cache_key] = characteristic
-      end
-    end
+    LOGGER.info "📦 ProductService: Enqueued #{batch_count} product import jobs for #{total_rows} products (batch size: #{JOB_BATCH_SIZE})"
   end
   
   def normalize_text(text)

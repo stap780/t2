@@ -31,8 +31,12 @@ class Product::ImportSaveData
   
   def initialize(data, properties_cache: {}, characteristics_cache: {})
     @data = data
-    @properties_cache = properties_cache
-    @characteristics_cache = characteristics_cache
+
+    # Если нам не передали кэши (или передали пустые), используем
+    # кэш, общий для процесса воркера, чтобы не гонять их через аргументы job'ов.
+    default_properties_cache, default_characteristics_cache = self.class.load_caches
+    @properties_cache = properties_cache.presence || default_properties_cache
+    @characteristics_cache = characteristics_cache.presence || default_characteristics_cache
     @product_data = extract_product_data
     @variant_data = extract_variant_data
     @properties_data = extract_properties_data
@@ -243,6 +247,31 @@ class Product::ImportSaveData
     characteristic = property.characteristics.find_or_create_by!(title: title)
     @characteristics_cache[cache_key] = characteristic
     characteristic
+  end
+
+  # Кэш свойств и характеристик на уровне процесса воркера
+  def self.load_caches
+    if defined?(@@properties_cache) && @@properties_cache.present? &&
+       defined?(@@characteristics_cache) && @@characteristics_cache.present?
+      return [@@properties_cache, @@characteristics_cache]
+    end
+
+    properties_cache = {}
+    characteristics_cache = {}
+
+    Property.includes(:characteristics).find_each do |property|
+      properties_cache[property.title] = property
+
+      property.characteristics.each do |characteristic|
+        cache_key = "#{property.id}_#{characteristic.title}"
+        characteristics_cache[cache_key] = characteristic
+      end
+    end
+
+    @@properties_cache = properties_cache
+    @@characteristics_cache = characteristics_cache
+
+    [@@properties_cache, @@characteristics_cache]
   end
   
   def create_varbinds_for_variant(product)

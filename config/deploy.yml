@@ -66,6 +66,7 @@ aliases:
   shell: app exec --interactive --reuse "bash"
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
+  product_import_logs: app exec --interactive
 
 
 # Use a persistent storage volume for sqlite database files and local Active Storage files.
