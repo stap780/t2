@@ -124,6 +124,12 @@ class Product::ImportSaveData
         features_attributes: features_attrs
       }
       
+      # Обновляем название, если оно изменилось
+      if @product_data[:title].present? && 
+         product.title != @product_data[:title]
+        update_attrs[:title] = @product_data[:title]
+      end
+      
       # Обновляем описание, если оно изменилось
       if @product_data[:description].present? && 
          product.description.to_plain_text != @product_data[:description]

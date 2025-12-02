@@ -42,19 +42,26 @@
   
   <!-- Изображение -->
   <div class="w-full flex items-center justify-center bg-gray-50 rounded aspect-square mb-2 overflow-hidden" data-original-image-url="<%= img_def_url %>">
-    <% if blob_exists %>
+    <% if img_def_url.present? %>
       <% 
-        # Используем оригинальное изображение для быстрой загрузки
-        # Вариант thumb_webp будет создан асинхронно при необходимости
-        img = url_for(blob)
+        # Пытаемся получить URL изображения
+        # Используем img_def_url как fallback, если url_for не работает
+        begin
+          img = blob.present? ? url_for(blob) : img_def_url
+        rescue => e
+          # Fallback на img_def_url если url_for не работает
+          img = img_def_url
+        end
       %>
-      <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
-        <div class="img-ratio__inner w-full h-full">
-          <%= picture_tag(class: "block w-full h-full") do %>
-            <%= tag(:source, srcset: img) %>
-            <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md", loading: "lazy") %>
-          <% end %>
-        </div>
+      <% if img.present? %>
+        <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
+          <div class="img-ratio__inner w-full h-full">
+            <%= picture_tag(class: "block w-full h-full") do %>
+              <%= tag(:source, srcset: img) %>
+              <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md", loading: "lazy") %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   </div>
