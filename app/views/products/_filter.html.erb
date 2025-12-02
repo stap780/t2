@@ -1,0 +1,96 @@
+<%= search_form_for @search, html: { class: 'bg-white rounded-lg shadow p-4 mb-4', data: { controller: "filter", turbo_frame: '_top' }  } do |f| %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+        <%= f.label :variants_sku_or_variants_barcode_or_title_cont_all, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.search_field :variants_sku_or_variants_barcode_or_title_cont_all, value: params.dig(:q, :variants_sku_or_variants_barcode_or_title_cont_all), class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+        </div>
+
+        <div data-controller="checkbox">
+            <div class="block text-sm font-medium text-gray-700 mb-1"><%= t('quantity') %></div>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center space-x-2">
+                <%= f.check_box :all_quantity, {
+                        checked: params.dig('q', 'all_quantity') == '1',
+                        class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                        data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                    } %>
+                <%= f.label :all_quantity, 'all', class: 'text-sm text-gray-700' %>
+                </div>
+                <div class="flex items-center space-x-2">
+                <%= f.check_box :no_quantity, {
+                        checked: params.dig('q', 'no_quantity') == '1',
+                        class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                        data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                    } %>
+                <%= f.label :no_quantity, '= 0', class: 'text-sm text-gray-700' %>
+                </div>
+                <div class="flex items-center space-x-2" <%= params.dig('q', 'yes_quantity') %> >
+                <%= f.check_box :yes_quantity, {
+                        checked: params.dig('q', 'yes_quantity') == '1',
+                        include_hidden: false,
+                        class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                        data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                    } %>
+                <%= f.label :yes_quantity, '> 0', class: 'text-sm text-gray-700' %>
+                </div>
+            </div>
+        </div>
+
+        <div data-controller="checkbox">
+        <div class="block text-sm font-medium text-gray-700 mb-1"><%= t('price') %></div>
+        <div class="flex flex-wrap gap-4">
+            <div class="flex items-center space-x-2">
+            <%= f.check_box :no_price, {
+                    checked: params.dig('q', 'no_price') == '1',
+                    class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                    data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                } %>
+            <%= f.label :no_price, '= 0', class: 'text-sm text-gray-700' %>
+            </div>
+            <div class="flex items-center space-x-2">
+            <%= f.check_box :yes_price, {
+                    checked: params.dig('q', 'yes_price') == '1',
+                    class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                    data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                } %>
+            <%= f.label :yes_price, '> 0', class: 'text-sm text-gray-700' %>
+            </div>
+        </div>
+        </div>
+
+        <div>
+        <div class="block text-sm font-medium text-gray-700 mb-1"><%= t('created_at') %></div>
+        <%= f.search_field :created_at_datebegin, value: params.dig(:q, :created_at_datebegin), placeholder: 'создан от', class: "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-pointer", autocomplete: "off", data: { controller: 'flatpickr', flatpickr_alt_input: "true", flatpickr_alt_format: "d-m-Y" } %>
+        </div>
+        <div>
+        <%= f.label :status_eq, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :status_eq, Product::STATUS, { prompt: '', selected: params.dig(:q, :status_eq) }, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+        </div>
+        <div data-controller="checkbox">
+        <div class="block text-sm font-medium text-gray-700 mb-1">Images</div>
+        <div class="flex flex-wrap gap-4">
+            <div class="flex items-center space-x-2">
+            <%= f.check_box :with_images, {
+                    checked: params.dig('q', 'with_images') == '1',
+                    class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                    data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                } %>
+            <%= f.label :with_images, 'есть', class: 'text-sm text-gray-700' %>
+            </div>
+            <div class="flex items-center space-x-2">
+            <%= f.check_box :without_images, {
+                    checked: params.dig('q', 'without_images') == '1',
+                    class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                    data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                } %>
+            <%= f.label :without_images, 'нет', class: 'text-sm text-gray-700' %>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+        <%= f.submit "Применить", class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+        <%= link_to "Очистить", products_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo_frame: '_top' } %>
+    </div>
+<% end %>

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       post :price_update
       post :download
       post :bulk_delete
+      get :filter
     end
     member do
       post :copy

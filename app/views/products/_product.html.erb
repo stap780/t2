@@ -16,8 +16,10 @@
     <% end %>
   </div>
   <div><%= product.status %></div>
-  <div>
+  <div class="flex flex-col">
     <%= link_to product.title, edit_product_path(product), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
+    <div class="text-xs text-gray-500"><%= product.variants&.first&.sku %></div>
+    <div class="text-xs text-gray-500"><%= product.variants&.first&.barcode %></div>
   </div>
   <div><%= product.variants&.first&.price %></div>
   <div class="flex justify-end space-x-2">

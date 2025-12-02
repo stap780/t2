@@ -8,8 +8,6 @@ class ProductsController < ApplicationController
     @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(params[:q])
     @search.sorts = "id desc" if @search.sorts.empty?
     @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
-    # Предзагружаем первый image для каждого продукта
-    @products.each { |p| p.images.first&.file&.attached? }
   end
 
   def search
@@ -34,6 +32,12 @@ class ProductsController < ApplicationController
     @product.images.includes([:file_attachment, :file_blob])
     @features = @product.features
     @variants = @product.variants.order(id: :asc)
+  end
+
+  def filter
+    @search = Product.ransack(params[:q])
+    @search.sorts = "id desc" if @search.sorts.empty?
+    @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
 
   def create
