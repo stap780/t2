@@ -17,7 +17,9 @@
   </div>
   <div><%= product.status %></div>
   <div class="flex flex-col">
-    <%= link_to product.title, edit_product_path(product), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
+    <div>
+      <%= link_to product.title, edit_product_path(product), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
+    </div>
     <div class="text-xs text-gray-500"><%= product.variants&.first&.sku %></div>
     <div class="text-xs text-gray-500"><%= product.variants&.first&.barcode %></div>
   </div>
