@@ -52,6 +52,8 @@ Rails.application.routes.draw do
     resources :variants do
       member do
         get :print_etiketka
+        get :edit_price_inline
+        patch :update_price_inline
       end
     end
     resources :varbinds, only: [:new, :create, :edit, :update, :destroy]

@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[30px_40px_80px_80px_1fr_120px_120px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[20px_50px_80px_80px_1fr_120px_120px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
   <div>
     <%= check_box_tag "product_ids[]", product.id, false, {
       class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
@@ -21,7 +21,8 @@
     <div class="text-xs text-gray-500"><%= product.variants&.first&.sku %></div>
     <div class="text-xs text-gray-500"><%= product.variants&.first&.barcode %></div>
   </div>
-  <div><%= product.variants&.first&.price %></div>
+  <% variant = product.variants&.first %>
+  <%= render 'products/inline/price', product: product, variant: variant %>
   <div class="flex justify-end space-x-2">
     <%= link_to_delete product_path(product), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
   </div>

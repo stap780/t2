@@ -13,7 +13,7 @@ class Detal < ApplicationRecord
 
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
-    Detal.attribute_names
+    attribute_names
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -75,6 +75,10 @@ class Detal < ApplicationRecord
       Rails.logger.error e.backtrace.join("\n")
       { success: false, message: "Неожиданная ошибка: #{e.message}", error: e.class.name }
     end
+  end
+
+  def variants
+    Variant.where(sku: sku)
   end
 
 end

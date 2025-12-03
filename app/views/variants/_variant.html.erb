@@ -6,8 +6,7 @@
   <div><%= variant.cost_price %></div>
   <div><%= variant.price %></div>
   <div class="flex justify-end space-x-1">
-    <%= link_to barcode_icon, print_etiketka_product_variant_path(product, variant), 
-        target: "_blank",
+    <%= link_to barcode_icon, print_etiketka_product_variant_path(product, variant), target: "_blank",
         class: "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center",
         title: t('print_barcode') %>
     <%= link_to_varbind product_variant_path(product, variant), 

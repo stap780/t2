@@ -59,6 +59,33 @@ class Variant < ApplicationRecord
     product.title.to_s
   end
 
+  # Получение oszz_price из Detal по SKU
+  def oszz_price
+    return nil if sku.blank?
+    @oszz_price ||= Detal.find_by(sku: sku)&.oszz_price
+  end
+
+  # Определение классов для подсветки цены на основе сравнения с oszz_price
+  def price_with_danger?
+    return false if price.blank? || oszz_price.blank?
+    # Если цена товара значительно ниже oszz_price (более чем на 20%) - danger
+    price < oszz_price * 0.8
+  end
+
+  def price_with_warning?
+    return false if price.blank? || oszz_price.blank?
+    # Если цена товара отличается от oszz_price на 10-20% - warning
+    diff_percent = ((price - oszz_price) / oszz_price * 100).abs
+    diff_percent >= 10 && diff_percent < 20
+  end
+
+  def price_css_classes
+    classes = []
+    classes << "bg-red-100" if price_with_danger?
+    classes << "bg-yellow-100" if price_with_warning?
+    classes.join(" ")
+  end
+
   def relation?
     result = []
     # Проверяем наличие связанных list_items

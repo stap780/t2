@@ -1,6 +1,6 @@
 class VariantsController < ApplicationController
   before_action :set_product
-  before_action :set_variant, only: %i[show edit update destroy print_etiketka]
+  before_action :set_variant, only: %i[show edit update destroy print_etiketka edit_price_inline update_price_inline]
   include ActionView::RecordIdentifier
 
   def index
@@ -60,6 +60,21 @@ class VariantsController < ApplicationController
       end
     end
   end
+
+  def edit_price_inline; end
+
+  def update_price_inline
+    respond_to do |format|
+      if @variant.update(variant_params)
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@product, dom_id(@variant, :price)), partial: "products/inline/price", locals: { product: @product, variant: @variant })
+          ]
+        end
+      end
+    end
+  end
+  
 
   def print_etiketka
     # Если этикетка уже существует, используем её

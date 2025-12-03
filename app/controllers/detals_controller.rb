@@ -7,7 +7,7 @@ class DetalsController < ApplicationController
   def index
     @search = Detal.ransack(params[:q])
     @search.sorts = "id desc" if @search.sorts.empty?
-    @detals = @search.result(distinct: true).paginate(page: params[:page], per_page: Rails.env.development? ? 30 : 100)
+    @detals = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
 
   def show
