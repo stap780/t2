@@ -47,7 +47,7 @@ incase_tips.each do |tip_data|
 end
 
 # ItemStatus (Статусы позиций)
-учше = [
+item_statuses = [
   { title: "Да", color: "#000000", position: 1 },
   { title: "Нет (Отсутствовала)", color: "#000000", position: 2 },
   { title: "Долг", color: "#000000", position: 3 },
