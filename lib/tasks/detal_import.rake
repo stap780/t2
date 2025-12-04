@@ -328,4 +328,4 @@ namespace :detal do
   end
 end
 
-#rails 'detal:json_import[email,password,page]'
+# rails 'detal:json_import[email,password,page]'

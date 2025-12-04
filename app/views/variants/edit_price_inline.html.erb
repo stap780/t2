@@ -1,6 +1,6 @@
 <%= turbo_frame_tag dom_id(@product, dom_id(@variant, :price)) do %>
     <%= form_with model: [@product, @variant], url: update_price_inline_product_variant_path(@product, @variant), method: :patch, local: false, class: "inline-flex items-center gap-2" do |f| %>
-        <%= f.number_field :price, step: 0.01, min: 0, value: @variant.price, class: "w-24 px-2 py-1 border border-gray-300 rounded text-sm", autofocus: true %>
+        <%= f.number_field :price, step: 1, min: 0, value: @variant.price, class: "w-24 px-2 py-1 border border-gray-300 rounded text-sm", autofocus: true %>
         <%= f.submit "✓", class: "px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm cursor-pointer" %>
     <% end %>
 <% end %>
