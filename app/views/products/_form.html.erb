@@ -34,7 +34,7 @@
         <% else %>
           <div class="flex items-center justify-between mb-3">
             <%= tag.label t("products.form.variants"), class: "text-sm font-medium text-gray-700" %>
-            <%= link_to t("products.form.add_variant"), new_product_variant_path(product), 
+            <%# link_to t("products.form.add_variant"), new_product_variant_path(product), 
                 class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700",
                 data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
           </div>
