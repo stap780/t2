@@ -8,7 +8,7 @@ ru:
     products: "Товары"
     detals: "Детали"
     incases: "Убытки"
-    incase_imports: "Импорт убытков"
+    incase_imports: "Импорт"
     incase_dubls: "Дубли"
     companies: "Компании"
     clients: "Клиенты"
@@ -849,7 +849,7 @@ ru:
       success: "Акты успешно созданы"
   incase_imports:
     index:
-      heading: "Импорты заявок"
+      heading: "Импорты"
       new: "Новый импорт"
       search: "Поиск"
       clear: "Очистить"
