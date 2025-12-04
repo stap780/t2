@@ -681,6 +681,7 @@ ru:
     index:
       title: "Параметры"
       heading: "Параметры"
+      new: "Новый"
     show:
       add_characteristic: "Добавить характеристику"
       search: "Поиск"

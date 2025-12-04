@@ -7,9 +7,11 @@ class User < ApplicationRecord
   has_many :exports, dependent: :destroy
   has_many :import_schedules, dependent: :destroy
 
-  enum :role, { admin: "admin", user: "user" }, default: "user"
+  enum :role, { admin: "admin", user: "user", driver: "driver" }, default: "user"
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+
+  scope :drivers, -> { where(role: "driver") }
 
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, presence: true, length: { minimum: 6 }, if: :password_required?

@@ -450,3 +450,19 @@ en:
     moysklad:
       check: "Check"
       delete_confirm: "Are you sure you want to delete this configuration?"
+  properties:
+    index:
+      title: "Properties"
+      heading: "Properties"
+      new: "New"
+    show:
+      add_characteristic: "Add Characteristic"
+      search: "Search"
+    new:
+      title: "New Property"
+    edit:
+      title: "Edit Property"
+    create:
+      success: "Property created"
+    update:
+      success: "Property updated"
