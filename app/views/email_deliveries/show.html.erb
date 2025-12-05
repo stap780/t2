@@ -1,0 +1,126 @@
+<% content_for :title, "Отправка письма ##{@email_delivery.id}" %>
+
+<div class="max-w-4xl mx-auto">
+  <div class="mb-6">
+    <%= link_to "← Назад к списку", email_deliveries_path, class: "text-violet-600 hover:text-violet-700 mb-4 inline-block" %>
+    <h1 class="text-2xl font-bold text-gray-900">Отправка письма #<%= @email_delivery.id %></h1>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6 space-y-6">
+    <!-- Основная информация -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Основная информация</h2>
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">ID</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.id %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Статус</dt>
+          <dd class="mt-1">
+            <% case @email_delivery.status %>
+            <% when 'pending' %>
+              <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">Ожидает</span>
+            <% when 'sent' %>
+              <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Отправлено</span>
+            <% when 'failed' %>
+              <span class="px-2 py-1 text-xs rounded bg-red-100 text-red-800">Ошибка</span>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Получатель</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <% if @email_delivery.recipient.respond_to?(:email_address) %>
+              <%= @email_delivery.recipient.email_address %>
+            <% elsif @email_delivery.recipient.respond_to?(:short_title) %>
+              <%= @email_delivery.recipient.short_title %>
+            <% else %>
+              <%= @email_delivery.recipient.class.name %>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Email получателя</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.recipient_email %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Тип письма</dt>
+          <dd class="mt-1">
+            <span class="px-2 py-1 text-xs rounded <%= @email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
+              <%= @email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Метод</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.mailer_method %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Тема письма</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.subject || 'Не указана' %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Дата создания</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.created_at.strftime('%d/%m/%Y %H:%M:%S') %></dd>
+        </div>
+        <% if @email_delivery.sent_at.present? %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Дата отправки</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @email_delivery.sent_at.strftime('%d/%m/%Y %H:%M:%S') %></dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+
+    <!-- Связанная запись -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Связанная запись</h2>
+      <div class="bg-gray-50 rounded-lg p-4">
+        <p class="text-sm text-gray-600">
+          <strong>Тип:</strong> <%= @email_delivery.record_type %><br>
+          <strong>ID:</strong> <%= @email_delivery.record_id %>
+          <% if @email_delivery.record_type == 'Act' %>
+            <br><%= link_to "Просмотреть акт", act_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+          <% elsif @email_delivery.record_type == 'Incase' %>
+            <br><%= link_to "Просмотреть заявку", incase_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Файл -->
+    <% if @email_delivery.attachment.attached? %>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Прикрепленный файл</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <p class="text-sm text-gray-600">
+            <strong>Имя файла:</strong> <%= @email_delivery.attachment.filename %><br>
+            <strong>Тип:</strong> <%= @email_delivery.attachment.content_type %><br>
+            <strong>Размер:</strong> <%= number_to_human_size(@email_delivery.attachment.byte_size) %>
+          </p>
+          <%= link_to "Скачать файл", rails_blob_path(@email_delivery.attachment, disposition: "attachment"), class: "mt-2 inline-block px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Ошибка -->
+    <% if @email_delivery.failed? && @email_delivery.error_message.present? %>
+      <div>
+        <h2 class="text-lg font-semibold text-red-900 mb-4">Ошибка</h2>
+        <div class="bg-red-50 rounded-lg p-4">
+          <p class="text-sm text-red-800"><%= @email_delivery.error_message %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Действия -->
+    <div class="flex justify-end space-x-3 pt-4 border-t">
+      <% if @email_delivery.failed? && @email_delivery.attachment.attached? %>
+        <%= button_to "Повторить отправку", retry_email_delivery_path(@email_delivery), method: :post, class: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
+      <% end %>
+      <%= link_to "Назад к списку", email_deliveries_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+    </div>
+  </div>
+</div>
+

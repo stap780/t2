@@ -84,6 +84,7 @@ gem 'chunky_png'
 
 # PDF generation for labels
 gem 'prawn', '~> 2.4'
+gem 'combine_pdf'
 
 # Rich text editor
 gem 'actiontext'

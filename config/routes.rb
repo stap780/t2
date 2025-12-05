@@ -100,6 +100,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :email_deliveries, only: [:index, :show] do
+    member do
+      post :retry
+    end
+  end
+
   resources :import_schedules do
     member do
       post :run
@@ -165,12 +171,11 @@ Rails.application.routes.draw do
 
   resources :acts do
     member do
-      get :act, format: :pdf
+      get :print, format: :pdf
     end
     collection do
       post :create_multi
       put :update_multi
-      post :bulk_print
     end
   end
 

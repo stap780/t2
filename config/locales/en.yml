@@ -35,6 +35,7 @@ en:
     imports: "Imports"
     import_schedules: "Import Schedules"
     exports: "Exports"
+    email_deliveries: "Email Deliveries"
     products: "Products"
     detals: "Detals"
     incases: "Incases"

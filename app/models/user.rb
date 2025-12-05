@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :imports, dependent: :destroy
   has_many :exports, dependent: :destroy
   has_many :import_schedules, dependent: :destroy
+  has_many :acts, foreign_key: 'driver_id', dependent: :nullify
 
   enum :role, { admin: "admin", user: "user", driver: "driver" }, default: "user"
 

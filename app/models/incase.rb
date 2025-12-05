@@ -13,6 +13,7 @@ class Incase < ApplicationRecord
 
   has_many :comments, as: :commentable, dependent: :destroy
   accepts_nested_attributes_for :comments, allow_destroy: true
+  has_many :email_deliveries, as: :record, dependent: :destroy
   
   after_create_commit { broadcast_prepend_to 'incases' }
   after_update_commit { broadcast_replace_to 'incases' }

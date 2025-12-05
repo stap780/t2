@@ -5,6 +5,7 @@ ru:
     imports: "Импорты"
     import_schedules: "Расписания"
     exports: "Экспорты"
+    email_deliveries: "Отправка писем"
     products: "Товары"
     detals: "Детали"
     incases: "Убытки"
@@ -774,20 +775,20 @@ ru:
       clear: "Очистить"
       ubitok: "Убыток"
     new:
-      title: "Новая заявка"
-      heading: "Новая заявка"
+      title: "Новый убыток"
+      heading: "Новый убыток"
     edit:
-      title: "Редактировать заявку"
-      heading: "Редактировать заявку"
+      title: "Редактировать убыток"
+      heading: "Редактировать убыток"
     show:
-      title: "Заявка"
-      heading: "Детали заявки"
+      title: "Убыток"
+      heading: "Детали убытка"
     create:
-      success: "Заявка успешно создана"
+      success: "Убыток успешно создан"
     update:
-      success: "Заявка успешно обновлена"
+      success: "Убыток успешно обновлен"
     destroy:
-      success: "Заявка успешно удалена"
+      success: "Убыток успешно удален"
     bulk_status:
       success: "Статусы убытков успешно обновлены"
     comments:
@@ -840,6 +841,20 @@ ru:
       new: "Новый акт"
     new:
       heading: "Создание акта"
+    show:
+      heading: "Акт приема-передачи"
+      back_to_list: "← К списку актов"
+      receiving_party: "Принимающая сторона"
+      transferring_party: "Передающая сторона"
+      act_date: "Дата акта"
+      status: "Статус"
+      driver: "Водитель"
+      items: "Позиции акта"
+      transfer_text: "Передающая сторона передаст Принимающей стороне повреждённые детали, узлы и агрегаты транспортных средств (ТС) в соответствии с нижеперечисленными заказ-нарядами."
+      signatures: "Подписи"
+      yes: "Да"
+      no: "Нет"
+      note: "Примечание"
     form:
       okrug: "Округ"
       item_statuses: "Статусы позиций"
@@ -848,6 +863,8 @@ ru:
       heading: "Выбор позиций для создания актов"
     update_multi:
       success: "Акты успешно созданы"
+    destroy:
+      success: "Акт успешно удален"
   incase_imports:
     index:
       heading: "Импорты"

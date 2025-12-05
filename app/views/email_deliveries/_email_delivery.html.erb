@@ -1,0 +1,38 @@
+<div class="grid grid-cols-[50px_150px_200px_150px_150px_100px_150px] gap-4 p-4 border-b hover:bg-gray-50 items-center">
+  <div><%= email_delivery.id %></div>
+  <div class="truncate">
+    <% if email_delivery.recipient.respond_to?(:email_address) %>
+      <%= email_delivery.recipient.email_address %>
+    <% elsif email_delivery.recipient.respond_to?(:short_title) %>
+      <%= email_delivery.recipient.short_title %>
+    <% else %>
+      <%= email_delivery.recipient.class.name %>
+    <% end %>
+  </div>
+  <div class="truncate text-sm"><%= email_delivery.recipient_email %></div>
+  <div>
+    <span class="px-2 py-1 text-xs rounded <%= email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
+      <%= email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
+    </span>
+  </div>
+  <div>
+    <% case email_delivery.status %>
+    <% when 'pending' %>
+      <span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">Ожидает</span>
+    <% when 'sent' %>
+      <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Отправлено</span>
+    <% when 'failed' %>
+      <span class="px-2 py-1 text-xs rounded bg-red-100 text-red-800">Ошибка</span>
+    <% end %>
+  </div>
+  <div class="text-sm text-gray-600">
+    <%= email_delivery.created_at.strftime('%d/%m/%Y %H:%M') %>
+  </div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to "Просмотр", email_delivery_path(email_delivery), class: "px-3 py-1 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+    <% if email_delivery.failed? %>
+      <%= button_to "Повторить", retry_email_delivery_path(email_delivery), method: :post, class: "px-3 py-1 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
+    <% end %>
+  </div>
+</div>
+

@@ -155,8 +155,6 @@ class Product < ApplicationRecord
     Product.where('id < ?', id).order(id: :desc).first || Product.last
   end
 
-
-
   private
 
   def check_variants_have_items

@@ -1,5 +1,5 @@
 class ActsController < ApplicationController
-  before_action :set_act, only: [:show, :edit, :update, :destroy, :act]
+  before_action :set_act, only: [:show, :edit, :update, :destroy, :print]
   include ActionView::RecordIdentifier
 
   def index
@@ -9,6 +9,7 @@ class ActsController < ApplicationController
   end
 
   def show
+    # @act уже загружен через before_action :set_act с includes
   end
 
   def edit
@@ -200,140 +201,30 @@ class ActsController < ApplicationController
 
   def update_multi
     act_datas = params[:act_datas] || {}
-    created_act_ids = []
     
-    # Группируем позиции по компании, страховой и дате акта (по всем компаниям сразу)
-    # ВАЖНО: Группировка должна быть по комбинации company_id + strah_id + date
-    items_by_company_strah_and_date = {}
-    
-    act_datas.each do |company_id, company_data|
-      next unless company_data['id'] == '1' # Компания выбрана
-      
-      company = Company.find(company_id.to_i)
-      okrug_id = company.okrug_id
-      incases_data = company_data['incases'] || {}
-      
-      incases_data.each do |incase_id, incase_data|
-        next unless incase_data['selected'] == '1' # Заявка выбрана
-        
-        incase = Incase.find(incase_id.to_i)
-        items_data = incase_data['items'] || {}
-        
-        items_data.each do |item_id, item_data|
-          next unless item_data['selected'] == '1' # Позиция выбрана
-          
-          item = Item.find(item_id.to_i)
-          
-          # Дата акта = текущая дата (если не выходной, иначе следующий рабочий день)
-          act_date = Date.current
-          act_date = act_date.advance(days: 1) while act_date.saturday? || act_date.sunday?
-          
-          # Ключ группировки: компания + страховая + дата
-          key = "#{company_id}_#{incase.strah_id}_#{act_date.strftime('%Y-%m-%d')}"
-          
-          items_by_company_strah_and_date[key] ||= {
-            company_id: company_id.to_i,
-            strah_id: incase.strah_id,
-            date: act_date,
-            okrug_id: okrug_id,
-            items: []
-          }
-          items_by_company_strah_and_date[key][:items] << item
+    result = Act.create_from_selected_items(act_datas)
+
+    respond_to do |format|
+      if result[:error]
+        format.turbo_stream do
+          flash.now[:alert] = result[:message]
+          render turbo_stream: [
+            render_turbo_flash
+          ]
         end
-      end
-    end
-    
-    # Создаем акты
-    items_by_company_strah_and_date.each do |key, data|
-      # Ищем существующий акт с такими же параметрами
-      existing_act = Act.find_by(
-        company_id: data[:company_id],
-        strah_id: data[:strah_id],
-        date: data[:date],
-        status: 'Новый'
-      )
-      
-      if existing_act
-        # Добавляем позиции к существующему акту
-        data[:items].each do |item|
-          ActItem.find_or_create_by!(act: existing_act, item: item)
-        end
-        created_act_ids << existing_act.id
       else
-        # Создаем новый акт
-        new_act = Act.create!(
-          company_id: data[:company_id],
-          strah_id: data[:strah_id],
-          okrug_id: data[:okrug_id],
-          date: data[:date],
-          status: 'Новый',
-          number: "#{Time.current.strftime('%Y%m%d')}-#{data[:company_id]}-#{data[:strah_id]}"
-        )
-        
-        # Связываем позиции с актом
-        data[:items].each do |item|
-          ActItem.create!(act: new_act, item: item)
-        end
-        created_act_ids << new_act.id
+        format.turbo_stream { redirect_to acts_path(format: :html), notice: "Создано актов: #{result[:act_ids]&.count || 0}" }
       end
     end
-    
-    # Генерируем PDF для созданных актов
-    if created_act_ids.any?
-      redirect_to acts_path(bulk_print_ids: created_act_ids.uniq), 
-                  notice: "Создано актов: #{created_act_ids.uniq.count}"
-    else
-      redirect_to acts_path, alert: "Не выбрано ни одной позиции"
-    end
-  rescue => e
-    Rails.logger.error("update_multi error: #{e.class} #{e.message}")
-    Rails.logger.error(e.backtrace.join("\n"))
-    redirect_to acts_path, alert: "Ошибка при создании актов: #{e.message}"
   end
 
-  def act
+  def print
     respond_to do |format|
       format.pdf do
-        pdf_data = generate_pdf_for_act(@act)
+        pdf_data = @act.generate_pdf
         send_data pdf_data, filename: "act_#{@act.number}.pdf", type: 'application/pdf', disposition: 'inline'
       end
     end
-  end
-
-  def bulk_print
-    if params[:act_ids].blank?
-      flash.now[:error] = 'Выберите акты для печати'
-      render turbo_stream: [render_turbo_flash]
-      return
-    end
-
-    acts = Act.where(id: params[:act_ids])
-    
-    if acts.empty?
-      flash.now[:error] = 'Акты не найдены'
-      render turbo_stream: [render_turbo_flash]
-      return
-    end
-
-    # Генерируем PDF для каждого акта и создаем ZIP архив
-    require 'zip'
-    require 'stringio'
-    
-    zip_buffer = StringIO.new
-    Zip::OutputStream.open(zip_buffer) do |zip|
-      acts.each do |act|
-        pdf_data = generate_pdf_for_act(act)
-        zip.put_next_entry("act_#{act.number}.pdf")
-        zip.write(pdf_data)
-      end
-    end
-    
-    zip_buffer.rewind
-    
-    send_data zip_buffer.read, 
-              filename: "acts_#{Time.current.strftime('%Y%m%d_%H%M%S')}.zip",
-              type: 'application/zip',
-              disposition: 'attachment'
   end
 
   private
@@ -405,100 +296,6 @@ class ActsController < ApplicationController
     [new_css, color_id]
   end
 
-  def generate_pdf_for_act(act)
-    require 'prawn'
-    
-    pdf = Prawn::Document.new(
-      page_size: 'A4', 
-      page_layout: :portrait,
-      margin: [15, 15, 15, 15]
-    )
-    
-    company = act.company
-    strahcompany = act.strah
-    
-    # Шапка: Информация о компании (принимающая сторона)
-    pdf.text company.title, size: 14, style: :bold if company&.title.present?
-    pdf.text company.ur_address, size: 10 if company&.ur_address.present?
-    pdf.move_down 10
-    
-    # Заголовок акта
-    pdf.text "Акт приёма-передачи", size: 18, align: :center, style: :bold
-    pdf.text "№ #{act.number}", size: 14, align: :center
-    pdf.move_down 15
-    
-    # Информация о сторонах
-    pdf.text "Передающая сторона:", size: 12, style: :bold
-    pdf.text strahcompany&.title || '', size: 11
-    pdf.text strahcompany&.ur_address || '', size: 10
-    pdf.move_down 10
-    
-    pdf.text "Принимающая сторона:", size: 12, style: :bold
-    pdf.text company.title || '', size: 11
-    pdf.text company.ur_address || '', size: 10
-    pdf.move_down 15
-    
-    # Дата акта
-    pdf.text "г. Москва", size: 10
-    pdf.text act.date&.strftime('%d/%m/%Y'), size: 10, align: :right
-    pdf.move_down 15
-    
-    # Текст о передаче
-    pdf.text "Передающая сторона передаст Принимающей стороне повреждённые детали, узлы и агрегаты транспортных средств (ТС) в соответствии с нижеперечисленными заказ-нарядами.", size: 10, style: :bold
-    pdf.move_down 15
-    
-    # Группируем позиции по заявкам (Incase)
-    # Получаем уникальные заявки из позиций акта
-    incases = act.items.includes(:incase).map(&:incase).uniq.compact
-    
-    incases.each do |incase|
-      # Заголовок заявки
-      incase_header_data = [
-        [
-          incase.stoanumber.present? ? "Номер З/Н #{incase.stoanumber}" : "Заявка ##{incase.id}",
-          "ТС: #{incase.modelauto || 'Не указано'} (#{incase.carnumber || 'Не указано'})",
-          "№ ВД #{incase.unumber} от #{incase.date&.strftime('%d/%m/%Y')}"
-        ]
-      ]
-      
-      pdf.table(incase_header_data, header: false, column_widths: [100, 225, 175]) do
-        row(0).font_style = :bold
-        row(0).background_color = 'E0E0E0'
-      end
-      
-      # Позиции этой заявки, включенные в акт
-      act_items_from_incase = act.items.where(incase: incase).order(:title)
-      
-      act_items_from_incase.each do |item|
-        item_data = [
-          [
-            { content: "#{item.title} (#{item.katnumber})", colspan: 2 },
-            { content: "☐ Да ☐ Нет Примечание: #{item.item_status&.title || ''}", colspan: 1 }
-          ]
-        ]
-        
-        pdf.table(item_data, header: false, column_widths: [225, 100, 175]) do
-          row(0).borders = [:bottom]
-          row(0).border_width = 0.5
-          row(0).border_color = 'CCCCCC'
-        end
-      end
-      
-      pdf.move_down 10
-    end
-    
-    pdf.move_down 20
-    
-    # Подписи
-    pdf.text "Передающая сторона:", size: 10
-    pdf.move_down 30
-    pdf.text "_________________", size: 10
-    pdf.move_down 5
-    pdf.text "Принимающая сторона:", size: 10
-    pdf.move_down 30
-    pdf.text "_________________", size: 10
-    
-    pdf.render
-  end
+  
 end
 

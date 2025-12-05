@@ -1,0 +1,14 @@
+<p>Здравствуйте!</p>
+
+<p>Во вложении заявка на вывоз запчастей.</p>
+
+<% if @incase.stoanumber.present? %>
+  <p>Номер З/Н СТОА: <%= @incase.stoanumber %></p>
+<% end %>
+<% if @incase.unumber.present? %>
+  <p>Номер дела: <%= @incase.unumber %></p>
+<% end %>
+
+<p>С уважением,<br>
+Авто Дизайн</p>
+

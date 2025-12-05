@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_27_140348) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_05_154604) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,8 +71,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_27_140348) do
     t.bigint "okrug_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "driver_id"
     t.index ["company_id"], name: "index_acts_on_company_id"
     t.index ["date"], name: "index_acts_on_date"
+    t.index ["driver_id"], name: "index_acts_on_driver_id"
     t.index ["number"], name: "index_acts_on_number"
     t.index ["okrug_id"], name: "index_acts_on_okrug_id"
     t.index ["status"], name: "index_acts_on_status"
@@ -179,6 +181,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_27_140348) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "oszz_price", precision: 12, scale: 2, default: "0.0"
+  end
+
+  create_table "email_deliveries", force: :cascade do |t|
+    t.string "recipient_type", null: false
+    t.bigint "recipient_id", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.string "mailer_class", null: false
+    t.string "mailer_method", null: false
+    t.string "status", default: "pending", null: false
+    t.text "error_message"
+    t.text "recipient_email", null: false
+    t.text "subject"
+    t.string "job_id"
+    t.datetime "sent_at"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_email_deliveries_on_job_id"
+    t.index ["recipient_type", "recipient_id"], name: "index_email_deliveries_on_recipient"
+    t.index ["recipient_type", "recipient_id"], name: "index_email_deliveries_on_recipient_type_and_recipient_id"
+    t.index ["record_type", "record_id"], name: "index_email_deliveries_on_record"
+    t.index ["record_type", "record_id"], name: "index_email_deliveries_on_record_type_and_record_id"
+    t.index ["status"], name: "index_email_deliveries_on_status"
   end
 
   create_table "exports", force: :cascade do |t|
@@ -456,6 +482,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_27_140348) do
   add_foreign_key "acts", "companies"
   add_foreign_key "acts", "companies", column: "strah_id"
   add_foreign_key "acts", "okrugs"
+  add_foreign_key "acts", "users", column: "driver_id"
   add_foreign_key "characteristics", "properties"
   add_foreign_key "client_companies", "clients"
   add_foreign_key "client_companies", "companies"
