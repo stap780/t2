@@ -20,7 +20,7 @@
       <%= render 'shared/bulk_delete_buttons', f: f, object: Incase.new %>
     <% end %>
     
-    <%= link_to t('.filter'), filter_incases_path(q: (params[:q] || {}).to_unsafe_h), class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter'), filter_incases_path, class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
     <%= link_to t('.new'), new_incase_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 </div>
