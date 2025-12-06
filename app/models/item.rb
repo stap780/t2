@@ -60,7 +60,8 @@ class Item < ApplicationRecord
     )
     variant = product.variants.create!(
       quantity: quantity || 0,
-      price: price || 0
+      price: price || 0,
+      sku: katnumber.presence || ''
     )
     self.variant_id = variant.id
   end
