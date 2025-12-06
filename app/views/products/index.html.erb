@@ -33,7 +33,7 @@
       <!-- Bulk Delete Buttons -->
       <%= render 'shared/bulk_delete_buttons', f: f, object: Product.new %>
     <% end %>
-    <%= link_to t('.filter'), filter_products_path(q: params.fetch(:q, {}).to_unsafe_h), class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter'), filter_products_path(q: (params[:q] || {}).to_unsafe_h), class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
     <%= link_to t("products.index.new"), new_product_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 </div>
