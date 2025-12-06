@@ -1,5 +1,5 @@
 class BulkDeleteJob < ApplicationJob
-  queue_as :default
+  queue_as :bulk_delete
 
   def perform(collection_ids, options = {})
     model_name = options[:model] # 'products' or 'detals'

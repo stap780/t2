@@ -1,11 +1,12 @@
 class CompaniesController < ApplicationController
   before_action :set_company, only: %i[show edit update destroy]
   include ActionView::RecordIdentifier
+  include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
 
   def index
-    @search = Company.ransack(params[:q])
+    @search = Company.ransack(search_params)
     @search.sorts = 'id desc' if @search.sorts.empty?
     @companies = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end

@@ -51,8 +51,5 @@ module DownloadExcel
     collection_ids
   end
 
-  def search_params
-    params[:q] || {}
-  end
 end
 

@@ -1,11 +1,12 @@
 class DetalsController < ApplicationController
   before_action :set_detal, only: %i[ show edit update get_oszz destroy ]
   include ActionView::RecordIdentifier
+  include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
 
   def index
-    @search = Detal.ransack(params[:q])
+    @search = Detal.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @detals = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end

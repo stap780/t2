@@ -1,25 +1,26 @@
 class IncasesController < ApplicationController
   before_action :set_incase, only: %i[ show edit update destroy act ]
   include ActionView::RecordIdentifier
+  include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
   include BulkStatus
 
   def index
-    if params[:q].present?
-      puts "params[:q]: #{params[:q]}"
+    if search_params.present?
+      puts "search_params: #{search_params}"
     end
     # Join items and variants if searching by items_barcode
     base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
-    search_params = params[:q] || {}
-    searching_by_barcode = search_params.keys.any? { |key| key.to_s.include?('items_barcode') }
+    search_params_hash = search_params || {}
+    searching_by_barcode = search_params_hash.keys.any? { |key| key.to_s.include?('items_barcode') }
     
     # Use left_joins instead of joins to avoid type conflicts with string foreign keys
     # Join variants for barcode search (ransacker in Item needs variant table)
     if searching_by_barcode
       base_relation = base_relation.left_joins(items: :variant)
     end
-    @search = base_relation.ransack(params[:q])
+    @search = base_relation.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @incases = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
@@ -41,15 +42,15 @@ class IncasesController < ApplicationController
   def filter
     # Join items and variants if searching by items_barcode
     base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
-    search_params = params[:q] || {}
-    searching_by_barcode = search_params.keys.any? { |key| key.to_s.include?('items_barcode') }
+    search_params_hash = search_params || {}
+    searching_by_barcode = search_params_hash.keys.any? { |key| key.to_s.include?('items_barcode') }
     
     # Use left_joins instead of joins to avoid type conflicts with string foreign keys
     # Join variants for barcode search (ransacker in Item needs variant table)
     if searching_by_barcode
       base_relation = base_relation.left_joins(items: :variant)
     end
-    @search = base_relation.ransack(params[:q])
+    @search = base_relation.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @incases = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end

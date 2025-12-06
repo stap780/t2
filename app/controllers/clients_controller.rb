@@ -1,11 +1,12 @@
 class ClientsController < ApplicationController
   before_action :set_client, only: %i[show edit update destroy]
   include ActionView::RecordIdentifier
+  include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
 
   def index
-    @search = Client.ransack(params[:q])
+    @search = Client.ransack(search_params)
     @search.sorts = 'id desc' if @search.sorts.empty?
     @clients = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end

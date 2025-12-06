@@ -2,6 +2,7 @@ module BulkDelete
   extend ActiveSupport::Concern
 
   def bulk_delete
+
     if params[:delete_type] == 'selected' && !params[items].present?
       flash.now[:error] = 'Выберите позиции'
     else
@@ -46,8 +47,5 @@ module BulkDelete
     collection_ids
   end
 
-  def search_params
-    params[:q] || {}
-  end
 end
 

@@ -1,11 +1,12 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy sort_image ]
   include ActionView::RecordIdentifier
+  include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
 
   def index
-    @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(params[:q])
+    @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
@@ -35,7 +36,7 @@ class ProductsController < ApplicationController
   end
 
   def filter
-    @search = Product.ransack(params[:q])
+    @search = Product.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
