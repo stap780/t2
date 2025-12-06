@@ -1,4 +1,5 @@
 module IncaseJsonImporter
+  LOGGER = Logger.new(Rails.root.join("log", "incase_json_import.log"))
   
   def self.run(url = nil, email = nil, password = nil, page = 1)
     puts "=" * 60

@@ -67,6 +67,7 @@ aliases:
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
   product_import_logs: app exec --interactive --reuse "tail -f log/product_import.log"
+  incase_json_import_logs: app exec --interactive --reuse "tail -f log/incase_json_import.log"
 
 
 # Use a persistent storage volume for sqlite database files and local Active Storage files.
