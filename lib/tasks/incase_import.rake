@@ -40,6 +40,10 @@ module IncaseJsonImporter
       
       if stats[:errors] > 0
         puts "\n⚠️  Errors occurred. Check logs for details."
+        puts "\nError details:"
+        stats[:error_messages].each_with_index do |error_msg, idx|
+          puts "  #{idx + 1}. #{error_msg}"
+        end
       else
         puts "\n✓ Import completed successfully!"
       end
@@ -197,7 +201,8 @@ module IncaseJsonImporter
       created: 0,
       updated: 0,
       dubls: 0,
-      errors: 0
+      errors: 0,
+      error_messages: []
     }
     
     # Create a single IncaseImport for tracking all dubls
@@ -235,9 +240,12 @@ module IncaseJsonImporter
         
       rescue => e
         stats[:errors] += 1
+        error_msg = "Case #{index + 1} (#{case_data['unumber'] || 'N/A'}): #{e.class} - #{e.message}"
+        stats[:error_messages] << error_msg
         puts "    ❌ Error: #{e.message}"
         Rails.logger.error "Error processing case #{index + 1}: #{e.message}"
         Rails.logger.error e.backtrace.first(5).join("\n")
+        LOGGER.error error_msg
       end
     end
     
