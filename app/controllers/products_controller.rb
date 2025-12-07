@@ -1,5 +1,6 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy sort_image ]
+  after_action :clear_preloaded_detals, only: [:index]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -9,6 +10,14 @@ class ProductsController < ApplicationController
     @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
+    
+    # Preload Detal records to avoid N+1 queries
+    # Use pluck to get all SKUs in one query instead of iterating through loaded objects
+    product_ids = @products.map(&:id)
+    skus = Variant.where(product_id: product_ids).pluck(:sku).compact.uniq if product_ids.any?
+    # Use pluck to load only sku and oszz_price (faster than loading full objects)
+    detals_by_sku = Detal.where(sku: skus).pluck(:sku, :oszz_price).to_h if skus&.any?
+    Variant.preload_detals(detals_by_sku || {})
   end
 
   def search
@@ -181,6 +190,10 @@ class ProductsController < ApplicationController
 
   def set_product
     @product = Product.find(params[:id])
+  end
+
+  def clear_preloaded_detals
+    Variant.clear_preloaded_detals
   end
 
   def check_positions(images)

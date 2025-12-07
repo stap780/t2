@@ -59,9 +59,27 @@ class Variant < ApplicationRecord
     product.title.to_s
   end
 
+  # Thread-safe cache for preloaded Detal records
+  def self.preload_detals(detals_by_sku)
+    Thread.current[:variant_preloaded_detals] = detals_by_sku
+  end
+  
+  def self.clear_preloaded_detals
+    Thread.current[:variant_preloaded_detals] = nil
+  end
+
   # Получение oszz_price из Detal по SKU
   def oszz_price
     return nil if sku.blank?
+    
+    # Use preloaded Detal if available, otherwise fallback to database query
+    preloaded_detals = Thread.current[:variant_preloaded_detals]
+    if preloaded_detals && preloaded_detals.is_a?(Hash)
+      # Preloaded data is a hash { sku => oszz_price }
+      return preloaded_detals[sku]
+    end
+    
+    # Fallback to database query if preloaded data not available
     @oszz_price ||= Detal.find_by(sku: sku)&.oszz_price
   end
 

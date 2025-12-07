@@ -614,3 +614,20 @@ namespace :incase do
 end
 
 # rails 'incase:json_import[email,password,page]'
+
+# Error details:
+#   1. Case 20 (1824-41MT5442AONABD№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   2. Case 21 (SGZA0001146263D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   3. Case 22 (SGZA0003247317D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   4. Case 23 (22MT2736-10D№0000195): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   5. Case 24 (SGZA0001510115D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   6. Case 25 (SGZA0002643220D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   7. Case 41 (закупка49): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   8. Case 47 (SGZA0002450493D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   9. Case 48 (SGZA0002786215D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   10. Case 49 (SGZA0001953938D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   11. Case 50 (SGZA0003176617D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   12. Case 51 (SGZA0002299967D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   13. Case 52 (SGZA0002291891D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   14. Case 53 (SGZA0002188000D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
+#   15. Case 54 (SGZA0001495036D№0000001): ActiveRecord::RecordInvalid - Валидация не пройдена: Страховая компания должна быть выбрана
