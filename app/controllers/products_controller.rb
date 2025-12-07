@@ -7,9 +7,14 @@ class ProductsController < ApplicationController
   include BulkDelete
 
   def index
-    @search = Product.includes(:features, :variants, images: [:file_attachment, :file_blob]).ransack(search_params)
+    # COUNT запрос БЕЗ includes (быстрый) - Ransack сам добавит нужные JOIN для условий поиска
+    @search = Product.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
-    @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
+    base_result = @search.result(distinct: true)
+    
+    # Данные С includes (для отображения, избегаем N+1)
+    @products = base_result.includes(:features, :variants, images: [:file_attachment, :file_blob])
+                           .paginate(page: params[:page], per_page: 100)
     
     # Preload Detal records to avoid N+1 queries
     # Use pluck to get all SKUs in one query instead of iterating through loaded objects
