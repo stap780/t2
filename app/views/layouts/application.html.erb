@@ -72,7 +72,7 @@
           <!-- Incases (collapsible) -->
           <details class="group" <%= 'open' if request.path.start_with?('/incases') || request.path.start_with?('/incase_imports') || request.path.start_with?('/incase_dubls') %>>
             <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
-              <%= link_to incases_path, 
+              <%= link_to incases_path(search_cancel: true), 
                   class: "flex items-center text-sm font-medium text-white" do %>
                 <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -84,7 +84,7 @@
               </svg>
             </summary>
             <div class="mt-1 space-y-1">
-              <%= link_to incase_imports_path(search_cancel: true),
+              <%= link_to incase_imports_path,
                   class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_imports')}" do %>
                 <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />

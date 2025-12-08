@@ -12,9 +12,16 @@ class ProductsController < ApplicationController
     @search.sorts = "id desc" if @search.sorts.empty?
     base_result = @search.result(distinct: true)
     
+    # COUNT через подзапрос по ID (быстрее чем COUNT с JOIN из includes)
+    # Выполняем COUNT на базовом запросе БЕЗ includes
+    total_count = base_result.count
+    
     # Данные С includes (для отображения, избегаем N+1)
     @products = base_result.includes(:features, :variants, images: [:file_attachment, :file_blob])
                            .paginate(page: params[:page], per_page: 100)
+    
+    # Переопределить total_entries для will_paginate (избегаем повторного COUNT)
+    @products.total_entries = total_count
     
     # Preload Detal records to avoid N+1 queries
     # Use pluck to get all SKUs in one query instead of iterating through loaded objects

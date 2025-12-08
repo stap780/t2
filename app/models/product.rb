@@ -51,8 +51,11 @@ class Product < ApplicationRecord
   scope :yes_quantity, -> { ransack(variants_quantity_gt: 0).result }
   scope :no_price, -> { ransack(variants_price_lt: 1).result }
   scope :yes_price, -> { ransack(variants_price_gt: 0).result }
-  scope :with_images, -> { include_images.where.not(images: {product_id: nil}) }
-  scope :without_images, -> { include_images.where(images: {product_id: nil}) }
+  # scope :with_images, -> { include_images.where.not(images: {product_id: nil}) }
+  # scope :without_images, -> { include_images.where(images: {product_id: nil}) }
+  # В app/models/product.rb заменить:
+  scope :with_images, -> { joins(:images).where.not(images: {product_id: nil}).distinct }
+  scope :without_images, -> { left_joins(:images).where(images: {product_id: nil}) }
 
   # Константы для статусов и типов
   STATUS = %w[draft active archived].freeze

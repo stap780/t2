@@ -10,7 +10,7 @@ module SearchQueryRansack
 
   # CHECK THE SESSION FOR SEARCH PARAMETERS IS THEY AREN'T IN THE REQUEST
   def search_params
-    puts "search_params => #{params[:q]}"
+    # puts "search_params => #{params[:q]}"
     if params[:q] == nil
       params[:q] = session[search_key]
     end
