@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_05_154604) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_09_164722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,7 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_154604) do
   create_table "acts", force: :cascade do |t|
     t.string "number"
     t.date "date"
-    t.string "status", default: "Новый"
+    t.string "status", default: "new"
     t.bigint "company_id", null: false
     t.bigint "strah_id", null: false
     t.bigint "okrug_id", null: false
@@ -392,6 +392,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_05_154604) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "supplier_code"
+    t.string "condition"
+    t.index ["condition"], name: "index_items_on_condition"
     t.index ["incase_id"], name: "index_items_on_incase_id"
     t.index ["variant_id"], name: "index_items_on_variant_id"
   end

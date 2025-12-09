@@ -57,6 +57,20 @@ en:
         processing: "Processing"
         completed: "Completed"
         failed: "Failed"
+    act:
+      status:
+        pending: "New"
+        in_progress: "In Progress"
+        sent: "Sent"
+        completed: "Completed"
+        canceled: "Canceled"
+        closed: "Closed"
+    item:
+      condition:
+        priemka: "Acceptance"
+        utilizatsiya: "Disposal"
+        otstoynik: "Storage"
+        remont: "Repair"
   exports:
     export:
       created_by: "Created by"

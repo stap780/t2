@@ -105,6 +105,20 @@ ru:
         processing: "В обработке"
         completed: "Завершён"
         failed: "Ошибка"
+    act:
+      status:
+        pending: "Новый"
+        in_progress: "В работе"
+        sent: "Отправлен"
+        completed: "Завершён"
+        canceled: "Отменён"
+        closed: "Закрыт"
+    item:
+      condition:
+        priemka: "Пр"
+        utilizatsiya: "Ут"
+        otstoynik: "От"
+        remont: "Рем"
     user:
       role:
         admin: "Администратор"
@@ -408,6 +422,7 @@ ru:
         item_status_id: "Статус позиции"
         variant_id: "Вариант товара"
         vat: "НДС"
+        condition: "Состояние"
       incase_status:
         title: "Название"
         color: "Цвет"
@@ -842,6 +857,8 @@ ru:
       new: "Новый акт"
     new:
       heading: "Создание акта"
+    update:
+      success: "Акт успешно обновлён"
     show:
       heading: "Акт приема-передачи"
       back_to_list: "← К списку актов"
@@ -991,6 +1008,10 @@ ru:
       success: "Позиция успешно создана"
     update:
       success: "Позиция успешно обновлена"
+    update_status:
+      success: "Статус позиции успешно обновлён"
+    update_condition:
+      success: "Состояние позиции успешно обновлено"
     destroy:
       success: "Позиция успешно удалена"
   incases/comments:

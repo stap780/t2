@@ -19,7 +19,14 @@ class Act < ApplicationRecord
   after_create_commit { broadcast_prepend_to 'acts' }
   after_update_commit { broadcast_replace_to 'acts' }
   
-  STATUSES = %w[Новый Отправлен Закрыт].freeze
+  enum :status, {
+    pending: 'pending',
+    in_progress: 'in_progress',
+    sent: 'sent',
+    completed: 'completed',
+    canceled: 'canceled',
+    closed: 'closed'
+  }
   
   def self.ransackable_attributes(auth_object = nil)
     attribute_names
@@ -169,7 +176,7 @@ class Act < ApplicationRecord
         strah_id: data[:strah_id],
         date: data[:date],
         driver_id: data[:driver_id] || nil,
-        status: 'Новый'
+        status: :pending
       )
 
       if existing_act
@@ -186,7 +193,7 @@ class Act < ApplicationRecord
           okrug_id: data[:okrug_id],
           date: data[:date],
           driver_id: data[:driver_id],
-          status: 'Новый'
+          status: :pending
         )
 
         # Связываем позиции с актом

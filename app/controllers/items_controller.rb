@@ -2,7 +2,7 @@ class ItemsController < ApplicationController
   include ActionView::RecordIdentifier
 
   before_action :set_incase
-  before_action :set_item, only: %i[ show edit update destroy update_variant_fields ]
+  before_action :set_item, only: %i[ show edit update destroy update_variant_fields update_status update_condition]
 
   def index
     @items = @incase.items.order(:id)
@@ -132,6 +132,40 @@ class ItemsController < ApplicationController
       end
       format.html { redirect_to incase_path(@incase), notice: t(".success") }
       format.json { head :no_content }
+    end
+  end
+
+  def update_status
+    @item.update(item_status_id: params[:item_status_id])
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:success] = t('.success')
+        render turbo_stream: [
+          render_turbo_flash,
+          turbo_stream.replace(
+            dom_id(@incase, dom_id(@item, 'act_show')),
+            partial: "items/act_show",
+            locals: { item: @item, incase: @incase }
+          )
+        ]
+      end
+    end
+  end
+
+  def update_condition
+    @item.update(condition: params[:condition])
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[:success] = t('.success')
+        render turbo_stream: [
+          render_turbo_flash,
+          turbo_stream.replace(
+            dom_id(@incase, dom_id(@item, 'act_show')),
+            partial: "items/act_show",
+            locals: { item: @item, incase: @incase }
+          )
+        ]
+      end
     end
   end
 

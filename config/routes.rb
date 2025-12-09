@@ -194,6 +194,8 @@ Rails.application.routes.draw do
     resources :items do
       member do
         get :update_variant_fields
+        post :update_status
+        post :update_condition
       end
     end
     resources :comments, module: :incases, only: [:new, :create, :destroy]

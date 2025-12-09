@@ -14,6 +14,13 @@ class Item < ApplicationRecord
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   
+  enum :condition, {
+    priemka: 'priemka',
+    utilizatsiya: 'utilizatsiya',
+    otstoynik: 'otstoynik',
+    remont: 'remont'
+  }
+  
   after_initialize :set_default_new
   before_create :create_product_variant, if: -> { variant_id.blank? }
   

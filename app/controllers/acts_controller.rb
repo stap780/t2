@@ -20,6 +20,12 @@ class ActsController < ApplicationController
       if @act.update(act_params)
         format.html { redirect_to acts_path, notice: t('.success') }
         format.json { render :show, status: :ok, location: @act }
+        format.turbo_stream do
+          flash.now[:success] = t('.success')
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @act.errors, status: :unprocessable_entity }
@@ -231,6 +237,10 @@ class ActsController < ApplicationController
 
   def set_act
     @act = Act.find(params[:id])
+  end
+
+  def act_params
+    params.require(:act).permit(:status, :date)
   end
 
   def calculate_company_status(plandate:, planvalue:, vrday:, items_quantity:, items_dolg:, incase_status:)

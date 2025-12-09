@@ -1,0 +1,6 @@
+class AddConditionToItems < ActiveRecord::Migration[8.0]
+  def change
+    add_column :items, :condition, :string
+    add_index :items, :condition
+  end
+end

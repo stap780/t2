@@ -11,7 +11,7 @@ class GenerateActsPdfJob < ApplicationJob
     user = User.find(user_id)
     
     # Находим акты со статусом "Новый"
-    acts = Act.where(id: act_ids, status: 'Новый')
+    acts = Act.where(id: act_ids, status: :pending)
     return if acts.empty?
     
     # Создаем EmailDelivery записи для каждого акта (если еще не созданы)

@@ -27,7 +27,7 @@ class ActEmailJob < ApplicationJob
       end
       
       # Обновляем статусы актов
-      acts.update_all(status: 'Отправлен')
+      acts.update_all(status: :sent)
     rescue => e
       email_deliveries.each do |ed|
         ed.update!(
