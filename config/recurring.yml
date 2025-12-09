@@ -17,3 +17,7 @@ production:
   product_import:
     class: ProductImportJob
     schedule: at 20:20 every day
+  
+  detal_oszz_price_update:
+    class: DetalOszzPriceUpdateJob
+    schedule: "0 1 */3 * *"  # каждые 3 дня в 1:00 ночи

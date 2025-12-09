@@ -29,7 +29,7 @@ class FeaturesController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_close_offcanvas_flash + [
             turbo_stream.append(
-              'features',
+              dom_id(@featureable, 'features'),
               partial: "features/feature",
               locals: { feature: @feature, featureable: @featureable }
             )

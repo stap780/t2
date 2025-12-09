@@ -264,6 +264,7 @@ en:
     edit:
       title: "Edit Product"
       heading: "Edit Product"
+    refill: "Fill from Detal"
     show:
       status: "Status"
       type: "Type"

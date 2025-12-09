@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy sort_image ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill ]
   after_action :clear_preloaded_detals, only: [:index]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
@@ -122,6 +122,7 @@ class ProductsController < ApplicationController
       if @product.update(product_params)
         format.html { redirect_to products_path, notice: t(".success") }
         format.json { render :show, status: :ok, location: @product }
+        format.turbo_stream { redirect_to products_path(format: :html), notice: t(".success") }
       else
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @product.errors, status: :unprocessable_entity }
@@ -196,6 +197,41 @@ class ProductsController < ApplicationController
       format.html { redirect_to products_path, notice: t(".success") }
       format.json { head :no_content }
     end
+  end
+
+  def refill
+    detal = nil
+
+    if @product.variants.first&.sku.present? && @product.status == 'in_progress' || @product.status == 'draft'
+      detal = Detal.find_by_sku(@product.variants.first&.sku)
+    end
+
+    if detal.present?
+      @product.title = detal.title
+      @product.description = detal.desc
+      # Удаляем существующие features и копируем новые из detal в product
+      @product.features.destroy_all
+      new_features = detal.features.select(:property_id, :characteristic_id).map(&:attributes)
+      @product.features_attributes = new_features
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@product), partial: "products/form", locals: { product: @product }),
+            render_turbo_flash
+          ]
+        end
+      end
+    else
+      flash.now[:notice] = 'Продукт не может быть заполнен'
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
+      end
+    end
+
   end
 
   private

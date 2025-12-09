@@ -1,6 +1,9 @@
 <div class="max-w-1xl mx-auto">
   <div class="flex items-center mb-4 space-x-4">
     <%= link_to_back products_path %>
+    <%= link_to t("products.refill"), refill_product_path(@product), 
+      class: "inline-flex items-center px-3 py-1 border border-violet-500 text-violet-600 bg-white hover:bg-violet-50 hover:text-violet-700 rounded-md cursor-pointer transition", 
+      data: { turbo_stream: true, turbo_confirm: "ВНИМАНИЕ! Это действие заполнит продукт данными из Detal и удалит все данные, кроме изображений. Вы уверены?"  } %>
     <h1 class="text-2xl font-semibold"><%= t("products.edit.heading") %></h1>
   </div>
   <%= render "form", product: @product %>

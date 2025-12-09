@@ -37,6 +37,7 @@ class Product < ApplicationRecord
   # Scopes для фильтрации
   scope :active, -> { where(status: 'active') }
   scope :draft, -> { where(status: 'draft') }
+  scope :in_progress, -> { where(status: 'in_progress') }
   scope :archived, -> { where(status: 'archived') }
 
   scope :tip_product, -> { where(tip: 'product') }
@@ -58,7 +59,7 @@ class Product < ApplicationRecord
   scope :without_images, -> { left_joins(:images).where(images: {product_id: nil}) }
 
   # Константы для статусов и типов
-  STATUS = %w[draft active archived].freeze
+  STATUS = %w[draft in_progress active archived].freeze
   TIP = %w[product service kit].freeze
 
   # Ransack для поиска

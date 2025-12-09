@@ -329,3 +329,14 @@ namespace :detal do
 end
 
 # rails 'detal:json_import[email,password,page]'
+# To run in rails console: call DetalImportBatch.run
+module DetalImportBatch
+  def self.run(email = 'panaet80@gmail.com', password = '071080', from_page = 111, to_page = 200)
+    (from_page..to_page).each do |page|
+      puts "Importing page #{page}..."
+      system("bundle exec rake detal:json_import['#{email}','#{password}',#{page}]")
+      sleep 1 # Optional: pause between requests to avoid overload
+    end
+    puts "Import completed for pages #{from_page} to #{to_page}."
+  end
+end

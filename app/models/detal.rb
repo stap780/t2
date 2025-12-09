@@ -44,7 +44,7 @@ class Detal < ApplicationRecord
               is_original_prices.reject(&:blank?).sort_by(&:to_i).first : nil
             
             if oszz_price_value
-              { success: true, message: "Успешно обновили цену ОСЗЗ", price: oszz_price_value }
+              { success: true, message: "Успешно получили цену ОСЗЗ", price: oszz_price_value }
             else
               { success: false, message: "Не нашли на сайте ОСЗ модель-деталь по оригинальному номеру" }
             end

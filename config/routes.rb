@@ -46,6 +46,7 @@ Rails.application.routes.draw do
       get :filter
     end
     member do
+      get :refill
       post :copy
       patch :sort_image
     end
