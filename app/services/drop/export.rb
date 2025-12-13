@@ -21,6 +21,11 @@ class Drop::Export < Liquid::Drop
     @export.data
   end
 
+  # Provide products access for Liquid templates (alias for data)
+  def products
+    @export.data
+  end
+
   # Provide record count for template use
   def record_count
     @export.data.length
@@ -46,7 +51,7 @@ class Drop::Export < Liquid::Drop
 
   # Data source information
   def data_source_info
-    @export.data_source_info
+    "Product model (#{@export.data.length} products)"
   end
 
   def has_data_source

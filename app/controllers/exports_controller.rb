@@ -20,7 +20,7 @@ class ExportsController < ApplicationController
     @export = Current.user.exports.build(export_params)
 
     if @export.save
-      redirect_to exports_path, notice: "Export setup saved successfully."
+      redirect_to exports_path, notice: t(".success")
     else
       render :new, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class ExportsController < ApplicationController
   def update
     # Update export setup - don't run automatically
     if @export.update(export_params)
-      redirect_to exports_path, notice: "Export setup updated successfully."
+      redirect_to exports_path, notice: t(".success")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -42,7 +42,7 @@ class ExportsController < ApplicationController
     # Always run immediately, regardless of any scheduled time
     Rails.logger.info "🎯 Controller: Queuing immediate ExportJob for Export ##{@export.id} at #{Time.current}"
     ExportJob.perform_later(@export)
-    notice = "Export started successfully."
+    notice = t(".success")
 
     respond_to do |format|
       format.turbo_stream { 
@@ -55,12 +55,12 @@ class ExportsController < ApplicationController
   def download
     # Check if export is completed and file exists
     unless @export.completed?
-      redirect_to exports_path, alert: "Export is not completed yet."
+      redirect_to exports_path, alert: t(".not_completed")
       return
     end
 
     unless @export.export_file.attached?
-      redirect_to exports_path, alert: "File not found."
+      redirect_to exports_path, alert: t(".file_not_found")
       return
     end
 
@@ -90,7 +90,7 @@ class ExportsController < ApplicationController
 
   def destroy
     @export.destroy
-    redirect_to exports_path, notice: "Export deleted successfully."
+    redirect_to exports_path, notice: t(".success")
   end
 
   private

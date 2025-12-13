@@ -180,23 +180,6 @@ class ItemsController < ApplicationController
     end
   end
 
-  # def set_item
-  #   item_id = params[:id]
-  #   # Для новых записей используем hash ID из turbo_id_for
-  #   if item_id.present? && item_id.match?(/^\d+$/) && item_id.to_i < 2147483647
-  #     @item = @incase.items.find_by(id: item_id) || Item.new(id: item_id, incase: @incase)
-  #   else
-  #     # Для новых записей с hash ID создаем новый объект с установленным id
-  #     @item = Item.new(incase: @incase)
-  #     @item.id = item_id if item_id.present?
-  #     # Если id не передан, устанавливаем hash для согласованности
-  #     @item.id ||= @item.hash unless @item.persisted?
-  #   end
-  # rescue ActiveRecord::RecordNotFound
-  #   @item = Item.new(incase: @incase)
-  #   @item.id = params[:id] if params[:id].present?
-  #   @item.id ||= @item.hash unless @item.persisted?
-  # end
   def set_item
     @item = @incase.items.find(params[:id])
   rescue ActiveRecord::RecordNotFound

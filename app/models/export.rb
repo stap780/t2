@@ -38,7 +38,7 @@ class Export < ApplicationRecord
   STATUS = %w[pending processing completed failed].freeze
 
   # Test mode limit
-  TEST_LIMIT = 10
+  TEST_LIMIT = 1000
 
   # Callbacks
   before_validation :set_default_name, on: :create
@@ -100,20 +100,9 @@ class Export < ApplicationRecord
     test_mode? ? TEST_LIMIT : nil
   end
 
-  # Extract data for template rendering (inspired by Dizauto)
+  # Extract data for template rendering (now from Product model)
   def data
-    @data ||= begin
-      # Use the last created import (from any user) as data source
-      last_import = Import.completed.recent.first
-
-      if last_import.present?
-        extract_data_from_import(last_import)
-      else
-        # Return empty array if no imports found
-        Rails.logger.warn "🎯 Export ##{id}: No completed imports found in the system"
-        []
-      end
-    end
+    @data ||= extract_data_from_products
   end
 
   # Convert to Liquid drop for template rendering (like Dizauto)
@@ -122,7 +111,48 @@ class Export < ApplicationRecord
   end
 
   def has_data_source?
-    Import.completed.any?
+    Product.any?
+  end
+
+  # Get available fields for export (used in forms and export service)
+  def self.available_fields
+    # Base Product fields
+    product_fields = %w[id status tip title description created_at updated_at]
+    
+    # Variant fields (will be flattened as variant_1_barcode, variant_1_sku, etc.)
+    variant_fields = %w[barcode sku price quantity cost_price]
+    variant_fields_flat = variant_fields.map { |f| "variant_1_#{f}" }
+    
+    # Image fields
+    image_fields = %w[images images_zap images_second images_thumb]
+    
+    # Feature fields - используем реальные названия свойств из базы данных
+    # Получаем все уникальные названия свойств, которые используются в продуктах
+    property_titles = Property.joins(:features)
+                              .where(features: { featureable_type: 'Product' })
+                              .distinct
+                              .pluck(:title)
+    
+    # Если свойств нет, используем пустой массив
+    feature_fields_flat = property_titles.map { |title| "feature_#{title}" }
+    
+    # Combine all fields
+    product_fields + variant_fields_flat + image_fields + feature_fields_flat
+  end
+
+  # Get translated field name for display
+  def self.field_label(field_name)
+    I18n.t("exports.fields.#{field_name}", default: field_name.humanize)
+  end
+
+  # Get available fields for Liquid template (for XML exports)
+  def self.available_product_fields_for_template
+    {
+      product_fields: %w[id status tip title description created_at updated_at],
+      variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.quantity variants.first.cost_price],
+      feature_fields: ['features (for iteration)'],
+      image_fields: %w[images images_zap images_second images_thumb]
+    }
   end
 
   private
@@ -196,49 +226,96 @@ class Export < ApplicationRecord
     self.test = true if test.nil?
   end
 
-  def extract_data_from_import(import)
-    return [] unless import&.completed? && import.zip_file.attached?
+  # Extract data from Product model with optimized queries
+  def extract_data_from_products
+    Rails.logger.info "🎯 Export ##{id}: Extracting data from Product model"
 
-    require "csv"
+    # Оптимизированная загрузка с includes для избежания N+1 запросов
+    products_scope = Product
+      .includes(:variants, features: [:property, :characteristic], images: [:file_attachment, :file_blob])
 
-    begin
-      Rails.logger.info "🎯 Export ##{id}: Extracting data from Import ##{import.id}"
-
-      # Download and unzip the import file
-      zip_data = import.zip_file.download
-      csv_content = nil
-
-      Zip::File.open_buffer(zip_data) do |zip|
-        zip.each do |entry|
-          if entry.name.end_with?(".csv")
-            csv_content = entry.get_input_stream.read
-            Rails.logger.info "🎯 Export ##{id}: Found CSV file: #{entry.name}"
-            break
-          end
-        end
-      end
-
-      return [] unless csv_content
-
-      # Ensure proper encoding for CSV content
-      csv_content = csv_content.force_encoding('UTF-8')
-      csv_content = csv_content.scrub('?') unless csv_content.valid_encoding?
-
-      # Parse CSV to array of hashes for Liquid template access
-      csv_data = CSV.parse(csv_content, headers: true)
-      data_array = csv_data.map(&:to_h)
-
-      # Apply test mode limit if enabled
-      if test_mode? && data_array.length > TEST_LIMIT
-        Rails.logger.info "🎯 Export ##{id}: TEST MODE - Limiting to #{TEST_LIMIT} records (from #{data_array.length} total)"
-        data_array = data_array.first(TEST_LIMIT)
-      end
-
-      Rails.logger.info "🎯 Export ##{id}: Extracted #{data_array.length} records from import"
-      data_array
-    rescue => e
-      Rails.logger.error "🎯 Export ##{id}: Error extracting data from import: #{e.message}"
-      []
+    # Применение тестового режима
+    if test_mode?
+      products_scope = products_scope.limit(TEST_LIMIT)
+      Rails.logger.info "🎯 Export ##{id}: TEST MODE - Limiting to #{TEST_LIMIT} products"
     end
+
+    # Преобразование в массив хешей
+    data_array = products_scope.find_each(batch_size: 100).map do |product|
+      product_to_hash(product)
+    end
+
+    Rails.logger.info "🎯 Export ##{id}: Extracted #{data_array.length} products"
+    data_array
+  rescue => e
+    Rails.logger.error "🎯 Export ##{id}: Error extracting data from products: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    []
+  end
+
+  # Convert Product to hash for export
+  def product_to_hash(product)
+    # Используем with_indifferent_access для работы со строковыми и символическими ключами
+    hash = product.attributes.with_indifferent_access.dup
+    
+    # Добавляем описание как plain text
+    hash['description'] = product.file_description
+    
+    # Добавляем варианты - преобразуем в массив хешей со строковыми ключами
+    hash['variants'] = product.variants.map do |variant|
+      variant.attributes.with_indifferent_access
+    end
+    
+    # Добавляем features как массив для итерации: for feature in product.features
+    hash['features'] = product.features.map do |feature|
+      {
+        'property' => feature.property.title.to_s,
+        'characteristic' => feature.characteristic.title.to_s
+      }
+    end
+    
+    # Добавляем изображения как массив URL
+    # Используем выбранный вариант изображений или оригинал по умолчанию
+    image_variant = image_variant_for_export || 'original'
+    hash['images'] = product_images_urls(product, image_variant)
+    
+    # Также добавляем все варианты изображений для гибкости
+    hash['images_zap'] = product_images_urls(product, 'zap')
+    hash['images_second'] = product_images_urls(product, 'second')
+    hash['images_thumb'] = product_images_urls(product, 'thumb')
+    
+    hash
+  end
+
+  # Get image variant for export (can be extended with image_variant field)
+  def image_variant_for_export
+    # Можно добавить поле image_variant в модель Export для выбора варианта
+    # Пока используем оригинал по умолчанию
+    nil # или self.image_variant если поле добавлено
+  end
+
+  # Get product images URLs for specific variant
+  def product_images_urls(product, variant = 'original')
+    return [] unless product.images.present?
+    
+    product.images.map do |image|
+      case variant
+      when 'zap'
+        image.zap_url
+      when 'second'
+        image.second_url
+      when 'thumb'
+        begin
+          thumb_variant = image.file.variant(:thumb)
+          thumb_variant.processed
+          thumb_variant.service.url(thumb_variant.key)
+        rescue => e
+          Rails.logger.warn "Failed to get thumb variant for Image ##{image.id}: #{e.message}"
+          image.s3_url
+        end
+      else # 'original'
+        image.s3_url
+      end
+    end.compact
   end
 end
