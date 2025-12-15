@@ -101,7 +101,6 @@ class Image < ApplicationRecord
   def schedule_variant_generation
     return unless file.attached?
     
-    # Генерируем second вариант сразу (простой resize)
     # Генерируем zap вариант в фоне (с водяным знаком)
     ImageZapVariantJob.perform_later(self)
   end
