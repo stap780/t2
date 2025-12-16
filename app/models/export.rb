@@ -281,8 +281,7 @@ class Export < ApplicationRecord
     
     # Также добавляем все варианты изображений для гибкости
     hash['images_zap'] = product_images_urls(product, 'zap')
-    hash['images_second'] = product_images_urls(product, 'second')
-    hash['images_thumb'] = product_images_urls(product, 'thumb')
+    # hash['images_second'] = product_images_urls(product, 'second')
     
     hash
   end
@@ -304,15 +303,6 @@ class Export < ApplicationRecord
         image.zap_url
       when 'second'
         image.second_url
-      when 'thumb'
-        begin
-          thumb_variant = image.file.variant(:thumb)
-          thumb_variant.processed
-          thumb_variant.service.url(thumb_variant.key)
-        rescue => e
-          Rails.logger.warn "Failed to get thumb variant for Image ##{image.id}: #{e.message}"
-          image.s3_url
-        end
       else # 'original'
         image.s3_url
       end

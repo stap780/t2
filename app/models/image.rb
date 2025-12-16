@@ -16,7 +16,6 @@ class Image < ApplicationRecord
   
   # Callback для предварительной генерации вариантов
   after_create_commit :schedule_variant_generation, if: -> { file.attached? }
-  after_update_commit :schedule_variant_generation, if: -> { file.attached? }
   
   validates :position, uniqueness: { scope: :product }
   validate :is_image
@@ -100,6 +99,11 @@ class Image < ApplicationRecord
 
   def schedule_variant_generation
     return unless file.attached?
+
+     # если zap уже есть — ничего не делаем
+    if file.blob.metadata.is_a?(Hash) && file.blob.metadata['zap_variant_key'].present?
+      return
+    end
     
     # Генерируем zap вариант в фоне (с водяным знаком)
     ImageZapVariantJob.perform_later(self)
