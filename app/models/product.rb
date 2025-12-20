@@ -27,6 +27,7 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
+
   before_destroy :check_variants_have_items, prepend: true
 
   validates :title, presence: true
@@ -52,14 +53,12 @@ class Product < ApplicationRecord
   scope :yes_quantity, -> { ransack(variants_quantity_gt: 0).result }
   scope :no_price, -> { ransack(variants_price_lt: 1).result }
   scope :yes_price, -> { ransack(variants_price_gt: 0).result }
-  # scope :with_images, -> { include_images.where.not(images: {product_id: nil}) }
-  # scope :without_images, -> { include_images.where(images: {product_id: nil}) }
-  # В app/models/product.rb заменить:
+
   scope :with_images, -> { joins(:images).where.not(images: {product_id: nil}).distinct }
   scope :without_images, -> { left_joins(:images).where(images: {product_id: nil}) }
 
   # Константы для статусов и типов
-  STATUS = %w[draft in_progress active archived].freeze
+  STATUS = %w[draft pending in_progress active archived].freeze
   TIP = %w[product service kit].freeze
 
   # Ransack для поиска
@@ -251,5 +250,6 @@ class Product < ApplicationRecord
 
     [true, { product: self, variant: variant }]
   end
+
   
 end

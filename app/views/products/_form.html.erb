@@ -4,7 +4,7 @@
 <% end %>
 <!-- Скрытая форма для массового удаления -->
 <%= turbo_frame_tag dom_id(product) do %>
-  <%= form_with model: product, local: true, data: { turbo: false } do |f| %>
+  <%= form_with model: product, local: true do |f| %>
     <%= render "shared/errors", object: product if product.errors.any? %>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -87,13 +87,13 @@
           <div class="flex gap-2 items-end">
             <div class="flex-1">
               <%= f.select :status, 
-                  options_for_select(Product::STATUS.map { |s| [s.humanize, s] }, product.status),
+                  options_for_select(Product::STATUS.map { |s| [t("products.form.status.#{s}"), s] }, product.status),
                   { include_blank: t("products.form.select_status") },
                   { class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
             </div>
             <div class="flex-1">
               <%= f.select :tip, 
-                  options_for_select(Product::TIP.map { |t| [t.humanize, t] }, product.tip),
+                  options_for_select(Product::TIP.map { |t| [t("products.form.tip.#{t}"), t] }, product.tip),
                   { include_blank: t("products.form.select_type") },
                   { class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
             </div>
@@ -148,7 +148,7 @@
 
     <!-- Кнопки действий -->
     <div class="mt-6 flex justify-start space-x-3">
-      <%= f.submit class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+      <%= f.submit class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo: false } %>
       <%= link_to t("products.form.cancel"), products_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
     </div>
   <% end %>

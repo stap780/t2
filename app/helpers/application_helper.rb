@@ -45,6 +45,13 @@ module ApplicationHelper
       options[:class] = "p-2 rounded-md bg-violet-100 hover:bg-violet-200 flex items-center justify-center"
     end
     options[:title] ||= t('edit')
+
+        # Правильно мержим data атрибуты, если они переданы
+    if options[:data].present?
+      # data уже есть, ничего не делаем - он будет передан в link_to
+    else
+      options[:data] = {}
+    end
     
     link_to path, options do
       edit_icon

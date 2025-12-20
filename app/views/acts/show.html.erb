@@ -26,7 +26,7 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <span class="text-sm text-gray-500"><%= t('.act_date') %>:</span>
-          <%= form_with model: @act, local: true do |f| %>
+          <%= form_with model: @act do |f| %>
             <%= f.date_field :date, 
               class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
               style: "max-width: 250px;",
@@ -35,7 +35,7 @@
         </div>
         <div>
           <span class="text-sm text-gray-500"><%= t('.status') %>:</span>
-          <%= form_with model: @act, local: true do |f| %>
+          <%= form_with model: @act do |f| %>
             <%= f.select :status, options_for_select(Act.statuses.keys.map { |k| [t("enums.act.status.#{k}"), k] }, @act.status), { include_blank: false }, 
                 onchange: 'this.form.requestSubmit();', 
                 class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 

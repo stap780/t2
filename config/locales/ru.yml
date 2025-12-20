@@ -1,4 +1,6 @@
 ru:
+  edit: "Редактировать"
+  delete: "Удалить"
   nav:
     brand: "App"
     dashboard: "Панель"
@@ -745,6 +747,16 @@ ru:
       quantity: "Кол-во"
       cost_price: "Вх. цена"
       price: "Цена"
+      status:
+        draft: "Черновик"
+        pending: "В ожидании"
+        in_progress: "В работе"
+        active: "Активен"
+        archived: "Архив"
+      tip:
+        product: "Товар"
+        service: "Услуга"
+        kit: "Комплект"
     create:
       success: "Товар создан"
     update:
@@ -753,6 +765,9 @@ ru:
       success: "Товар удален"
     insales_info:
       success: "Данные из InSales обновлены"
+    sync_with_moysklad: "Синхронизировать с МС"
+    sync_with_moysklad_started: "Синхронизация с МойСклад запущена"
+    sync_with_moysklad_no_binding: "Настройте связь с МойСклад в разделе привязок товара"
   properties:
     index:
       title: "Параметры"

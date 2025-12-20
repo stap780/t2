@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       get :refill
       post :copy
       patch :sort_image
+      post :sync_with_moysklad
     end
     resources :variants do
       member do

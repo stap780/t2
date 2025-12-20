@@ -154,6 +154,7 @@ class ItemsController < ApplicationController
 
   def update_condition
     @item.update(condition: params[:condition])
+    @item.variant.product.update(status: 'pending') if @item.variant.product.status == 'draft'
     respond_to do |format|
       format.turbo_stream do
         flash.now[:success] = t('.success')

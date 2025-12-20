@@ -1,7 +1,7 @@
 <%= turbo_frame_tag  dom_id(incase, dom_id(item, 'act_show')) do %>
     <div class="px-2 py-1 hover:bg-gray-50">
         <div class="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-4 items-center">
-            <span class="text-sm font-medium text-gray-900">
+            <span class="text-sm font-medium text-gray-900" title="<%= item.variant&.full_title %>">
                 <%= item.title %> (<%= item.katnumber %>)
             </span>
             <%= form_with url: update_status_incase_item_path(incase, item), method: :post, local: true do |f| %>
@@ -14,10 +14,10 @@
                 <% Item.conditions.each_key do |cond| %>
                     <label class="flex items-center space-x-2 text-sm text-gray-600">
                         <%= form_with url: update_condition_incase_item_path(incase, item), method: :post, local: true do |f| %>
-                        <%= f.radio_button :condition, cond, checked: item.condition == cond, onchange: 'this.form.requestSubmit();', 
-                        class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded",
-                        style: "max-width: 250px;" %>
-                        <span><%= t("enums.item.condition.#{cond}") %></span>
+                            <%= f.radio_button :condition, cond, checked: item.condition == cond, onchange: 'this.form.requestSubmit();', 
+                            class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded",
+                            style: "max-width: 250px;" %>
+                            <span><%= t("enums.item.condition.#{cond}") %></span>
                         <% end %>
                     </label>
                 <% end %>

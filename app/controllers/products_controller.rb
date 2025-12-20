@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad ]
   after_action :clear_preloaded_detals, only: [:index]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
@@ -234,6 +234,25 @@ class ProductsController < ApplicationController
 
   end
 
+  def sync_with_moysklad
+    if has_moysklad_binding?
+      MoyskladSyncProductJob.perform_later(@product.id)
+      flash_message = t("products.sync_with_moysklad_started")
+      flash_type = :notice
+    else
+      flash_message = t("products.sync_with_moysklad_no_binding")
+      flash_type = :alert
+    end
+
+    respond_to do |format|
+      format.turbo_stream do
+        flash.now[flash_type] = flash_message
+        render turbo_stream: [render_turbo_flash]
+      end
+      format.html { redirect_to products_path, flash_type => flash_message }
+    end
+  end
+
   private
 
   def set_product
@@ -253,6 +272,12 @@ class ProductsController < ApplicationController
         end
       end
     end
+  end
+
+  def has_moysklad_binding?
+    moysklad = Moysklad.first
+    return false unless moysklad
+    @product.bindings.exists?(bindable: moysklad)
   end
 
   def product_params
