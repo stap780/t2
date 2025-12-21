@@ -47,9 +47,15 @@
         <div>
           <dt class="text-sm font-medium text-gray-500">Тип письма</dt>
           <dd class="mt-1">
-            <span class="px-2 py-1 text-xs rounded <%= @email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
-              <%= @email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
-            </span>
+            <% if @email_delivery.moysklad_notification? %>
+              <span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800">
+                <%= @email_delivery.operation_type_name %>
+              </span>
+            <% else %>
+              <span class="px-2 py-1 text-xs rounded <%= @email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
+                <%= @email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
+              </span>
+            <% end %>
           </dd>
         </div>
         <div>
@@ -74,20 +80,63 @@
     </div>
 
     <!-- Связанная запись -->
-    <div>
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Связанная запись</h2>
-      <div class="bg-gray-50 rounded-lg p-4">
-        <p class="text-sm text-gray-600">
-          <strong>Тип:</strong> <%= @email_delivery.record_type %><br>
-          <strong>ID:</strong> <%= @email_delivery.record_id %>
-          <% if @email_delivery.record_type == 'Act' %>
-            <br><%= link_to "Просмотреть акт", act_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
-          <% elsif @email_delivery.record_type == 'Incase' %>
-            <br><%= link_to "Просмотреть заявку", incase_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
-          <% end %>
-        </p>
+    <% if @email_delivery.record.present? %>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Связанная запись</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <p class="text-sm text-gray-600">
+            <strong>Тип:</strong> <%= @email_delivery.record_type %><br>
+            <strong>ID:</strong> <%= @email_delivery.record_id %>
+            <% if @email_delivery.record_type == 'Act' %>
+              <br><%= link_to "Просмотреть акт", act_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+            <% elsif @email_delivery.record_type == 'Incase' %>
+              <br><%= link_to "Просмотреть заявку", incase_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+            <% elsif @email_delivery.record_type == 'Product' %>
+              <br><%= link_to "Просмотреть товар", product_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+            <% end %>
+          </p>
+        </div>
       </div>
-    </div>
+    <% end %>
+
+    <!-- Детали операции Moysklad -->
+    <% if @email_delivery.moysklad_notification? %>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Детали операции</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <dl class="grid grid-cols-2 gap-4">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Тип операции</dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                <%= @email_delivery.operation_type_name %>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Результат</dt>
+              <dd class="mt-1 text-sm text-gray-900">
+                <%= @email_delivery.operation_result == 'success' ? 'Успешно' : 'Ошибка' %>
+              </dd>
+            </div>
+            <% if @email_delivery.record.is_a?(Product) %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Товар</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  <%= link_to @email_delivery.record.title, product_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
+                </dd>
+              </div>
+            <% end %>
+            <% if @email_delivery.operation_details.present? %>
+              <div class="col-span-2">
+                <dt class="text-sm font-medium text-gray-500">Детали</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                  <pre class="bg-white p-2 rounded text-xs overflow-auto"><%= JSON.pretty_generate(@email_delivery.operation_details) %></pre>
+                </dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+    <% end %>
 
     <!-- Файл -->
     <% if @email_delivery.attachment.attached? %>
@@ -116,8 +165,10 @@
 
     <!-- Действия -->
     <div class="flex justify-end space-x-3 pt-4 border-t">
-      <% if @email_delivery.failed? && @email_delivery.attachment.attached? %>
-        <%= button_to "Повторить отправку", retry_email_delivery_path(@email_delivery), method: :post, class: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
+      <% if @email_delivery.failed? %>
+        <% if @email_delivery.moysklad_notification? || @email_delivery.attachment.attached? %>
+          <%= button_to "Повторить отправку", retry_email_delivery_path(@email_delivery), method: :post, class: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
+        <% end %>
       <% end %>
       <%= link_to "Назад к списку", email_deliveries_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
     </div>

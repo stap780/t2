@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Массовое создание товаров в МойСклад успешно завершено' : '❌ Ошибка массового создания товаров в МойСклад' %></h2>
+    
+    <% if @success %>
+      <% if @details['created_count'].present? %>
+        <p><strong>Создано товаров:</strong> <%= @details['created_count'] %></p>
+      <% end %>
+      <% if @details['error_count'].present? %>
+        <p><strong>Ошибок:</strong> <%= @details['error_count'] %></p>
+      <% end %>
+      <% if @details['error_412_count'].present? %>
+        <p><strong>Ошибок 412 (дубликат code):</strong> <%= @details['error_412_count'] %></p>
+      <% end %>
+      <% if @details['total'].present? %>
+        <p><strong>Всего обработано:</strong> <%= @details['total'] %></p>
+      <% end %>
+      <% if @details['completed_at'].present? %>
+        <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+      <% end %>
+    <% else %>
+      <p><strong>Ошибка:</strong> <%= @email_delivery.error_message %></p>
+      <% if @details['error_class'].present? %>
+        <p><strong>Тип ошибки:</strong> <%= @details['error_class'] %></p>
+      <% end %>
+      <% if @details['error_message'].present? %>
+        <p><strong>Детали ошибки:</strong> <%= @details['error_message'] %></p>
+      <% end %>
+    <% end %>
+  </body>
+</html>
+

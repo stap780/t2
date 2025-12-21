@@ -305,5 +305,6 @@ class Moysklad::SyncProductService
       value: ms_id
     )
   end
+  
 end
 

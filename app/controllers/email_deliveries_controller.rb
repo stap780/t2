@@ -14,20 +14,22 @@ class EmailDeliveriesController < ApplicationController
   def retry
     @email_delivery = EmailDelivery.find(params[:id])
     
-    # Проверяем, что файл прикреплен
-    unless @email_delivery.attachment.attached?
-      redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'
-      return
-    end
-    
     case @email_delivery.mailer_class
     when 'IncaseMailer'
+      unless @email_delivery.attachment.attached?
+        redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'
+        return
+      end
       IncaseEmailJob.perform_later(
         @email_delivery.record.id,
         @email_delivery.recipient.id,
         @email_delivery.id
       )
     when 'ActMailer'
+      unless @email_delivery.attachment.attached?
+        redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'
+        return
+      end
       # Для актов нужно найти все EmailDelivery записи для этого пользователя и актов
       user = @email_delivery.recipient
       act_ids = EmailDelivery.where(
@@ -37,6 +39,12 @@ class EmailDeliveriesController < ApplicationController
       ).pluck(:record_id).uniq
       
       ActEmailJob.perform_later(user.id, [@email_delivery.id])
+    when 'MoyskladNotificationMailer'
+      # Повторная отправка уведомления Moysklad
+      MoyskladNotificationJob.perform_later(@email_delivery.id)
+    else
+      redirect_to @email_delivery, alert: 'Повторная отправка недоступна для этого типа письма'
+      return
     end
     
     redirect_to @email_delivery, notice: 'Повторная отправка запланирована'

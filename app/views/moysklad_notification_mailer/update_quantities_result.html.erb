@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Обновление остатков успешно завершено' : '❌ Ошибка обновления остатков' %></h2>
+    
+    <% if @success %>
+      <% if @details['updated_count'].present? %>
+        <p><strong>Обновлено вариантов:</strong> <%= @details['updated_count'] %></p>
+      <% end %>
+      <% if @details['stations_updated'].present? %>
+        <p><strong>Обновлено складов (features):</strong> <%= @details['stations_updated'] %></p>
+      <% end %>
+      <% if @details['with_quantity_count'].present? %>
+        <p><strong>Вариантов с остатком > 0:</strong> <%= @details['with_quantity_count'] %></p>
+      <% end %>
+      <% if @details['completed_at'].present? %>
+        <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+      <% end %>
+    <% else %>
+      <p><strong>Ошибка:</strong> <%= @email_delivery.error_message %></p>
+      <% if @details['error_class'].present? %>
+        <p><strong>Тип ошибки:</strong> <%= @details['error_class'] %></p>
+      <% end %>
+      <% if @details['error_message'].present? %>
+        <p><strong>Детали ошибки:</strong> <%= @details['error_message'] %></p>
+      <% end %>
+    <% end %>
+  </body>
+</html>
+

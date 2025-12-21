@@ -9,12 +9,16 @@
 
   <!-- Поиск и фильтры -->
   <div class="bg-white rounded-lg shadow p-4 mb-4">
-    <%= search_form_for @search, url: email_deliveries_path, method: :get, html: { class: "flex items-center space-x-4" } do |f| %>
-      <%= f.search_field :recipient_email_cont, placeholder: "Email получателя", class: "px-3 py-2 border border-gray-300 rounded-md" %>
-      <%= f.select :status_eq, options_for_select([['Все', ''], ['Ожидает', 'pending'], ['Отправлено', 'sent'], ['Ошибка', 'failed']], params.dig(:q, :status_eq)), {}, { class: "px-3 py-2 border border-gray-300 rounded-md" } %>
-      <%= f.select :mailer_class_eq, options_for_select([['Все', ''], ['ActMailer', 'ActMailer'], ['IncaseMailer', 'IncaseMailer']], params.dig(:q, :mailer_class_eq)), {}, { class: "px-3 py-2 border border-gray-300 rounded-md" } %>
-      <%= f.submit "Поиск", class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
-      <%= link_to "Сбросить", email_deliveries_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
+    <%= search_form_for @search, url: email_deliveries_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+      <%= f.search_field :recipient_email_cont, placeholder: "Email получателя", class: "h-8  px-2 py-1 border rounded" %>
+      <%= f.select :status_eq, options_for_select([['Все', ''], ['Ожидает', 'pending'], ['Отправлено', 'sent'], ['Ошибка', 'failed']], params.dig(:q, :status_eq)), {}, { class: "h-8 px-2 py-1 border rounded-md" } %>
+      <%= f.select :mailer_class_eq, options_for_select([['Все', ''], ['Уведомления Акты', 'ActMailer'], ['Уведомления Убытки', 'IncaseMailer'], ['Уведомления МойСклад', 'MoyskladNotificationMailer']], params.dig(:q, :mailer_class_eq)), {}, { class: "h-8 px-2 py-1 border rounded-md" } %>
+      <%= f.submit "Поиск", class: "h-8 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"  %>
+      <%= link_to email_deliveries_path(search_cancel: true), class: "h-8 px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("products.index.clear") do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
     <% end %>
   </div>
 

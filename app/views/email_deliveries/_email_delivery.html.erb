@@ -1,19 +1,33 @@
 <div class="grid grid-cols-[50px_150px_200px_150px_150px_100px_150px] gap-4 p-4 border-b hover:bg-gray-50 items-center">
   <div><%= email_delivery.id %></div>
   <div class="truncate">
-    <% if email_delivery.recipient.respond_to?(:email_address) %>
-      <%= email_delivery.recipient.email_address %>
-    <% elsif email_delivery.recipient.respond_to?(:short_title) %>
-      <%= email_delivery.recipient.short_title %>
+    <% if email_delivery.moysklad_notification? %>
+      <% if email_delivery.record.is_a?(Product) %>
+        Товар #<%= email_delivery.record.id %>
+      <% else %>
+        МойСклад
+      <% end %>
     <% else %>
-      <%= email_delivery.recipient.class.name %>
+      <% if email_delivery.recipient.respond_to?(:email_address) %>
+        <%= email_delivery.recipient.email_address %>
+      <% elsif email_delivery.recipient.respond_to?(:short_title) %>
+        <%= email_delivery.recipient.short_title %>
+      <% else %>
+        <%= email_delivery.recipient.class.name %>
+      <% end %>
     <% end %>
   </div>
   <div class="truncate text-sm"><%= email_delivery.recipient_email %></div>
   <div>
-    <span class="px-2 py-1 text-xs rounded <%= email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
-      <%= email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
-    </span>
+    <% if email_delivery.moysklad_notification? %>
+      <span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800">
+        <%= email_delivery.operation_type_name %>
+      </span>
+    <% else %>
+      <span class="px-2 py-1 text-xs rounded <%= email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
+        <%= email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
+      </span>
+    <% end %>
   </div>
   <div>
     <% case email_delivery.status %>
@@ -29,7 +43,7 @@
     <%= email_delivery.created_at.strftime('%d/%m/%Y %H:%M') %>
   </div>
   <div class="flex justify-end space-x-2">
-    <%= link_to "Просмотр", email_delivery_path(email_delivery), class: "px-3 py-1 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+    <%= link_to "Просмотр", email_delivery_path(email_delivery), class: "px-3 py-1 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo: false } %>
     <% if email_delivery.failed? %>
       <%= button_to "Повторить", retry_email_delivery_path(email_delivery), method: :post, class: "px-3 py-1 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
     <% end %>

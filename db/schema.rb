@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_09_164722) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_21_112257) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -186,8 +186,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_09_164722) do
   create_table "email_deliveries", force: :cascade do |t|
     t.string "recipient_type", null: false
     t.bigint "recipient_id", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
+    t.string "record_type"
+    t.bigint "record_id"
     t.string "mailer_class", null: false
     t.string "mailer_method", null: false
     t.string "status", default: "pending", null: false
