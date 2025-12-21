@@ -6,7 +6,7 @@ class Moysklad::UpdateQuantitiesService
   MOYSKLAD_API_URL = "https://api.moysklad.ru/api/remap/1.2/report/stock/bystore/current".freeze
   
   # Email для уведомлений (можно вынести в настройки)
-  NOTIFICATION_EMAIL = ENV['MOYSKLAD_NOTIFICATION_EMAIL'] || 'dizautodealer@gmail.com'
+  NOTIFICATION_EMAIL = Rails.application.credentials.dig(:moysklad_notification_email) || 'dizautodealer@gmail.com'
   
   MS_SKLAD_MAPPING = {
     '381569e6-4f34-11e6-7a69-9711000bbbe5' => 'Волгоградский проспект',

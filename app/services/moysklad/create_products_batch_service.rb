@@ -1,6 +1,6 @@
 class Moysklad::CreateProductsBatchService
   # Email для уведомлений (можно вынести в настройки)
-  NOTIFICATION_EMAIL = ENV['MOYSKLAD_NOTIFICATION_EMAIL'] || 'dizautodealer@gmail.com'
+  NOTIFICATION_EMAIL = Rails.application.credentials.dig(:moysklad_notification_email) || 'dizautodealer@gmail.com'
   
   def initialize(moysklad_config = nil)
     @moysklad = moysklad_config || Moysklad.first
