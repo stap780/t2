@@ -6,14 +6,9 @@ class MoyskladNotificationMailer < ApplicationMailer
     @moysklad = @email_delivery.recipient
     @details = @email_delivery.operation_details
     @success = @email_delivery.sent?
-    
-    subject = @success ? 
-      "✅ Массовое создание товаров в МойСклад - успешно" :
-      "❌ Массовое создание товаров в МойСклад - ошибка"
-    
     mail(
       to: @email_delivery.recipient_email,
-      subject: subject,
+      subject: @email_delivery.subject,
       reply_to: "robot@gmail.com"
     )
   end
@@ -23,14 +18,9 @@ class MoyskladNotificationMailer < ApplicationMailer
     @moysklad = @email_delivery.recipient
     @details = @email_delivery.operation_details
     @success = @email_delivery.sent?
-    
-    subject = @success ? 
-      "✅ Обновление остатков из МойСклад - успешно" :
-      "❌ Обновление остатков из МойСклад - ошибка"
-    
     mail(
       to: @email_delivery.recipient_email,
-      subject: subject,
+      subject: @email_delivery.subject,
       reply_to: "robot@gmail.com"
     )
   end
