@@ -277,7 +277,11 @@ class ProductsController < ApplicationController
   def has_moysklad_binding?
     moysklad = Moysklad.first
     return false unless moysklad
-    @product.bindings.exists?(bindable: moysklad)
+    
+    first_variant = @product.variants.first
+    return false unless first_variant
+    
+    first_variant.bindings.exists?(bindable: moysklad)
   end
 
   def product_params

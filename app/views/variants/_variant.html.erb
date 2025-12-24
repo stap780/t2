@@ -1,7 +1,9 @@
-<%= turbo_frame_tag dom_id(product, dom_id(variant)), class: "grid grid-cols-[50px_100px_140px_1fr_1fr_1fr_125px] gap-2 py-2 border-t hover:bg-gray-50" do %>
+<%= turbo_frame_tag dom_id(product, dom_id(variant)), class: "grid grid-cols-[50px_240px_1fr_1fr_1fr_125px] gap-2 py-2 border-t hover:bg-gray-50" do %>
   <div><%= variant.id %></div>
-  <div><%= variant.sku %></div>
-  <div><%= variant.barcode %></div>
+  <div class="flex flex-col">
+    <div class="text-sm">sku: <%= variant.sku %></div>
+    <div class="text-sm">barcode: <%= variant.barcode %></div>
+  </div>
   <div><%= variant.quantity %></div>
   <div><%= variant.cost_price %></div>
   <div><%= variant.price %></div>

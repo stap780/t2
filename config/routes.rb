@@ -83,6 +83,7 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   get "dashboard", to: "dashboard#index"
+  post "dashboard/fullsearch", to: "dashboard#fullsearch", as: :fullsearch_dashboard_index
   
   # Routes with modern RESTful patterns
   resources :imports, only: [:index, :show, :create, :destroy] do

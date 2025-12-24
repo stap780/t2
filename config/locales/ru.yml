@@ -281,6 +281,7 @@ ru:
     form:
       time_label: "Время (24ч, шаг 15 минут)"
       daily: "Ежедневно"
+  search: "Поиск"
   actions:
     continue: "Продолжить"
     edit: "Редактировать"
@@ -599,8 +600,17 @@ ru:
         restrict_dependent_destroy:
           has_one: "Нельзя удалить запись, так как существует зависимая %{record}"
           has_many: "Нельзя удалить запись, так как существуют зависимые %{record}"
+  dashboard:
+    search:
+      no_results: "Результаты не найдены"
   helpers:
     label:
+      dashboard:
+        incase: "Убытки"
+        user: "Пользователи"
+        company: "Компании"
+        variant: "Варианты товаров"
+        product: "Товары"
       incase:
         region: "Регион"
         strah_id: "Страховая компания"

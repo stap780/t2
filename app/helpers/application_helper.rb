@@ -94,5 +94,9 @@ module ApplicationHelper
     super *[collection_or_options, options].compact
   end
 
+  def highlight(text, phrase)
+    return text if phrase.blank?
+    text.to_s.gsub(/(#{Regexp.escape(phrase)})/i, '<mark class="bg-yellow-200">\1</mark>').html_safe
+  end
 
 end
