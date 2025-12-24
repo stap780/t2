@@ -300,7 +300,7 @@ class Moysklad::SyncProductService
   end
 
   def create_varbind(ms_id)
-    @product.bindings.find_or_create_by!(
+    @variant.bindings.find_or_create_by!(
       bindable: @moysklad,
       value: ms_id
     )
