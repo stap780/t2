@@ -1,5 +1,5 @@
 class MoyskladSyncProductJob < ApplicationJob
-  queue_as :default
+  queue_as :moysklad_sync_product
 
   def perform(product_id, moysklad_id = nil)
     product = Product.find(product_id)

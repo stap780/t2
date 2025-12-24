@@ -268,7 +268,7 @@ class Moysklad::SyncProductService
     
     Rails.logger.info "Moysklad::SyncProductService: Sending product ##{@product.id} to Moysklad"
     
-    RestClient.post(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json') do |response, request, result|
+    RestClient.post(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json;charset=utf-8') do |response, request, result|
       data = JSON.parse(response.body)
       
       case response.code

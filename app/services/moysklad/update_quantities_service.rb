@@ -80,7 +80,10 @@ class Moysklad::UpdateQuantitiesService
         response = RestClient::Request.execute(
           method: :get, 
           url: MOYSKLAD_API_URL, 
-          headers: { Authorization: auth }
+          headers: { 
+            Authorization: auth,
+            Accept: 'application/json;charset=utf-8'
+          }
         )
         
         case response.code
