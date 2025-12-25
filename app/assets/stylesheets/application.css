@@ -39,3 +39,10 @@ details summary::-webkit-details-marker {
 details summary::marker {
   display: none;
 }
+
+.CodeMirror-gutter {
+  width: 40px;
+}
+.CodeMirror-line {
+  padding-left: 45px;
+}

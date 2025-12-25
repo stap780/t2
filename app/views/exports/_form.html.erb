@@ -324,7 +324,7 @@
 
   <%= form.label :template, t("exports.form.custom_xml_template"), class: "block text-sm font-semibold text-gray-800 mb-3" %>
         <%= form.text_area :template, 
-            rows: 15,
+            rows: 20,
             placeholder: t("exports.form.template_placeholder"),
         class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
         data: { controller: "codemirror", codemirror_mode_value: "html" }

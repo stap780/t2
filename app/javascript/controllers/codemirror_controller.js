@@ -29,8 +29,9 @@ export default class extends Controller {
       this.wrapper.appendChild(cmEl)
     }
 
-    // Size similar to ~16 rows
-    this.editor.setSize("100%", "22rem")
+    this.editor.setSize("100%", "25rem")
+
+    this.editor.refresh();
 
     // Mirror changes back to textarea so form submits the value
     this.editor.on("change", () => {
@@ -38,6 +39,8 @@ export default class extends Controller {
       this.textarea.dispatchEvent(new Event("input", { bubbles: true }))
       this.textarea.dispatchEvent(new Event("change", { bubbles: true }))
     })
+
+
   }
 
   disconnect() {
