@@ -1,87 +1,85 @@
 <%= turbo_frame_tag export, class: "flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-150 ease-in-out", data: { controller: "export-status" } do %>
-  <div class="flex-1">
-    <div class="flex items-center space-x-4">
-      <div class="flex-shrink-0">
-        <span data-export-status-target="status">
-          <% if export.completed? %>
-            <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          <% elsif export.processing? %>
-            <svg class="h-6 w-6 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          <% elsif export.failed? %>
-            <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          <% else %>
-            <svg class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          <% end %>
+  <div class="flex items-center space-x-4">
+    <div class="flex-shrink-0">
+      <span data-export-status-target="status">
+        <% if export.completed? %>
+          <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        <% elsif export.processing? %>
+          <svg class="h-6 w-6 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        <% elsif export.failed? %>
+          <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        <% else %>
+          <svg class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        <% end %>
+      </span>
+      <span class="<%= export.status_color %> px-2 py-1 rounded-full text-xs font-medium">
+        <%= t("enums.export.status.#{export.status}") %>
+      </span>
+    </div>
+    
+    <div class="flex-1 min-w-0">
+      <div class="export-title text-sm font-medium text-gray-900 truncate">
+        <%= export.name %>
+        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+          <%= export.format.upcase %>
         </span>
-        <span class="<%= export.status_color %> px-2 py-1 rounded-full text-xs font-medium">
-          <%= t("enums.export.status.#{export.status}") %>
-        </span>
-      </div>
-      
-      <div class="flex-1 min-w-0">
-        <div class="export-title text-sm font-medium text-gray-900 truncate">
-          <%= export.name %>
+          <% if export.export_file.attached? %>
           <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-            <%= export.format.upcase %>
+            <%= number_to_human_size(export.export_file.byte_size) %>
           </span>
-            <% if export.export_file.attached? %>
-            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-              <%= number_to_human_size(export.export_file.byte_size) %>
-            </span>
-          <% end %>
-          <% if export.test_mode? %>
-            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              <%= t("exports.export.test_mode") %>
-            </span>
-          <% end %>
-        </div>
-        <div class="export-content-1 flex items-center space-x-2 mt-1">
-          <span class="text-xs text-gray-500">
-            <%= t("exports.export.created_by") %> <%= export.user.email_address %>
-          </span>
-          <span class="text-xs text-gray-500">
-            • <%= export.created_at.strftime("%d/%m/%Y-%H:%M") %>
-          </span>
-          <% if export.exported_at %>
-            <span class="text-xs text-gray-500">
-              • <%= t("exports.export.completed") %> <%= time_ago_in_words(export.exported_at) %> <%= t("exports.export.ago") %>
-            </span>
-          <% end %>
-        </div>
-        <% if export.time.present? || export.scheduled_for.present? %>
-          <div class="export-schedule mt-1 flex items-center flex-wrap gap-2">
-            <% if export.time.present? %>
-                <span class="bg-violet-100 text-violet-800 py-1 rounded-full text-xs font-medium">
-                <%= t("exports.export.time") %>: <%= export.time %>
-                </span>
-            <% end %>
-            <% if export.scheduled_for.present? %>
-              <span class="text-xs text-violet-700">
-                <%= t("exports.export.scheduled_for") %> <%= export.scheduled_for.in_time_zone.strftime("%d/%m/%Y") %>
-              </span>
-            <% elsif export.time.present? %>
-              <span class="text-xs text-violet-700">
-                <%= t("exports.export.next_at") %> <%= export.next_run_at&.in_time_zone&.strftime("%d/%m/%Y") %>
-              </span>
-            <% end %>
-          </div>
         <% end %>
-        <% if export.has_error? %>
-          <div class="mt-1">
-            <p class="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
-              <span class="font-medium"><%= t("exports.export.error") %>:</span> <%= export.error_summary %>
-            </p>
-          </div>
+        <% if export.test_mode? %>
+          <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+            <%= t("exports.export.test_mode") %>
+          </span>
         <% end %>
       </div>
+      <div class="export-content-1 flex items-center space-x-2 mt-1">
+        <span class="text-xs text-gray-500">
+          <%= t("exports.export.created_by") %> <%= export.user.email_address %>
+        </span>
+        <span class="text-xs text-gray-500">
+          • <%= export.created_at.strftime("%d/%m/%Y-%H:%M") %>
+        </span>
+        <% if export.exported_at %>
+          <span class="text-xs text-gray-500">
+            • <%= t("exports.export.completed") %> <%= time_ago_in_words(export.exported_at) %> <%= t("exports.export.ago") %>
+          </span>
+        <% end %>
+      </div>
+      <% if export.time.present? || export.scheduled_for.present? %>
+        <div class="export-schedule mt-1 flex items-center flex-wrap gap-2">
+          <% if export.time.present? %>
+              <span class="bg-violet-100 text-violet-800 py-1 rounded-full text-xs font-medium">
+              <%= t("exports.export.time") %>: <%= export.time %>
+              </span>
+          <% end %>
+          <% if export.scheduled_for.present? %>
+            <span class="text-xs text-violet-700">
+              <%= t("exports.export.scheduled_for") %> <%= export.scheduled_for.in_time_zone.strftime("%d/%m/%Y") %>
+            </span>
+          <% elsif export.time.present? %>
+            <span class="text-xs text-violet-700">
+              <%= t("exports.export.next_at") %> <%= export.next_run_at&.in_time_zone&.strftime("%d/%m/%Y") %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+      <% if export.has_error? %>
+        <div class="mt-1">
+          <p class="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
+            <span class="font-medium"><%= t("exports.export.error") %>:</span> <%= export.error_summary %>
+          </p>
+        </div>
+      <% end %>
     </div>
   </div>
   
@@ -155,7 +153,7 @@
       <%= button_to cancel_export_path(export), method: :post,remote: true,
           class: "inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out" do %>
           <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-7 4h12l-2 5H8l-2-5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         <%= t("exports.export.cancel.label") %>
       <% end %>

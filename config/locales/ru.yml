@@ -136,6 +136,8 @@ ru:
       time: "Время"
       error: "Ошибка"
       delete_confirm: "Вы уверены, что хотите удалить этот экспорт?"
+      cancel:
+        label: "Отменить"
     index:
       title: "Экспорты"
       heading: "Экспорты"
@@ -159,8 +161,6 @@ ru:
       success: "Экспорт успешно удалён"
     run:
       success: "Экспорт запущен"
-    cancel:
-      label: "Отменить"
     download:
       not_completed: "Экспорт ещё не завершён"
       file_not_found: "Файл экспорта не найден"

@@ -144,7 +144,7 @@ class Export < ApplicationRecord
   def self.field_label(field_name)
     if field_name.include?("feature_")
       value = field_name.split("_").last
-      'Параметр: ' + I18n.t("exports.fields.#{value}")
+      "Параметр: #{value}"
     else
       I18n.t("exports.fields.#{field_name}")
     end

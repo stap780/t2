@@ -55,6 +55,7 @@ class ExportsController < ApplicationController
 
   def cancel
     @export.cancel_pending_job
+    @export.update(status: "pending")
     notice = t(".success")
     respond_to do |format|
       format.turbo_stream { 
