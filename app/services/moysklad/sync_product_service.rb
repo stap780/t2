@@ -16,28 +16,27 @@ class Moysklad::SyncProductService
   end
 
   def call
-    payload = build_payload
-    
     # Проверяем, есть ли уже привязка к МойСклад
     existing_binding = @variant.bindings.find_by(bindable: @moysklad)
     
     if existing_binding&.value.present?
-      # Товар уже существует - обновляем через PUT
+      # Товар уже существует - обновляем через PUT (без code)
+      payload = build_payload(include_code: false)
       update_in_moysklad(payload, existing_binding.value)
     else
-      # Товара нет - создаем через POST
+      # Товара нет - создаем через POST (с code)
+      payload = build_payload(include_code: true)
       send_to_moysklad(payload)
     end
   end
 
   private
 
-  def build_payload
+  def build_payload(include_code: true)
     features_hash = @product.features_to_h
     
-    {
+    payload = {
       "name" => @product.title.to_s,
-      "code" => code_for_payload,
       "externalCode" => @product.id.to_s,
       "description" => @product.file_description.to_s,
       "vat" => 18,
@@ -68,6 +67,11 @@ class Moysklad::SyncProductService
         }
       }
     }
+    
+    # Добавляем code только при создании нового товара
+    payload["code"] = code_for_payload if include_code
+    
+    payload
   end
 
   def code_for_payload
