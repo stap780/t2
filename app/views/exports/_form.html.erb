@@ -70,8 +70,8 @@
     <!-- Field Selection for Excel/CSV -->
     <div class="space-y-3 mt-2 mb-2" id="field-selection" data-export-form-target="fieldSelection" style="display: none;">
       <% all_fields = Export.available_fields %>
-  <%= form.label :file_headers, t("exports.form.fields_to_export"), class: "block text-sm font-semibold text-gray-800" %>
-  <p class="text-xs text-gray-600 mt-2 mb-4"><%= t("exports.form.fields_hint") %></p>
+      <%= form.label :file_headers, t("exports.form.fields_to_export"), class: "block text-sm font-semibold text-gray-800" %>
+      <p class="text-xs text-gray-600 mt-2 mb-4"><%= t("exports.form.fields_hint") %></p>
       
       <% if all_fields.any? %>
         <div class="flex gap-6 overflow-y-auto p-4 bg-gray-50 border-1 border-gray-200 rounded-lg">
@@ -81,8 +81,7 @@
                 <label class="flex items-center cursor-pointer">
                   <%= form.check_box :file_headers, 
                       { multiple: true, class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded", 
-                        checked: form.object.file_headers&.include?(header.to_s) }, 
-                      header, nil %>
+                        checked: form.object.file_headers&.include?(header.to_s) }, header, nil %>
                   <span class="ml-2 text-sm font-medium text-gray-700">
                     <%= Export.field_label(header) %>
                   </span>

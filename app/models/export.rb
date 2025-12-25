@@ -142,7 +142,12 @@ class Export < ApplicationRecord
 
   # Get translated field name for display
   def self.field_label(field_name)
-    I18n.t("exports.fields.#{field_name}", default: field_name.humanize)
+    if field_name.include?("feature_")
+      value = field_name.split("_").last
+      'Параметр: ' + I18n.t("exports.fields.#{value}")
+    else
+      I18n.t("exports.fields.#{field_name}")
+    end
   end
 
   # Get available fields for Liquid template (for XML exports)
@@ -154,22 +159,6 @@ class Export < ApplicationRecord
       image_fields: %w[images images_zap images_second images_thumb]
     }
   end
-
-  private
-
-  # Schedule next run if time is present and this change affected time
-  def enqueue_on_create
-    schedule! if time.present?
-  end
-
-  def handle_enqueue_on_update
-    if saved_change_to_time?
-      cancel_pending_job
-      schedule! if time.present?
-    end
-  end
-
-  public
 
   # Computes the next run time based on time-of-day in app timezone
   def next_run_at(from_time: Time.zone.now)
@@ -308,4 +297,20 @@ class Export < ApplicationRecord
       end
     end.compact
   end
+
+
+  private
+
+  # Schedule next run if time is present and this change affected time
+  def enqueue_on_create
+    schedule! if time.present?
+  end
+
+  def handle_enqueue_on_update
+    if saved_change_to_time?
+      cancel_pending_job
+      schedule! if time.present?
+    end
+  end
+
 end

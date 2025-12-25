@@ -100,6 +100,7 @@ Rails.application.routes.draw do
       get :download
       get :file
       post :run
+      post :cancel
     end
   end
 

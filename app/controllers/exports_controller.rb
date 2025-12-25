@@ -2,7 +2,7 @@ class ExportsController < ApplicationController
   # Allow public access to the stable file URL for external services
   allow_unauthenticated_access only: [:file]
 
-  before_action :set_export, only: [:edit, :update, :run, :destroy, :download]
+  before_action :set_export, only: [:edit, :update, :run, :destroy, :download, :cancel]
   before_action :set_export_public, only: [:file]
 
   def index
@@ -44,6 +44,18 @@ class ExportsController < ApplicationController
     ExportJob.perform_later(@export)
     notice = t(".success")
 
+    respond_to do |format|
+      format.turbo_stream { 
+        render turbo_stream: turbo_stream.replace(@export, partial: "exports/export", locals: { export: @export })
+      }
+      format.html { redirect_to exports_path, notice: notice }
+    end
+  end
+
+
+  def cancel
+    @export.cancel_pending_job
+    notice = t(".success")
     respond_to do |format|
       format.turbo_stream { 
         render turbo_stream: turbo_stream.replace(@export, partial: "exports/export", locals: { export: @export })
