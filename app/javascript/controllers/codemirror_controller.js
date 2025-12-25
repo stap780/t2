@@ -20,6 +20,7 @@ export default class extends Controller {
       lineNumbers: true,
       styleActiveLine: true,
       matchBrackets: true,
+      autoRefresh: true,
       theme: "default"
     })
 
@@ -31,7 +32,6 @@ export default class extends Controller {
 
     this.editor.setSize("100%", "25rem")
 
-    this.editor.refresh();
 
     // Mirror changes back to textarea so form submits the value
     this.editor.on("change", () => {
