@@ -3,6 +3,7 @@ require 'barby/barcode/ean_13'
 require 'rest-client'
 require 'base64'
 require 'json'
+require 'cgi'
 
 class Moysklad::SyncProductService
   def initialize(product, moysklad_config = nil)
@@ -16,7 +17,17 @@ class Moysklad::SyncProductService
 
   def call
     payload = build_payload
-    send_to_moysklad(payload)
+    
+    # Проверяем, есть ли уже привязка к МойСклад
+    existing_binding = @variant.bindings.find_by(bindable: @moysklad)
+    
+    if existing_binding&.value.present?
+      # Товар уже существует - обновляем через PUT
+      update_in_moysklad(payload, existing_binding.value)
+    else
+      # Товара нет - создаем через POST
+      send_to_moysklad(payload)
+    end
   end
 
   private
@@ -266,7 +277,7 @@ class Moysklad::SyncProductService
     uri = "https://api.moysklad.ru/api/remap/1.2/entity/product"
     auth = authorization_header
     
-    Rails.logger.info "Moysklad::SyncProductService: Sending product ##{@product.id} to Moysklad"
+    Rails.logger.info "Moysklad::SyncProductService: Creating product ##{@product.id} in Moysklad"
     
     RestClient.post(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json;charset=utf-8') do |response, request, result|
       data = JSON.parse(response.body)
@@ -275,11 +286,12 @@ class Moysklad::SyncProductService
       when 200
         ms_id = data['id']
         create_varbind(ms_id)
-        Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} successfully synced, ms_id: #{ms_id}"
+        Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} successfully created, ms_id: #{ms_id}"
         { success: true, ms_id: ms_id }
       when 412
-        Rails.logger.warn "Moysklad::SyncProductService: Product ##{@product.id} - error 412 (duplicate code): #{data.inspect}"
-        { success: false, error_code: 412, error: "Duplicate code" }
+        # Товар уже существует, но varbind не создан - нужно найти существующий товар
+        Rails.logger.warn "Moysklad::SyncProductService: Product ##{@product.id} - error 412 (duplicate code), trying to find existing product"
+        find_and_bind_existing_product(payload['code'])
       else
         Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error #{response.code}: #{data.inspect}"
         { success: false, error_code: response.code, error: data['errors'] || data['error_message'] || 'Unknown error' }
@@ -292,6 +304,57 @@ class Moysklad::SyncProductService
     Rails.logger.error "Moysklad::SyncProductService: Error for product ##{@product.id}: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     raise
+  end
+
+  def update_in_moysklad(payload, ms_id)
+    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product/#{ms_id}"
+    auth = authorization_header
+    
+    Rails.logger.info "Moysklad::SyncProductService: Updating product ##{@product.id} in Moysklad (ms_id: #{ms_id})"
+    
+    RestClient.put(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json;charset=utf-8') do |response, request, result|
+      data = JSON.parse(response.body)
+      
+      case response.code
+      when 200
+        Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} successfully updated, ms_id: #{ms_id}"
+        { success: true, ms_id: ms_id }
+      else
+        Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - update error #{response.code}: #{data.inspect}"
+        { success: false, error_code: response.code, error: data['errors'] || data['error_message'] || 'Unknown error' }
+      end
+    end
+  rescue RestClient::ExceptionWithResponse => e
+    Rails.logger.error "Moysklad::SyncProductService: RestClient update error for product ##{@product.id}: #{e.message}"
+    { success: false, error: e.message }
+  rescue StandardError => e
+    Rails.logger.error "Moysklad::SyncProductService: Update error for product ##{@product.id}: #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
+  end
+
+  def find_and_bind_existing_product(code)
+    # Ищем существующий товар по code
+    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{CGI.escape(code)}"
+    auth = authorization_header
+    
+    begin
+      response = RestClient.get(uri, Authorization: auth, accept: 'application/json;charset=utf-8')
+      data = JSON.parse(response.body)
+      
+      if data['rows'].present? && data['rows'].first.present?
+        ms_id = data['rows'].first['id']
+        create_varbind(ms_id)
+        Rails.logger.info "Moysklad::SyncProductService: Found existing product ##{@product.id} in Moysklad, created varbind, ms_id: #{ms_id}"
+        { success: true, ms_id: ms_id, message: "Product already exists, varbind created" }
+      else
+        Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error 412 but product not found by code"
+        { success: false, error_code: 412, error: "Duplicate code but product not found" }
+      end
+    rescue RestClient::ExceptionWithResponse => e
+      Rails.logger.error "Moysklad::SyncProductService: Error finding existing product ##{@product.id}: #{e.message}"
+      { success: false, error_code: 412, error: "Duplicate code, failed to find existing product: #{e.message}" }
+    end
   end
 
   def authorization_header
