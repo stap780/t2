@@ -41,8 +41,8 @@ details summary::marker {
 }
 
 .CodeMirror-gutter {
-  /* width: 40px!important; */
+  width: 40px!important;
 }
 .CodeMirror-line {
-  /* padding-left: 1px!important; */
+  padding-left: 1px!important;
 }
