@@ -15,12 +15,12 @@ export default class extends Controller {
 
     // Initialize CodeMirror from textarea
     this.editor = window.CodeMirror.fromTextArea(this.textarea, {
-      mode: this.modeValue === "xml" ? "xml" : this.modeValue,
+      // mode: this.modeValue === "xml" ? "xml" : this.modeValue,
+      mode: "htmlmixed",
       lineWrapping: true,
       lineNumbers: true,
       styleActiveLine: true,
       matchBrackets: true,
-      autoRefresh: true,
       theme: "default"
     })
 
