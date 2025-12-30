@@ -77,6 +77,7 @@ gem 'receipts'
 
 # Audit trail for models
 gem 'audited', '~> 5.0'
+gem 'audited-ui'  # UI для audited
 
 # Barcode generation
 gem 'barby'

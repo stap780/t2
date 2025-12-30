@@ -3,7 +3,7 @@
 
   <!-- Tabs Navigation -->
   <div class="bg-white rounded-lg shadow mb-6 w-full min-w-0" data-controller="tabs">
-    <div class="border-b border-gray-200">
+    <div class="border-b border-gray-200 flex items-center justify-between px-4">
       <nav class="flex -mb-px" aria-label="Tabs">
         <button type="button" 
                 data-tabs-target="tab"
@@ -20,6 +20,9 @@
           Комментарии
         </button>
       </nav>
+      <% unless incase.new_record? %>
+        <%= link_to_history(auditable_type: "incase", auditable_id: incase.id) %>
+      <% end %>
     </div>
 
     <!-- Tab Content -->

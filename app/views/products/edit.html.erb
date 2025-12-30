@@ -3,8 +3,9 @@
     <%= link_to_back products_path %>
     <h1 class="text-2xl font-semibold"><%= t("products.edit.heading") %></h1>
     <%= link_to t("products.refill"), refill_product_path(@product), 
-      class: "ml-auto inline-flex items-center px-3 py-1 border border-violet-500 text-violet-600 bg-white hover:bg-violet-50 hover:text-violet-700 rounded-md cursor-pointer transition", 
+      class: "ml-auto inline-flex items-center px-3 py-1 border border-violet-500 text-sm font-medium text-violet-600 bg-white hover:bg-violet-50 hover:text-violet-700 rounded-md cursor-pointer transition", 
       data: { turbo_stream: true, turbo_confirm: "ВНИМАНИЕ! Это действие заполнит продукт данными из Detal и удалит все данные, кроме изображений. Вы уверены?"  } %>
+    <%= link_to_history(auditable_type: "product", auditable_id: @product.id) unless @product.new_record?%>
   </div>
   <%= render "form", product: @product %>
 </div>

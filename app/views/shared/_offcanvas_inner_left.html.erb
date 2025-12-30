@@ -1,0 +1,18 @@
+<%= turbo_frame_tag :offcanvas do %>
+  <div data-controller="offcanvas">
+    <!-- Backdrop -->
+    <div data-offcanvas-backdrop class="fixed inset-0 bg-transparent hidden opacity-0 transition-opacity duration-300 ease-out" data-action="click->offcanvas#close"></div>
+    <!-- Panel wrapper - слева -->
+    <div data-offcanvas-panel class="offcanvas-left fixed inset-y-0 left-0 bg-white shadow-xl transform transition-transform duration-300 ease-out -translate-x-full overflow-y-auto" 
+      style="max-width: <%= local_assigns[:width] || '40rem' %>;width: 100%;">
+      <div class="p-4 border-b flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-black"><%= title %></h2>
+        <button type="button" class="text-gray-500 hover:text-gray-700" data-action="offcanvas#close">✕</button>
+      </div>
+      <div class="p-4">
+        <%= yield %>
+      </div>
+    </div>
+  </div>
+<% end %>
+

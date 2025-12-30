@@ -7,7 +7,7 @@ class Product < ApplicationRecord
   include Rails.application.routes.url_helpers
   include ActionView::RecordIdentifier
   include Bindable
-  audited
+  audited except: [:images_urls, :file_description]
 
   has_many :features, as: :featureable, dependent: :destroy
   has_many :properties, through: :features
@@ -159,6 +159,7 @@ class Product < ApplicationRecord
   end
 
   private
+
 
   def check_variants_have_items
     # Проверяем, есть ли Items, которые ссылаются на Variant этого Product

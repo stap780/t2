@@ -194,6 +194,12 @@ en:
       variant:
         one: "Variant"
         other: "Variants"
+      feature:
+        one: "Feature"
+        other: "Features"
+      action_text/rich_text:
+        one: "Rich Text"
+        other: "Rich Texts"
       detal:
         one: "Detal"
         other: "Detals"
@@ -239,6 +245,90 @@ en:
         desc: "Description"
         status: "Status"
         oszz_price: "OSZZ Price"
+      audit:
+        auditable_type: "Record Type"
+        auditable: "Record"
+        version: "#"
+        created_at: "Created At"
+        action: "Action"
+        user: "User"
+        audited_changes: "Changes"
+        comment: "Comment"
+      product:
+        title: "Title"
+        description: "Description"
+        status: "Status"
+        tip: "Type"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      item:
+        title: "Title"
+        quantity: "Quantity"
+        price: "Price"
+        sum: "Sum"
+        vat: "VAT"
+        katnumber: "Catalog Number"
+        supplier_code: "Supplier Code"
+        item_status_id: "Item Status"
+        variant_id: "Variant"
+        incase_id: "Incase"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      incase:
+        date: "Act Date"
+        region: "Region"
+        unumber: "Incase Number"
+        stoanumber: "Order Number"
+        carnumber: "Car Number"
+        modelauto: "Car Model"
+        totalsum: "Total Sum"
+        company_id: "Company"
+        strah_id: "Insurance Company"
+        incase_status_id: "Incase Status"
+        incase_tip_id: "Incase Type"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      company:
+        short_title: "Short Title"
+        title: "Title"
+        tip: "Type"
+        weekdays: "Weekdays"
+        okrug_id: "District"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      act:
+        date: "Date"
+        number: "Number"
+        status: "Status"
+        company_id: "Company"
+        strah_id: "Insurance Company"
+        okrug_id: "District"
+        driver_id: "Driver"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      variant:
+        price: "Price"
+        quantity: "Quantity"
+        sku: "SKU"
+        barcode: "Barcode"
+        cost_price: "Cost Price"
+        product_id: "Product"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      feature:
+        property_id: "Property"
+        characteristic_id: "Characteristic"
+        featureable_type: "Record Type"
+        featureable_id: "Record ID"
+        created_at: "Created At"
+        updated_at: "Updated At"
+      action_text/rich_text:
+        body: "Body"
+        name: "Name"
+        record_type: "Record Type"
+        record_id: "Record ID"
+        created_at: "Created At"
+        updated_at: "Updated At"
   activerecord:
     models:
       import_schedule:
@@ -482,3 +572,18 @@ en:
       success: "Property created"
     update:
       success: "Property updated"
+  audited:
+    ui:
+      audits:
+        index:
+          title:
+            all: "Audit of All Records"
+          empty: "No change history"
+          attribute: "Attribute"
+          before: "Old Value"
+          after: "New Value"
+          actions:
+            create: "Create"
+            update: "Update"
+            destroy: "Destroy"
+          system: "System"

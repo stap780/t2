@@ -356,6 +356,16 @@ ru:
         few: "Варианта"
         many: "Вариантов"
         other: "Вариантов"
+      feature:
+        one: "Параметр товара"
+        few: "Параметра товара"
+        many: "Параметров товара"
+        other: "Параметров товара"
+      action_text/rich_text:
+        one: "Текстовое содержимое"
+        few: "Текстовых содержимых"
+        many: "Текстовых содержимых"
+        other: "Текстовых содержимых"
       incase:
         one: "Убыток"
         few: "Убытки"
@@ -416,6 +426,11 @@ ru:
         few: "Акта"
         many: "Актов"
         other: "Актов"
+      audit:
+        one: "Аудит"
+        few: "Аудита"
+        many: "Аудитов"
+        other: "Аудитов"
     attributes:
       import:
         name: "Название"
@@ -1186,3 +1201,104 @@ ru:
       success: "Изображение успешно загружено"
     destroy:
       success: "Изображение успешно удалено"
+  activerecord:
+    attributes:
+      audit:
+        auditable_type: "Тип записи"
+        auditable: "Запись"
+        version: "#"
+        created_at: "Дата создания"
+        action: "Действие"
+        user: "Пользователь"
+        audited_changes: "Изменения"
+        comment: "Комментарий"
+      product:
+        title: "Название"
+        description: "Описание"
+        status: "Статус"
+        tip: "Тип"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      item:
+        title: "Название"
+        quantity: "Количество"
+        price: "Цена"
+        sum: "Сумма"
+        vat: "НДС"
+        katnumber: "Каталожный номер"
+        supplier_code: "Код поставщика"
+        item_status_id: "Статус позиции"
+        variant_id: "Вариант"
+        incase_id: "Убыток"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      incase:
+        date: "Дата акта"
+        region: "Регион"
+        unumber: "Номер убытка"
+        stoanumber: "Номер З/Н"
+        carnumber: "Номер автомобиля"
+        modelauto: "Модель автомобиля"
+        totalsum: "Общая сумма"
+        company_id: "Компания"
+        strah_id: "Страховая компания"
+        incase_status_id: "Статус убытка"
+        incase_tip_id: "Тип убытка"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      company:
+        short_title: "Краткое название"
+        title: "Название"
+        tip: "Тип"
+        weekdays: "Дни недели"
+        okrug_id: "Округ"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      act:
+        date: "Дата"
+        number: "Номер"
+        status: "Статус"
+        company_id: "Компания"
+        strah_id: "Страховая компания"
+        okrug_id: "Округ"
+        driver_id: "Водитель"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      variant:
+        price: "Цена"
+        quantity: "Количество"
+        sku: "Артикул"
+        barcode: "Штрихкод"
+        cost_price: "Себестоимость"
+        product_id: "Товар"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      feature:
+        property_id: "Параметр"
+        characteristic_id: "Значение"
+        featureable_type: "Тип объекта"
+        featureable_id: "ID объекта"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      action_text/rich_text:
+        body: "Содержимое"
+        name: "Имя"
+        record_type: "Тип записи"
+        record_id: "ID записи"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+  audited:
+    ui:
+      audits:
+        index:
+          title:
+            all: "Аудит всех записей"
+          empty: "История изменений отсутствует"
+          attribute: "Атрибут"
+          before: "Старое значение"
+          after: "Новое значение"
+          actions:
+            create: "Создание"
+            update: "Обновление"
+            destroy: "Удаление"
+          system: "Система"

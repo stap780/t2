@@ -10,6 +10,8 @@ class Variant < ApplicationRecord
   include Bindable
 
   belongs_to :product
+  
+  audited associated_with: :product
   has_many :list_items, as: :item
   has_one_attached :etiketka
   

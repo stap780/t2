@@ -99,4 +99,126 @@ module ApplicationHelper
     text.to_s.gsub(/(#{Regexp.escape(phrase)})/i, '<mark class="bg-yellow-200">\1</mark>').html_safe
   end
 
+  def history_value(attribute, value, auditable_type: nil)
+    return '-' if value.blank?
+    
+    # Специальная обработка для определенных типов атрибутов
+    case attribute.to_s
+    when 'created_at', 'updated_at', 'deleted_at'
+      value.is_a?(Time) || value.is_a?(Date) ? value.strftime('%d.%m.%Y %H:%M') : value
+    when 'description'
+      # Для description обрезаем длинный текст и показываем первые 100 символов
+      text = value.to_s
+      text.length > 100 ? "#{text[0..100]}..." : text
+    when 'status'
+      # Перевод статусов для Product
+      if auditable_type == 'Product'
+        t("products.form.status.#{value}", default: value)
+      else
+        value
+      end
+    when 'tip'
+      # Перевод типов для Product
+      if auditable_type == 'Product'
+        t("products.form.tip.#{value}", default: value)
+      else
+        value
+      end
+    when 'state'
+      value
+    else
+      # Обработка атрибутов с _id суффиксом (связанные объекты)
+      if attribute.to_s.end_with?('_id')
+        begin
+          # Пытаемся преобразовать значение в число
+          id_value = value.to_i
+          return value if id_value.zero? && value.to_s != '0'
+          
+          association_name = attribute.to_s.gsub(/_id$/, '')
+          model_class = case association_name
+          when 'variant'
+            Variant
+          when 'item_status'
+            ItemStatus
+          when 'company', 'strah'
+            Company
+          when 'incase'
+            Incase
+          when 'incase_status'
+            IncaseStatus
+          when 'incase_tip'
+            IncaseTip
+          when 'okrug'
+            Okrug
+          when 'driver'
+            User
+          when 'product'
+            Product
+          when 'characteristic'
+            Characteristic
+          when 'property'
+            Property
+          else
+            nil
+          end
+          
+          if model_class
+            associated_object = model_class.find_by(id: id_value)
+            if associated_object
+              # Для Variant используем full_title, для остальных - title или short_title
+              case association_name
+              when 'variant'
+                associated_object.respond_to?(:full_title) ? associated_object.full_title : associated_object.id.to_s
+              when 'company', 'strah'
+                associated_object.respond_to?(:short_title) ? associated_object.short_title : (associated_object.respond_to?(:title) ? associated_object.title : associated_object.id.to_s)
+              when 'item_status', 'incase_status', 'incase_tip', 'okrug'
+                associated_object.respond_to?(:title) ? associated_object.title : associated_object.id.to_s
+              when 'driver'
+                associated_object.respond_to?(:email_address) ? associated_object.email_address : associated_object.id.to_s
+              when 'product'
+                associated_object.respond_to?(:title) ? associated_object.title : associated_object.id.to_s
+              when 'characteristic', 'property'
+                associated_object.respond_to?(:title) ? associated_object.title : associated_object.id.to_s
+              else
+                associated_object.respond_to?(:title) ? associated_object.title : (associated_object.respond_to?(:name) ? associated_object.name : associated_object.id.to_s)
+              end
+            else
+              # Объект не найден (возможно, был удален)
+              "#{id_value} (deleted)"
+            end
+          else
+            value
+          end
+        rescue => e
+          Rails.logger.error "history_value error for #{attribute}: #{e.message}"
+          value
+        end
+      else
+        value
+      end
+    end
+  end
+
+  def link_to_history(auditable_type:, auditable_id:, **options)
+    return '' if auditable_id.blank?
+    
+    default_options = {
+      class: "inline-flex items-center px-3 py-1 border border-violet-300 shadow-sm text-sm font-medium rounded-md text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+      data: { turbo_frame: :offcanvas },
+      title: 'История изменений'
+    }
+    
+    options = default_options.deep_merge(options)
+    
+    link_to(
+      audited_auditable_audits_path(auditable_type: auditable_type, auditable_id: auditable_id),
+      options
+    ) do
+      '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span class="ml-2">История</span>'.html_safe
+    end
+  end
+
 end
