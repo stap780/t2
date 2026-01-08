@@ -283,5 +283,6 @@ class IncaseService
     
     value.to_s.to_i
   end
+  
 end
 

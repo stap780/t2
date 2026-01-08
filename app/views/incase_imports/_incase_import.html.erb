@@ -6,7 +6,7 @@
     <%= incase_import.created_at.strftime('%d.%m.%Y %H:%M') if incase_import.created_at %>
   </div>
   <div>
-    <span class="px-2 py-1 text-xs font-medium rounded <%= incase_import.status_color %>">
+    <span class="px-2 py-1 text-xs font-medium rounded <%= incase_import.status_color %>" title="<%= incase_import.error_message %>">
       <%= t("incase_imports.status.#{incase_import.status_before_type_cast}") %>
     </span>
   </div>
