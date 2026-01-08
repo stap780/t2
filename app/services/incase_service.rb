@@ -51,14 +51,17 @@ class IncaseService
   
   def parse_file
     blob = @incase_import.file.blob
-    file_path = ActiveStorage::Blob.service.path_for(blob.key)
-    spreadsheet = open_spreadsheet(file_path, blob.filename.to_s)
     
-    header = spreadsheet.row(1)
-    rows = (2..spreadsheet.last_row).map do |i|
-      Hash[[header, spreadsheet.row(i)].transpose]
+    # Используем blob.open для работы с файлом (работает для S3 и локального хранилища)
+    blob.open do |tempfile|
+      spreadsheet = open_spreadsheet(tempfile.path, blob.filename.to_s)
+      
+      header = spreadsheet.row(1)
+      rows = (2..spreadsheet.last_row).map do |i|
+        Hash[[header, spreadsheet.row(i)].transpose]
+      end
+      rows
     end
-    rows
   end
   
   def open_spreadsheet(file_path, filename)
