@@ -78,6 +78,17 @@ class Company < ApplicationRecord
   def self.tip_collection
     TIP.map { |key| [I18n.t(key, scope: %i[company tip], default: key.humanize), key] }
   end
+
+  def self.human_attribute_name(attr, options = {})
+    attr_str = attr.to_s
+    if attr_str == 'company_plan_dates.comments.body' || attr_str.start_with?('company_plan_dates.')
+      # Для вложенных атрибутов company_plan_dates используем перевод из CompanyPlanDate
+      nested_attr = attr_str.sub(/^company_plan_dates\./, '')
+      CompanyPlanDate.human_attribute_name(nested_attr, options)
+    else
+      super
+    end
+  end
   
   private
   

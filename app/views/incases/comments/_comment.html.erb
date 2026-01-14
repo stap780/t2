@@ -2,25 +2,14 @@
   incase = local_assigns[:incase] || @incase
   is_admin = defined?(Current) && Current.user&.admin?
 %>
-<%= turbo_frame_tag dom_id(incase, dom_id(comment)), class: "p-3 border-t hover:bg-gray-50" do %>
-  <div class="space-y-2">
-    <div class="flex items-center gap-2 text-sm text-gray-600">
-      <% if comment.user.present? %>
-        <span class="font-medium"><%= comment.user.email_address %></span>
-      <% end %>
-      <% if comment.created_at.present? %>
-        <span class="text-gray-400">•</span>
-        <span><%= comment.created_at.strftime('%d.%m.%Y %H:%M') %></span>
-      <% end %>
-      <% if is_admin %>
-        <div class="ml-auto">
-          <%= link_to_delete incase_comment_path(incase, comment), 
-              data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
-        </div>
-      <% end %>
-    </div>
-    <div class="text-gray-900">
-      <%= comment.body %>
+<%= turbo_frame_tag dom_id(incase, dom_id(comment)), class: "" do %>
+  <div class="grid grid-cols-[200px_200px_1fr_40px] gap-2 p-2 text-sm text-gray-600">
+    <%=tag.span comment.created_at.strftime('%d.%m.%Y %H:%M'), class: 'font-medium'%>
+    <%=tag.span comment.user.email_address, class: 'font-medium'%>
+    <%=tag.span comment.body, class: 'font-medium text-gray-900'%>
+    <div class="flex justify-end">
+      <%= link_to_delete incase_comment_path(incase, comment), 
+          data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } if is_admin %>
     </div>
   </div>
 <% end %>

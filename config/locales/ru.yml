@@ -124,7 +124,12 @@ ru:
     user:
       role:
         admin: "Администратор"
-        user: "Пользователь"  
+        user: "Пользователь"
+  company:
+    tip:
+      standart: "Стандартная"
+      strah: "Страховая"
+      our: "Наша"
   exports:
     export:
       created_by: "Создал"
@@ -494,7 +499,7 @@ ru:
       item:
         title: "Название"
         quantity: "Кол-во"
-        katnumber: "Каталожный номер"
+        katnumber: "Кат номер"
         supplier_code: "Код поставщика"
         price: "Цена"
         sum: "Сумма"
@@ -556,52 +561,6 @@ ru:
         description: "Описание"
         status: "Статус"
         tip: "Тип"
-    errors:
-      models:
-        variant: {}
-        item: {}
-        incase:
-          items_required: "Убыток должен содержать хотя бы одну позицию"
-          attributes:
-            company:
-              required: "должна быть выбрана"
-            strah:
-              required: "должна быть выбрана"
-        item_status: {}
-        incase_tip: {}
-        incase_status: {}
-        comment: {}
-        company: {}
-        client: {}
-        client_company: {}
-        company_plan_date: {}
-        moysklad: {}
-        detal: {}
-        product: {}
-        property: {}
-        characteristic: {}
-        feature: {}
-        image: {}
-        varbind: {}
-        insale: {}
-        user: {}
-        import: {}
-        session: {}
-        import_schedule: {}
-        export: {}
-      messages:
-        inclusion: "не включено в список"
-        exclusion: "исключено из списка"
-        invalid: "имеет неверное значение"
-        confirmation: "не совпадает с подтверждением"
-        accepted: "должно быть принято"
-        empty: "не может быть пустым"
-        blank: "должно быть заполнено"
-        present: "должно быть пустым"
-        required: "обязательно для заполнения"
-        too_long: "слишком длинное (не более %{count} символов)"
-        too_short: "слишком короткое (не менее %{count} символов)"
-        wrong_length: "имеет неверную длину (должно быть %{count} символов)"
         not_a_number: "не является числом"
         not_an_integer: "должно быть целым числом"
         greater_than: "должно быть больше %{count}"
@@ -643,7 +602,7 @@ ru:
       item:
         title: "Название"
         quantity: "Кол-во"
-        katnumber: "Каталожный номер"
+        katnumber: "Кат номер"
         supplier_code: "Код поставщика"
         price: "Цена"
         sum: "Сумма"
@@ -891,6 +850,7 @@ ru:
       search: "Поиск"
       clear: "Очистить"
       ubitok: "Убыток"
+      incases_search: "Номера Убытков, Авто, Номер З/Н, Контрагент, Штрихкод"
     new:
       title: "Новый убыток"
       heading: "Новый убыток"
@@ -1054,8 +1014,8 @@ ru:
       modelauto: "Марка и модель"
       region: "Регион"
       items: "Позиции"
-      katnumber: "Каталожный номер"
-      quantity: "Количество"
+      katnumber: "Кат номер"
+      quantity: "Кол-во"
       price: "Цена"
       merge_selected: "Добавить выбранные"
       delete_dubl: "Удалить дубль"
@@ -1101,6 +1061,7 @@ ru:
     destroy:
       success: "Статус успешно удален"
   items:
+    heading: "Позиции убытка"
     new:
       title: "Новая позиция"
     edit:
@@ -1202,6 +1163,17 @@ ru:
     destroy:
       success: "Изображение успешно удалено"
   activerecord:
+    models:
+      comment:
+        one: "Комментарий"
+        few: "Комментария"
+        many: "Комментариев"
+        other: "Комментариев"
+      company_plan_date:
+        one: "Планируемая дата компании"
+        few: "Планируемые даты компании"
+        many: "Планируемых дат компании"
+        other: "Планируемых дат компании"
     attributes:
       audit:
         auditable_type: "Тип записи"
@@ -1221,11 +1193,11 @@ ru:
         updated_at: "Дата обновления"
       item:
         title: "Название"
-        quantity: "Количество"
+        quantity: "Кол-во"
         price: "Цена"
         sum: "Сумма"
         vat: "НДС"
-        katnumber: "Каталожный номер"
+        katnumber: "Кат номер"
         supplier_code: "Код поставщика"
         item_status_id: "Статус позиции"
         variant_id: "Вариант"
@@ -1239,11 +1211,13 @@ ru:
         stoanumber: "Номер З/Н"
         carnumber: "Номер автомобиля"
         modelauto: "Модель автомобиля"
-        totalsum: "Общая сумма"
+        totalsum: "Сумма"
         company_id: "Компания"
         strah_id: "Страховая компания"
-        incase_status_id: "Статус убытка"
-        incase_tip_id: "Тип убытка"
+        incase_status_id: "Статус"
+        incase_tip_id: "Тип"
+        auto: "Авто"
+        okrug: "Округ"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
       company:
@@ -1252,6 +1226,16 @@ ru:
         tip: "Тип"
         weekdays: "Дни недели"
         okrug_id: "Округ"
+        inn: "ИНН"
+        kpp: "КПП"
+        ur_address: "Юридический адрес"
+        fact_address: "Фактический адрес"
+        ogrn: "ОГРН"
+        okpo: "ОКПО"
+        bik: "БИК"
+        bank_title: "Название банка"
+        bank_account: "Расчётный счёт"
+        info: "Дополнительная информация"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
       act:
@@ -1266,7 +1250,7 @@ ru:
         updated_at: "Дата обновления"
       variant:
         price: "Цена"
-        quantity: "Количество"
+        quantity: "Кол-во"
         sku: "Артикул"
         barcode: "Штрихкод"
         cost_price: "Себестоимость"
@@ -1287,6 +1271,87 @@ ru:
         record_id: "ID записи"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
+      comment:
+        body: "Текст комментария"
+        user_id: "Автор"
+      company_plan_date:
+        date: "Дата"
+        company_id: "Компания"
+        comments: "Комментарии"
+        "comments.body": "Текст комментария"
+        comments:
+          body: "Текст комментария"
+    errors:
+      format: "%{attribute} %{message}"
+      models:
+        variant: {}
+        item: {}
+        incase:
+          items_required: "Убыток должен содержать хотя бы одну позицию"
+          attributes:
+            company:
+              required: "должна быть выбрана"
+            strah:
+              required: "должна быть выбрана"
+        item_status: {}
+        incase_tip: {}
+        incase_status: {}
+        comment:
+          attributes:
+            body:
+              blank: "не может быть пустым"
+          blank: "не может быть пустым"
+        company: {}
+        client: {}
+        client_company: {}
+        company_plan_date:
+          attributes:
+            "comments.body":
+              blank: "Текст комментария не может быть пустым"
+            comments:
+              body:
+                blank: "Текст комментария не может быть пустым"
+        moysklad: {}
+        detal: {}
+        product: {}
+        property: {}
+        characteristic: {}
+        feature: {}
+        image: {}
+        varbind: {}
+        insale: {}
+        user: {}
+        import: {}
+        session: {}
+        import_schedule: {}
+        export: {}
+      messages:
+        inclusion: "не включено в список"
+        exclusion: "исключено из списка"
+        invalid: "имеет неверное значение"
+        confirmation: "не совпадает с подтверждением"
+        accepted: "должно быть принято"
+        empty: "не может быть пустым"
+        blank: "должно быть заполнено"
+        present: "должно быть пустым"
+        required: "обязательно для заполнения"
+        too_long: "слишком длинное (не более %{count} символов)"
+        too_short: "слишком короткое (не менее %{count} символов)"
+        wrong_length: "имеет неверную длину (должно быть %{count} символов)"
+        not_a_number: "не является числом"
+        not_an_integer: "должно быть целым числом"
+        greater_than: "должно быть больше %{count}"
+        greater_than_or_equal_to: "должно быть больше или равно %{count}"
+        equal_to: "должно быть равно %{count}"
+        less_than: "должно быть меньше %{count}"
+        less_than_or_equal_to: "должно быть меньше или равно %{count}"
+        odd: "должно быть нечетным"
+        even: "должно быть четным"
+        taken: "уже существует"
+        record_invalid: "Возникли ошибки: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "Нельзя удалить запись, так как существует зависимая %{record}"
+          has_many: "Нельзя удалить запись, так как существуют зависимые %{record}"
   audited:
     ui:
       audits:

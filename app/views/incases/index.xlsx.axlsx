@@ -1,6 +1,6 @@
 wb = xlsx_package.workbook
-inc_attributes = Incase.attribute_names
-item_attributes = Item.attribute_names
+inc_attributes = Incase.file_export_attributes
+item_attributes = Item.file_export_attributes
 all_attributes = inc_attributes + item_attributes
 check_int = ["id","price","quantity","cost_price"]
 wb.add_worksheet(name: "Incase") do |sheet|

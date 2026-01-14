@@ -17,7 +17,7 @@ class Incases::CommentsController < ApplicationController
         flash.now[:success] = t('.success')
         format.turbo_stream do
           render turbo_stream: turbo_close_offcanvas_flash + [
-            turbo_stream.append(
+            turbo_stream.prepend(
               dom_id(@incase, :comments),
               partial: "incases/comments/comment",
               locals: { comment: @comment, incase: @incase }

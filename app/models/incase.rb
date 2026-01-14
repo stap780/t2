@@ -25,6 +25,15 @@ class Incase < ApplicationRecord
   validate :items_presence
   
   REGION = %w[МСК СПБ].freeze
+
+  attribute :strah_title
+  attribute :company_title
+  attribute :incase_status_title
+  attribute :incase_tip_title
+
+  def self.file_export_attributes
+    attribute_names - ["strah_id","company_id","incase_status_id","incase_tip_id","created_at","updated_at"]
+  end
   
   def self.ransackable_attributes(auth_object = nil)
     # attribute_names
@@ -33,6 +42,23 @@ class Incase < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[associated_audits audits company items strah incase_status incase_tip]
+  end
+
+  def strah_title
+    return '' unless strah.present?
+    strah.title
+  end
+  def company_title
+    return '' unless company.present?
+    company.title
+  end
+  def incase_status_title
+    return '' unless incase_status.present?
+    incase_status.title
+  end
+  def incase_tip_title
+    return '' unless incase_tip.present?
+    incase_tip.title
   end
 
   private

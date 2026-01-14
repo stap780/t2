@@ -15,8 +15,7 @@
     </div>
           
     <%= turbo_stream_from incase, :comments %>
-    
-    <%= turbo_frame_tag incase, :comments, class: "w-full" do %>
+    <%= turbo_frame_tag dom_id(incase, :comments), class: "" do %>
       <% if incase.comments.any? %>
         <% incase.comments.order(created_at: :desc).each do |comment| %>
           <%= render "incases/comments/comment", comment: comment, incase: incase %>

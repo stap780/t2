@@ -54,7 +54,8 @@ class Variant < ApplicationRecord
   end
 
   def full_title
-    "#{barcode} - #{product.title} - #{sku}"
+    # "#{barcode} - #{product.title} - #{sku}"
+    "#{barcode} - #{product.title}"
   end
 
   def title

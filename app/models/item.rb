@@ -25,6 +25,11 @@ class Item < ApplicationRecord
   before_create :create_product_variant, if: -> { variant_id.blank? }
   
   attribute :barcode, :string
+  attribute :item_status_title
+	
+	def self.file_export_attributes
+    attribute_names - ["id","incase_id","item_status_id","variant_id","created_at","updated_at"]
+	end
   
   def self.ransackable_attributes(auth_object = nil)
     # attribute_names
@@ -49,6 +54,23 @@ class Item < ApplicationRecord
 
   def barcode
     variant.barcode
+  end
+
+  def last_status_change_date
+    audit = Audited::Audit.where(
+      auditable_type: 'Item',
+      auditable_id: self.id
+    )
+    .where("audited_changes ? 'item_status_id'")
+    .order(created_at: :desc)
+    .first
+    
+    audit&.created_at || ''
+  end
+
+  def item_status_title
+		return '' unless item_status.present?
+		item_status.title
   end
   
   private

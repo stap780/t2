@@ -8,7 +8,7 @@
                 <%= f.select :item_status_id, options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }, item.item_status_id), { include_blank: false }, 
                     onchange: 'this.form.requestSubmit();', 
                     class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
-                    style: "max-width: 250px;" %>
+                    style: "max-width: 250px;",  data: { choose_target: 'itemResults', submit_element: 'true' } %>
             <% end %>           
             <%=tag.div class: "flex items-center space-x-4" do %>
                 <% Item.conditions.each_key do |cond| %>

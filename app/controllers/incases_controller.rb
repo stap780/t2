@@ -13,14 +13,18 @@ class IncasesController < ApplicationController
     # Join items and variants if searching by items_barcode
     base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
     search_params_hash = search_params || {}
-    searching_by_barcode = search_params_hash.keys.any? { |key| key.to_s.include?('items_barcode') }
+
+    # Process multiple unumber search
+    processed_params = process_multiple_unumber_search(search_params_hash.dup)
+    
+    searching_by_barcode = processed_params.keys.any? { |key| key.to_s.include?('items_barcode') }
     
     # Use left_joins instead of joins to avoid type conflicts with string foreign keys
     # Join variants for barcode search (ransacker in Item needs variant table)
     if searching_by_barcode
       base_relation = base_relation.left_joins(items: :variant)
     end
-    @search = base_relation.ransack(search_params)
+    @search = base_relation.ransack(processed_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @incases = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
@@ -238,7 +242,27 @@ class IncasesController < ApplicationController
     pdf.render
   end
 
-  private
+  def process_multiple_unumber_search(search_params_hash)
+    search_key = :unumber_or_company_title_or_items_barcode_or_carnumber_cont
+    
+    return search_params_hash unless search_params_hash[search_key].present?
+    
+    search_value = search_params_hash[search_key].to_s.strip
+    
+    # Check if search value contains spaces (multiple values)
+    if search_value.include?(' ')
+      parts = search_value.split(/\s+/).map(&:strip).reject(&:blank?)
+      
+      # If we have multiple parts and they all look like unumber values (short strings)
+      # Use unumber_in for array search
+      if parts.length > 1 && parts.all? { |part| part.length <= 50 }
+        search_params_hash.delete(search_key)
+        search_params_hash[:unumber_in] = parts
+      end
+    end
+    
+    search_params_hash
+  end
 
   def set_incase
     @incase = Incase.find(params[:id])

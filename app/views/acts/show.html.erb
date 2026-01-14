@@ -12,7 +12,7 @@
       <!-- Информация о компании (принимающая сторона) -->
       <div>
         <h2 class="text-lg font-semibold text-gray-900 mb-2"><%= t('.receiving_party') %></h2>
-        <p class="text-gray-700 font-medium"><%= @act.company&.title %> <%= @act.company&.ur_address %></p>
+        <p class="text-gray-700 font-medium"><%=link_to @act.company&.title, edit_company_path(@act.company), class: "text-blue-600 hover:text-blue-800 cursor-pointer", target: '_blank', data: { turbo: false } %> <%= @act.company&.ur_address %></p>
       </div>
 
       <!-- Информация о страховой компании (передающая сторона) -->
@@ -58,7 +58,7 @@
 
     <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
     <% incases.each do |incase| %>
-      <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+      <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" data-controller="choose">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
           <div class="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-4">
@@ -72,10 +72,19 @@
               </span>
               <span class="text-xs text-gray-500">№ ВД:</span>
               <span class="text-sm font-semibold text-gray-900">
-                <%= incase.unumber %> от <%= incase.date&.strftime('%d.%m.%Y') %>
+                <%=link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800 cursor-pointer", target: '_blank', data: { turbo: false } %> от <%= incase.date&.strftime('%d.%m.%Y') %>
               </span>
             </div>
-            <div>Статус</div>
+            <div>
+              <%= select_tag "incase_item_status_label", 
+            options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
+            { prompt: t('activerecord.attributes.item.item_status_id'),
+              class: "px-2 py-1 border rounded-md text-sm w-full", 
+              data: {
+                action: "change->choose#changeBulkItemStatus", 
+                choose_target: "itemSelected" 
+              } } %>
+              </div>
             <div>Состояние</div>
           </div>
         </div>

@@ -1,25 +1,25 @@
-<%= search_form_for @q, url: request.path, class: "mb-4 p-4 bg-gray-50 rounded-lg" do |f| %>
+<%= search_form_for @q, url: request.path, class: "mb-4 p-4 bg-gray-50 rounded-lg flex gap-4" do |f| %>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div>
       <%= f.label t("activerecord.attributes.audit.user"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.collection_select :user_id_eq, User.all, :id, :email_address, {include_blank: true}, {class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm"} %>
+      <%= f.collection_select :user_id_eq, User.all, :id, :email_address, {include_blank: true}, {class: "block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm"} %>
     </div>
 
     <div>
       <%= f.label t("activerecord.attributes.audit.created_at"), class: "block text-sm font-medium text-gray-700 mb-1" %>
       <div class="flex gap-2">
-        <%= f.date_field :created_at_gteq, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
-        <%= f.date_field :created_at_lteq, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
+        <%= f.date_field :created_at_gteq, class: "block w-full h-8 p-1 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
+        <%= f.date_field :created_at_lteq, class: "block w-full h-8 p-1 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
       </div>
     </div>
 
     <div>
       <%= f.label t("activerecord.attributes.audit.audited_changes"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :raw_audited_changes_cont, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
+      <%= f.text_field :raw_audited_changes_cont, class: "block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm" %>
     </div>
   </div>
 
-  <div class="mt-4">
-    <%= f.submit t("search", default: "Поиск"), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
+  <div class="mt-6">
+    <%= f.submit t("search", default: "Поиск"), class: "h-8 flex items-center px-2 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500" %>
   </div>
 <% end %>
