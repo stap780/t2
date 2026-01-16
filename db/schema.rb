@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_24_161803) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_16_114226) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -364,7 +364,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_161803) do
     t.string "incase_tip_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "sendstatus"
     t.index ["company_id"], name: "index_incases_on_company_id"
+    t.index ["sendstatus"], name: "index_incases_on_sendstatus"
     t.index ["strah_id"], name: "index_incases_on_strah_id"
   end
 

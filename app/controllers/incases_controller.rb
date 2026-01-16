@@ -1,5 +1,5 @@
 class IncasesController < ApplicationController
-  before_action :set_incase, only: %i[ show edit update destroy act ]
+  before_action :set_incase, only: %i[ show edit update destroy act send_email ]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -150,6 +150,70 @@ class IncasesController < ApplicationController
               filename: "incases_#{Time.current.strftime('%Y%m%d_%H%M%S')}.zip",
               type: 'application/zip',
               disposition: 'attachment'
+  end
+
+  def send_emails
+    if params[:incase_ids].blank?
+      redirect_to incases_path, alert: 'Выберите убытки для отправки'
+      return
+    end
+
+    incase_ids = params[:incase_ids].reject(&:blank?)
+    
+    if incase_ids.empty?
+      redirect_to incases_path, alert: 'Выберите убытки для отправки'
+      return
+    end
+
+    begin
+      IncaseEmailService.send_multiple(incase_ids)
+      redirect_to incases_path, notice: 'Письма по убыткам отправлены'
+    rescue => e
+      redirect_to incases_path, alert: "Ошибка при отправке: #{e.message}"
+    end
+  end
+
+  def send_email
+    begin
+      result = IncaseEmailService.send_one(@incase.id)
+      @incase.reload
+      
+      respond_to do |format|
+        format.turbo_stream do
+          if result
+            flash.now[:notice] = 'Письмо отправлено'
+            render turbo_stream: [
+              turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
+              render_turbo_flash
+            ]
+          else
+            flash.now[:alert] = 'Письмо не отправлено. Проверьте наличие дубля или email у контрагента.'
+            render turbo_stream: [
+              render_turbo_flash
+            ]
+          end
+        end
+        format.html do
+          if result
+            redirect_to incases_path, notice: 'Письмо отправлено'
+          else
+            redirect_to incases_path, alert: 'Письмо не отправлено. Проверьте наличие дубля или email у контрагента.'
+          end
+        end
+      end
+    rescue => e
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:alert] = "Ошибка при отправке: #{e.message}"
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
+        format.html do
+          redirect_to incases_path, alert: "Ошибка при отправке: #{e.message}"
+        end
+      end
+    end
   end
 
   private

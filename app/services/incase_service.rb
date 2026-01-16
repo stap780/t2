@@ -250,6 +250,15 @@ class IncaseService
     )
     
     @created_incases << incase.id
+    
+    # Автоматическая отправка письма для нового убытка (Сценарий 3)
+    begin
+      IncaseEmailService.send_one(incase.id)
+    rescue => e
+      Rails.logger.error "Failed to auto-send email for incase #{incase.id}: #{e.message}"
+      # Не прерываем процесс импорта из-за ошибки отправки
+    end
+    
     incase
   end
   

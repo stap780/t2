@@ -1,16 +1,15 @@
-class IncaseEmailJob < ApplicationJob
+class IncaseMultipleEmailJob < ApplicationJob
   queue_as :mailers
   
-  def perform(incase_id, company_id, email_delivery_id)
+  def perform(company_id, email_delivery_id, incase_ids)
     email_delivery = EmailDelivery.find(email_delivery_id)
-    incase = Incase.find(incase_id)
     company = Company.find(company_id)
     
     # Проверяем, что файл уже прикреплен
     return unless email_delivery.attachment.attached?
     
     begin
-      mailer = IncaseMailer.send_excel(incase_id, company_id, email_delivery.id)
+      mailer = IncaseMailer.send_multiple_excel(company_id, email_delivery.id)
       mailer.deliver_now
       
       email_delivery.update!(
@@ -18,8 +17,9 @@ class IncaseEmailJob < ApplicationJob
         sent_at: Time.current
       )
       
-      # Обновляем sendstatus для убытка
-      incase.update(sendstatus: true)
+      # Обновляем sendstatus для всех отправленных убытков
+      Incase.where(id: incase_ids).update_all(sendstatus: true)
+      
     rescue => e
       email_delivery.update!(
         status: 'failed',
@@ -29,4 +29,3 @@ class IncaseEmailJob < ApplicationJob
     end
   end
 end
-

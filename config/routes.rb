@@ -186,12 +186,14 @@ Rails.application.routes.draw do
   resources :incases do
     member do
       get :act
+      post :send_email
     end
     collection do
       post :bulk_print
       post :bulk_status
       post :download
       post :bulk_delete
+      post :send_emails
       get :filter
     end
     resources :items do

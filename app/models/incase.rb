@@ -44,6 +44,12 @@ class Incase < ApplicationRecord
     %w[associated_audits audits company items strah incase_status incase_tip]
   end
 
+  scope :unsent, -> { where(sendstatus: nil) }
+
+  def sent?
+    sendstatus == true
+  end
+
   def strah_title
     return '' unless strah.present?
     strah.title
