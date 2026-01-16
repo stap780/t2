@@ -21,20 +21,10 @@ class EmailDeliveriesController < ApplicationController
         return
       end
       
-      # Проверяем, это массовая отправка или одиночная
-      if @email_delivery.mailer_method == 'send_multiple_excel'
-        # Массовая отправка
-        company_id = @email_delivery.recipient.id
-        incase_ids = @email_delivery.metadata&.dig('incase_ids') || []
-        IncaseMultipleEmailJob.perform_later(company_id, @email_delivery.id, incase_ids)
-      else
-        # Одиночная отправка
-        IncaseEmailJob.perform_later(
-          @email_delivery.record.id,
-          @email_delivery.recipient.id,
-          @email_delivery.id
-        )
-      end
+      # Унифицированная отправка (работает для одиночных и массовых)
+      company_id = @email_delivery.recipient.id
+      incase_ids = @email_delivery.metadata&.dig('incase_ids') || [@email_delivery.record.id]
+      IncaseEmailJob.perform_later(incase_ids, company_id, @email_delivery.id)
     when 'ActMailer'
       unless @email_delivery.attachment.attached?
         redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'

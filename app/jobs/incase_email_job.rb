@@ -1,16 +1,23 @@
+# Унифицированный Job для отправки писем (одиночных и массовых)
 class IncaseEmailJob < ApplicationJob
   queue_as :mailers
   
-  def perform(incase_id, company_id, email_delivery_id)
+  # incase_ids: массив ID убытков (даже если один элемент)
+  # company_id: ID компании
+  # email_delivery_id: ID EmailDelivery записи
+  def perform(incase_ids, company_id, email_delivery_id)
     email_delivery = EmailDelivery.find(email_delivery_id)
-    incase = Incase.find(incase_id)
     company = Company.find(company_id)
     
     # Проверяем, что файл уже прикреплен
     return unless email_delivery.attachment.attached?
     
     begin
-      mailer = IncaseMailer.send_excel(incase_id, company_id, email_delivery.id)
+      # Нормализуем массив ID
+      incase_ids = Array(incase_ids)
+      
+      # Отправляем письмо через mailer
+      mailer = IncaseMailer.send_excel(incase_ids, company_id, email_delivery.id)
       mailer.deliver_now
       
       email_delivery.update!(
@@ -18,8 +25,9 @@ class IncaseEmailJob < ApplicationJob
         sent_at: Time.current
       )
       
-      # Обновляем sendstatus для убытка
-      incase.update(sendstatus: true)
+      # Обновляем sendstatus для всех убытков
+      Incase.where(id: incase_ids).update_all(sendstatus: true)
+      
     rescue => e
       email_delivery.update!(
         status: 'failed',
@@ -29,4 +37,3 @@ class IncaseEmailJob < ApplicationJob
     end
   end
 end
-
