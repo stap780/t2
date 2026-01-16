@@ -152,6 +152,7 @@ class IncasesController < ApplicationController
               disposition: 'attachment'
   end
 
+  # Массовая отправка (collection action)
   def send_emails
     if params[:incase_ids].blank?
       redirect_to incases_path, alert: 'Выберите убытки для отправки'
@@ -166,39 +167,26 @@ class IncasesController < ApplicationController
     end
 
     begin
-      IncaseEmailService.send_multiple(incase_ids)
+      IncaseEmailService.send(incase_ids)
       redirect_to incases_path, notice: 'Письма по убыткам отправлены'
     rescue => e
       redirect_to incases_path, alert: "Ошибка при отправке: #{e.message}"
     end
   end
 
+  # Одиночная отправка (member action) - использует Turbo Stream для обновления строки
   def send_email
     begin
-      result = IncaseEmailService.send_one(@incase.id)
+      IncaseEmailService.send([@incase.id])
       @incase.reload
       
       respond_to do |format|
         format.turbo_stream do
-          if result
-            flash.now[:notice] = 'Письмо отправлено'
-            render turbo_stream: [
-              turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
-              render_turbo_flash
-            ]
-          else
-            flash.now[:alert] = 'Письмо не отправлено. Проверьте наличие дубля или email у контрагента.'
-            render turbo_stream: [
-              render_turbo_flash
-            ]
-          end
-        end
-        format.html do
-          if result
-            redirect_to incases_path, notice: 'Письмо отправлено'
-          else
-            redirect_to incases_path, alert: 'Письмо не отправлено. Проверьте наличие дубля или email у контрагента.'
-          end
+          flash.now[:notice] = 'Письмо отправлено'
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
+            render_turbo_flash
+          ]
         end
       end
     rescue => e
@@ -208,9 +196,6 @@ class IncasesController < ApplicationController
           render turbo_stream: [
             render_turbo_flash
           ]
-        end
-        format.html do
-          redirect_to incases_path, alert: "Ошибка при отправке: #{e.message}"
         end
       end
     end

@@ -1175,6 +1175,21 @@ ru:
         few: "Планируемые даты компании"
         many: "Планируемых дат компании"
         other: "Планируемых дат компании"
+      incase:
+        one: "Убыток"
+        few: "Убытка"
+        many: "Убытков"
+        other: "Убытков"
+      act:
+        one: "Акт"
+        few: "Акта"
+        many: "Актов"
+        other: "Актов"
+      product:
+        one: "Товар"
+        few: "Товара"
+        many: "Товаров"
+        other: "Товаров"
     attributes:
       audit:
         auditable_type: "Тип записи"

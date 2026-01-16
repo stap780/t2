@@ -25,8 +25,10 @@ class IncaseEmailJob < ApplicationJob
         sent_at: Time.current
       )
       
-      # Обновляем sendstatus для всех убытков
-      Incase.where(id: incase_ids).update_all(sendstatus: true)
+      # Обновляем sendstatus для всех убытков (используем update! для каждого, чтобы сработали callbacks и Turbo Stream broadcast)
+      Incase.where(id: incase_ids).find_each do |incase|
+        incase.update!(sendstatus: true)
+      end
       
     rescue => e
       email_delivery.update!(

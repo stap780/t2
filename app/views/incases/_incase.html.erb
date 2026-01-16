@@ -34,18 +34,17 @@
   <div class="text-sm text-gray-600"><%= number_to_currency(incase.totalsum, unit: '', delimiter: ' ', precision: 2) if incase.totalsum.present? %></div>
   <div class="text-sm text-gray-600"><%= incase.date&.strftime('%d.%m.%Y') %></div>
   <div class="flex items-center justify-center">
-    <%= button_to send_email_incase_path(incase), method: :post,
+    <%= button_to send_email_incase_path(incase), method: :post, title: "Отправить письмо",
         class: "text-blue-600 hover:text-blue-800 cursor-pointer",
-        data: { turbo_confirm: 'Отправить письмо контрагенту?', turbo_method: :post },
-        title: "Отправить письмо" do %>
-        <% if incase.sendstatus == true %>
-      <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Отправлено">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-        <% else %>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
+        data: { turbo_confirm: 'Отправить письмо контрагенту?', turbo_method: :post } do %>
+      <% if incase.sendstatus == true %>
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Отправлено">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      <% else %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
       <% end %>
     <% end %>
   </div>
@@ -54,4 +53,3 @@
     <%= link_to_delete incase_path(incase), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
   </div>
 <% end %>
-

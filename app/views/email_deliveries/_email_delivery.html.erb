@@ -1,4 +1,4 @@
-<div class="grid grid-cols-[50px_150px_200px_150px_150px_100px_150px] gap-4 p-4 border-b hover:bg-gray-50 items-center">
+<div class="grid grid-cols-[50px_1fr_1fr_150px_150px_100px_150px] gap-4 p-4 border-b hover:bg-gray-50 items-center">
   <div><%= email_delivery.id %></div>
   <div class="truncate">
     <% if email_delivery.moysklad_notification? %>
@@ -17,7 +17,17 @@
       <% end %>
     <% end %>
   </div>
-  <div class="truncate text-sm"><%= email_delivery.recipient_email %></div>
+  <div class="truncate text-sm flex flex-col">
+    <%=tag.div email_delivery.recipient_email %>
+    <%=tag.div email_delivery.subject %>
+    <%=tag.div do %>
+      <% if email_delivery.record.present? %>
+        <%=link_to email_delivery.record.model_name.human(count: 1), email_delivery.record, class: "text-blue-600 hover:text-blue-800" %>
+      <% elsif email_delivery.record_type.present? %>
+        <%= email_delivery.record_type.constantize.model_name.human(count: 1) rescue email_delivery.record_type %>
+      <% end %>
+    <% end %>
+  </div>
   <div>
     <% if email_delivery.moysklad_notification? %>
       <span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800">
@@ -25,7 +35,7 @@
       </span>
     <% else %>
       <span class="px-2 py-1 text-xs rounded <%= email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
-        <%= email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
+        <%= email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Убытки' %>
       </span>
     <% end %>
   </div>
