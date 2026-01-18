@@ -1,16 +1,17 @@
-<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[20px_50px_80px_80px_1fr_120px_120px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
-  <div>
+<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[30px_80px_80px_80px_1fr_100px_85px_120px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+  <div class="flex flex-col gap-2">
     <%= check_box_tag "product_ids[]", product.id, false, {
       class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
       data: { 'selectall_target': 'checkbox', action: "change->selectall#toggleParent"}, 
       form: :bulk_action_form 
     } %>
+    <div class="text-xs text-gray-500"><%= product.id %></div>
   </div>
-  <div><%= product.id %></div>
+  <div class="text-xs text-center"><%= product.created_at.strftime('%d.%m.%Y') %></div>
   <div>
     <% first_image = product.images.first %>
     <% if first_image&.file&.attached? %>
-      <%= image_tag first_image.s3_url, alt: product.title, class: "w-16 h-16 object-cover rounded" %>
+      <%# image_tag first_image.s3_url, alt: product.title, class: "w-16 h-16 object-cover rounded" %>
     <% else %>
       <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No image</div>
     <% end %>
@@ -22,9 +23,11 @@
     </div>
     <div class="text-xs text-gray-500"><%= product.variants&.first&.sku %></div>
     <div class="text-xs text-gray-500"><%= product.variants&.first&.barcode %></div>
+    <div class="text-xs text-gray-500"><%= product.stantsiya %></div>
   </div>
   <% variant = product.variants&.first %>
   <%= render 'products/inline/price', product: product, variant: variant %>
+  <div class="text-center"><%= product.variants&.first&.quantity %></div>
   <div class="flex justify-end space-x-2">
     <%= link_to sync_with_moysklad_product_path(product), 
         method: :post,

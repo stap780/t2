@@ -158,6 +158,13 @@ class Product < ApplicationRecord
     Product.where('id < ?', id).order(id: :desc).first || Product.last
   end
 
+  def stantsiya
+    feature = features.find { |f| f.property.handle == 'stantsiya' }
+
+    return '' unless feature.present?
+    feature.characteristic&.title
+  end
+
   private
 
 

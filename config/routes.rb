@@ -176,6 +176,7 @@ Rails.application.routes.draw do
   resources :acts do
     member do
       get :print, format: :pdf
+      get :print_etiketkas, format: :pdf
     end
     collection do
       post :create_multi

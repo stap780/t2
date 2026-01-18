@@ -1,5 +1,5 @@
 class ActsController < ApplicationController
-  before_action :set_act, only: [:show, :edit, :update, :destroy, :print]
+  before_action :set_act, only: [:show, :edit, :update, :destroy, :print, :print_etiketkas]
   include ActionView::RecordIdentifier
 
   def index
@@ -231,6 +231,58 @@ class ActsController < ApplicationController
         send_data pdf_data, filename: "act_#{@act.number}.pdf", type: 'application/pdf', disposition: 'inline'
       end
     end
+  end
+
+  def print_etiketkas
+    require 'combine_pdf'
+    
+    # Получаем все варианты из позиций акта
+    variants = @act.items.includes(:variant).map(&:variant).compact.uniq
+    
+    if variants.empty?
+      flash[:alert] = "В акте нет позиций с вариантами товаров"
+      redirect_back(fallback_location: acts_path)
+      return
+    end
+    
+    # Фильтруем варианты, у которых есть штрихкод
+    variants_with_barcode = variants.select { |v| v.barcode.present? && v.barcode.size == 13 }
+    
+    if variants_with_barcode.empty?
+      flash[:alert] = "В акте нет позиций с валидными штрихкодами"
+      redirect_back(fallback_location: acts_path)
+      return
+    end
+    
+    # Генерируем этикетки для всех вариантов
+    combined_pdf = CombinePDF.new
+    
+    variants_with_barcode.each do |variant|
+      # Генерируем этикетку, если еще не сгенерирована
+      variant.generate_etiketka unless variant.etiketka.attached?
+      
+      if variant.etiketka.attached?
+        pdf_data = variant.etiketka.download
+        combined_pdf << CombinePDF.parse(pdf_data)
+      end
+    end
+    
+    if combined_pdf.pages.empty?
+      flash[:alert] = "Не удалось сгенерировать этикетки"
+      redirect_back(fallback_location: acts_path)
+      return
+    end
+    
+    # Возвращаем объединенный PDF
+    send_data combined_pdf.to_pdf, 
+              filename: "etiketkas_act_#{@act.number}.pdf", 
+              type: 'application/pdf', 
+              disposition: 'inline'
+  rescue => e
+    Rails.logger.error "ActsController#print_etiketkas error: #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    flash[:alert] = "Ошибка при генерации этикеток: #{e.message}"
+    redirect_back(fallback_location: acts_path)
   end
 
   private

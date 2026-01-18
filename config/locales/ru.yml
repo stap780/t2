@@ -1,6 +1,7 @@
 ru:
   edit: "Редактировать"
   delete: "Удалить"
+  print_barcode: "Печать штрихкода"
   nav:
     brand: "App"
     dashboard: "Панель"
@@ -702,9 +703,11 @@ ru:
       status: "Статус"
       title_label: "Название"
       price: "Цена"
-      quantity: "Количество"
+      quantity: "Кол-во"
       created_at: "Дата создания"
       created_from: "создан от"
+    filter:
+      heading: "Фильтр товаров"
     new:
       title: "Новый товар"
       heading: "Новый товар"

@@ -10,17 +10,35 @@ class ProductsController < ApplicationController
     # COUNT запрос БЕЗ includes (быстрый) - Ransack сам добавит нужные JOIN для условий поиска
     @search = Product.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
-    base_result = @search.result(distinct: true)
     
-    # COUNT через подзапрос по ID (быстрее чем COUNT с JOIN из includes)
-    # Выполняем COUNT на базовом запросе БЕЗ includes
-    total_count = base_result.count
+    # Проверяем, используется ли сортировка по полям вариантов
+    sorting_by_variants_price = @search.sorts.any? { |sort| sort.name.to_s == 'variants_price' }
+    sorting_by_variants_quantity = @search.sorts.any? { |sort| sort.name.to_s == 'variants_quantity' }
+    
+    # COUNT запрос БЕЗ includes (быстрый) - Ransack сам добавит нужные JOIN для условий поиска
+    count_result = @search.result(distinct: true)
+    total_count = count_result.count
+    
+    # Для основного запроса добавляем select при сортировке по полям вариантов
+    # Согласно документации Ransack: при distinct: true и сортировке по колонке из ассоциированной таблицы
+    # нужно явно добавить эту колонку в SELECT через .select
+    # https://www.rubydoc.info/gems/ransack/1.8.7#problem-with-distinct-selects
+    base_result = if sorting_by_variants_price || sorting_by_variants_quantity
+      # Формируем список колонок для SELECT в зависимости от используемых сортировок
+      select_columns = ["products.*"]
+      select_columns << "variants.price" if sorting_by_variants_price
+      select_columns << "variants.quantity" if sorting_by_variants_quantity
+      
+      @search.result(distinct: true)
+             .select(select_columns.join(", "))
+    else
+      @search.result(distinct: true)
+    end
     
     # Данные С includes (для отображения, избегаем N+1)
     @products = base_result.includes(:features, :variants, images: [:file_attachment, :file_blob])
                            .paginate(page: params[:page], per_page: 100)
     
-    # Переопределить total_entries для will_paginate (избегаем повторного COUNT)
     @products.total_entries = total_count
     
     # Preload Detal records to avoid N+1 queries

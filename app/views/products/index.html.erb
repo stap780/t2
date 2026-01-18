@@ -3,7 +3,7 @@
   <div class="flex space-x-2">
     <%= search_form_for @search, url: products_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
       <%= f.label :title_or_variants_sku_cont, t("products.index.search_by_title_sku"), class: "sr-only" %>
-      <%= f.search_field :title_or_variants_sku_or_variants_barcode_cont, value: params.dig(:q, :title_cont), placeholder: t("products.index.search_by_title_sku"), class: "h-8 px-2 py-1 border rounded", style: "width: 350px;" %>
+      <%= f.search_field :title_or_variants_sku_or_variants_barcode_cont, value: params.dig(:q, :title_or_variants_sku_or_variants_barcode_cont), placeholder: t("products.index.search_by_title_sku"), class: "h-8 px-2 py-1 border rounded", style: "width: 350px;" %>
       <%= f.submit t("products.index.search"), class: "h-8 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
       <%= link_to products_path(search_cancel: true), class: "h-8 px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("products.index.clear") do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,7 +41,7 @@
 <%= turbo_stream_from "products" %>
 
 <div class="bg-white rounded-lg shadow divide-y" data-controller="selectall">
-  <div class="grid grid-cols-[20px_50px_80px_80px_1fr_120px_120px] gap-2 px-3 py-4 font-medium text-gray-700">
+  <div class="grid grid-cols-[30px_80px_80px_80px_1fr_100px_85px_120px] gap-2 px-3 py-4 font-medium text-gray-700">
     <div>
       <%= check_box_tag "select_all", "1", false, {
         class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500',
@@ -53,11 +53,12 @@
         form: :bulk_action_form
       } %>
     </div>
-    <div>#</div>
+    <div></div>
     <div></div>
     <div><%= t("products.index.status") %></div>
     <div><%= t("products.index.title_label") %></div>
-    <div><%= t("products.index.price") %></div>
+    <div><%= sort_link(@search, :variants_price, t('products.index.price'), default_order: :desc, data: { turbo_prefetch: false }) %></div>
+    <div><%= sort_link(@search, :variants_quantity, t('products.index.quantity'), default_order: :desc, data: { turbo_prefetch: false }) %></div>
     <div></div>
   </div>
   <%= turbo_frame_tag "products" do %>

@@ -111,7 +111,19 @@ class ActPdfService
       # Группируем позиции по заявкам (Incase)
       incases = @act.items.includes(:incase).map(&:incase).uniq.compact
 
+      # Минимальная высота для футера с подписями
+      # Футер размещается на footer_y = 35 от низа страницы, имеет высоту 25
+      # margin bottom = 15, поэтому относительно bounds.bottom футер начинается на высоте 35 - 15 = 20
+      # Добавляем отступ (15) для безопасности, чтобы контент не накладывался на футер
+      footer_min_height = 20 + 15  # 35 точек от bounds.bottom
+
       incases.each do |incase|
+        # Проверяем доступное место перед добавлением заголовка заявки
+        # Заголовок занимает примерно 20-25 точек
+        if pdf.cursor < footer_min_height + 25
+          pdf.start_new_page
+        end
+
         # Заголовок заявки
         incase_header_data = [
           [
@@ -132,6 +144,12 @@ class ActPdfService
         act_items_from_incase = @act.items.where(incase: incase).order(:title)
 
         act_items_from_incase.each do |item|
+          # Проверяем доступное место перед добавлением каждой позиции
+          # Каждая позиция занимает примерно 20-25 точек
+          if pdf.cursor < footer_min_height + 25
+            pdf.start_new_page
+          end
+
           item_data = [
             [
               { content: "#{item.title} (#{item.katnumber})", colspan: 2 },

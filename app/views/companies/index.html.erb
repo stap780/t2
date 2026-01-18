@@ -1,18 +1,16 @@
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-xl font-semibold"><%= t(".heading") %> <small class="text-sm text-gray-500"><%= @companies.count %></small></h1>
 
-  <div class="flex space-x-2">
-    <%= search_form_for @search, url: companies_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
-      <%= f.label :short_title_or_title_cont, t('.search'), class: "sr-only" %>
-      <%= f.search_field :short_title_or_title_cont, value: params.dig(:q, :short_title_or_title_cont), placeholder: t('.search'), class: "px-2 py-1 border rounded", style: "width: 350px;" %>
-      <%= f.submit t('.search'), class: "px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
-      <%= link_to companies_path(search_cancel: true), class: "px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t('.clear') do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      <% end %>
+  <%= search_form_for @search, url: companies_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
+    <%= f.search_field :short_title_or_title_cont, value: params.dig(:q, :short_title_or_title_cont), placeholder: t('.search'), class: "h-8 px-2 py-1 border border-gray-300 rounded-md", style: "width: 350px;" %>
+    <%= f.select :tip_eq, Company.tip_collection, {prompt: t('activerecord.attributes.company.tip')}, { class: "h-8 px-2 py-1 border border-gray-300 rounded-md" } %>
+    <%= f.submit t('.search'), class: "h-8 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+    <%= link_to companies_path(search_cancel: true), class: "h-8 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t('.clear') do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
     <% end %>
-  </div>
+  <% end %>
 
   <div class="flex space-x-2 items-center">    
     <%= form_with url: companies_path, method: :post, id: :bulk_action_form, local: false do |f| %>

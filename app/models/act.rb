@@ -219,6 +219,7 @@ class Act < ApplicationRecord
     ActPdfService.new(self).call
   end
   
+  
   private
   
   def set_number_from_id
