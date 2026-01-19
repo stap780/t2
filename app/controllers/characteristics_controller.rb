@@ -87,7 +87,7 @@ class CharacteristicsController < ApplicationController
 
   def set_property
     if params[:property_id].present?
-      @property = Property.find(params[:property_id]).order(:title)
+      @property = Property.find(params[:property_id])
     else
       # Для новых записей создаем временный объект
       @property = Property.new
