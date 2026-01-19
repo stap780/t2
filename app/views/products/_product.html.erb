@@ -16,7 +16,7 @@
       <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">No image</div>
     <% end %>
   </div>
-  <div><%= product.status %></div>
+  <div><%= t("products.form.status.#{product.status}") %></div>
   <div class="flex flex-col">
     <div>
       <%= link_to product.title, edit_product_path(product), class: "text-blue-600 hover:text-blue-800", data: {turbo: false } %>
