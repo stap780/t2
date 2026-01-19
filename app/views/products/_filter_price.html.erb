@@ -1,0 +1,120 @@
+<%= search_form_for @search, html: { class: 'bg-white rounded-lg shadow p-4 mb-4', data: { controller: "filter", turbo_frame: '_top' }  } do |f| %>
+    <div class="pt-0 mt-0">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Атрибут модели (Цена/Количество) -->
+            <div>
+                <%= f.label :h_m_a_eq, t('products.index.history_attribute'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.select :h_m_a_eq, [['Цена', 'price']], 
+                    { prompt: t('products.index.select_attribute'), selected: params.dig(:q, :h_m_a_eq) || 'price' }, 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+            </div>
+            
+            <!-- Пользователь (используем стандартный ransack предикат associated_audits_user_id_eq) -->
+            <div>
+                <%= f.label :associated_audits_user_id_eq, t('products.index.history_user'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.collection_select :associated_audits_user_id_eq, User.all.order(:email_address), :id, :email_address, 
+                    { prompt: t('products.index.select_user'), selected: params.dig(:q, :associated_audits_user_id_eq) }, 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+            </div>
+            
+            <!-- Наличие старого значения -->
+            <div>
+                <%= f.label :h_o_v_present, t('products.index.history_old_value'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.select :h_o_v_present, [[t('products.index.yes'), 'true'], [t('products.index.no'), 'false']], 
+                    { prompt: t('products.index.select_old_value'), selected: params.dig(:q, :h_o_v_present) }, 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+            </div>
+            
+            <!-- Наличие нового значения -->
+            <div>
+                <%= f.label :h_n_v_present, t('products.index.history_new_value'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.select :h_n_v_present, [[t('products.index.yes'), 'true'], [t('products.index.no'), 'false']], 
+                    { prompt: t('products.index.select_new_value'), selected: params.dig(:q, :h_n_v_present) }, 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+            </div>
+            
+            <!-- Дата изменения от (используем стандартный ransack предикат associated_audits_created_at_dategteq) -->
+            <div>
+                <%= f.label :associated_audits_created_at_dategteq, t('products.index.history_date_from'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.search_field :associated_audits_created_at_dategteq, 
+                    value: params.dig(:q, :associated_audits_created_at_dategteq), 
+                    placeholder: t('products.index.history_date_from'), 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-pointer", 
+                    autocomplete: "off", 
+                    data: { controller: 'flatpickr', flatpickr_alt_input: "true", flatpickr_alt_format: "d-m-Y" } %>
+            </div>
+            
+            <!-- Дата изменения до (используем стандартный ransack предикат associated_audits_created_at_datelteq) -->
+            <div>
+                <%= f.label :associated_audits_created_at_datelteq, t('products.index.history_date_to'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= f.search_field :associated_audits_created_at_datelteq, 
+                    value: params.dig(:q, :associated_audits_created_at_datelteq), 
+                    placeholder: t('products.index.history_date_to'), 
+                    class: "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-pointer", 
+                    autocomplete: "off", 
+                    data: { controller: 'flatpickr', flatpickr_alt_input: "true", flatpickr_alt_format: "d-m-Y" } %>
+            </div>
+            
+            <!-- Количество -->
+            <div data-controller="checkbox">
+                <div class="block text-sm font-medium text-gray-700 mb-1"><%= t('products.index.quantity') %></div>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box :all_quantity, {
+                                checked: params.dig('q', 'all_quantity') == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label :all_quantity, 'all', class: 'text-sm text-gray-700' %>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box :no_quantity, {
+                                checked: params.dig('q', 'no_quantity') == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label :no_quantity, '= 0', class: 'text-sm text-gray-700' %>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box :yes_quantity, {
+                                checked: params.dig('q', 'yes_quantity') == '1',
+                                include_hidden: false,
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label :yes_quantity, '> 0', class: 'text-sm text-gray-700' %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Danger/Warning чекбоксы -->
+            <div data-controller="checkbox">
+                <div class="block text-sm font-medium text-gray-700 mb-1"><%= t('products.index.price_status') %></div>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box :danger_true, {
+                                checked: params.dig('q', 'danger_true') == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label :danger_true, t('products.index.danger'), class: 'text-sm text-gray-700' %>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box :warning_true, {
+                                checked: params.dig('q', 'warning_true') == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label :warning_true, t('products.index.warning'), class: 'text-sm text-gray-700' %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+        <%= f.submit "Применить", class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+        <%= link_to "Очистить", products_path(search_cancel: true), class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo_frame: '_top' } %>
+    </div>
+<% end %>

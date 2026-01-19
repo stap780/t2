@@ -6,6 +6,12 @@ class ApplicationController < ActionController::Base
   before_action :set_locale
   before_action :set_active_storage_url_options
 
+  # Метод для получения текущего пользователя (используется audited и доступен во views)
+  def current_user
+    Current.user
+  end
+  helper_method :current_user
+
   private
   
     def set_locale

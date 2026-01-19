@@ -62,7 +62,7 @@
                 <% if i.zero? %>
                   <% if @auditable_type.blank? %>
                     <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900" rowspan="<%= filtered_changes.size %>">
-                      <%= link_to t("activerecord.models.#{audit.auditable_type.underscore.downcase}", default: audit.auditable_type), 
+                      <%= link_to t("activerecord.models.#{audit.auditable_type.underscore.downcase}", count: 1, default: audit.auditable_type), 
                           audited_auditable_type_audits_path(audit.auditable_type.underscore.downcase),
                           class: "text-violet-600 hover:text-violet-800" %>
                     </td>
@@ -78,7 +78,7 @@
                     <%= audit.version %>
                     <% if @auditable&.respond_to?(:associated_audits) && @auditable_type.present? %>
                       <span class="text-gray-500 text-xs">
-                        (<%= t("activerecord.models.#{audit.auditable_type.underscore.downcase}", default: audit.auditable_type) %>)
+                        (<%= t("activerecord.models.#{audit.auditable_type.underscore.downcase}", count: 1, default: audit.auditable_type) %>)
                       </span>
                     <% end %>
                   </td>

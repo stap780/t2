@@ -65,10 +65,16 @@ class CharacteristicsController < ApplicationController
   end
 
   def search
-    if params[:title].present? && params[:property_id].present?
-      property = Property.find(params[:property_id])
+    # Получаем title из разных возможных мест
+    search_title = params[:title] || params.dig(:characteristic, :title)
+    
+    # Получаем property_id из разных возможных мест
+    property_id = params[:property_id] || params.dig(:characteristic, :property_id)
+    
+    if search_title.present? && property_id.present?
+      property = Property.find(property_id)
       @search_results = property.characteristics
-                                 .where("title ILIKE ?", "%#{params[:title]}%")
+                                 .where("title ILIKE ?", "%#{search_title}%")
                                  .limit(20)
                                  .map { |c| { title: c.title, id: c.id } }
       render json: @search_results, status: :ok
@@ -81,7 +87,7 @@ class CharacteristicsController < ApplicationController
 
   def set_property
     if params[:property_id].present?
-      @property = Property.find(params[:property_id])
+      @property = Property.find(params[:property_id]).order(:title)
     else
       # Для новых записей создаем временный объект
       @property = Property.new

@@ -6,7 +6,7 @@
 <%= turbo_frame_tag "feature_#{turbo_id_for(feature)}" do %>
   <%= fields_for "#{featureable_type}[features_attributes][#{turbo_id_for(feature)}]", feature do |ff| %>
     <div class="grid grid-cols-[1fr_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50" id="feature_<%= turbo_id_for(feature) %>">
-      <%= ff.collection_select :property_id, Property.all, :id, :title, { prompt: t("features.select_property"), selected: feature.property_id }, 
+      <%= ff.collection_select :property_id, Property.all.order(title: :asc), :id, :title, { prompt: t("features.select_property"), selected: feature.property_id }, 
       { class: "flex-1 px-2 py-1 border rounded-md w-full",
         data: {
           controller: "slimselect",
@@ -19,14 +19,15 @@
       
       <%= turbo_frame_tag "characteristic_#{turbo_id_for(feature)}" do %>
         <%= ff.collection_select :characteristic_id, 
-            (feature.property&.characteristics || []), :id, :title, 
+            (feature.property&.characteristics&.order(title: :asc) || []), :id, :title, 
             { prompt: t("features.select_characteristic"), selected: feature.characteristic_id }, 
             { 
               class: "flex-1 px-2 py-1 border rounded-md",
               id: "feature_#{turbo_id_for(feature)}_characteristic_id",
               data: {
                 controller: "slimselect",
-                search_url: search_characteristics_path
+                search_url: search_characteristics_path,
+                property_id: feature.property_id
               }
             } %>
       <% end %>

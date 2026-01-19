@@ -23,6 +23,8 @@ class Item < ApplicationRecord
   
   after_initialize :set_default_new
   before_create :create_product_variant, if: -> { variant_id.blank? }
+  after_save :recalculate_incase_status, if: :saved_change_to_item_status_id?
+  after_destroy :recalculate_incase_status_after_destroy
   
   attribute :barcode, :string
   attribute :item_status_title
@@ -93,6 +95,16 @@ class Item < ApplicationRecord
       sku: katnumber.presence || ''
     )
     self.variant_id = variant.id
+  end
+
+  def recalculate_incase_status
+    return unless incase_id.present?
+    Incase.recalculate_status_from_items(incase_id)
+  end
+
+  def recalculate_incase_status_after_destroy
+    return unless incase_id.present?
+    Incase.recalculate_status_from_items(incase_id)
   end
 
 

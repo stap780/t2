@@ -25,7 +25,7 @@ module ApplicationHelper
     if options[:class]
       options[:class]
     elsif !options[:class]
-      options[:class] = "p-2 rounded-md bg-blue-50 hover:bg-blue-100 flex items-center justify-center"
+      options[:class] = "p-2 rounded-md bg-blue-50 hover:bg-blue-100 flex items-center justify-center h-8"
     end
     link_to path, options do
       varbind_icon
@@ -42,7 +42,7 @@ module ApplicationHelper
     if options[:class]
       options[:class]
     elsif !options[:class]
-      options[:class] = "p-2 rounded-md bg-violet-100 hover:bg-violet-200 flex items-center justify-center"
+      options[:class] = "p-2 rounded-md bg-violet-100 hover:bg-violet-200 flex items-center justify-center h-8"
     end
     options[:title] ||= t('edit')
 

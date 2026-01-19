@@ -67,6 +67,27 @@ class Incase < ApplicationRecord
     incase_tip.title
   end
 
+  def self.recalculate_status_from_items(incase_id)
+    incase = find_by(id: incase_id)
+    return unless incase
+    
+    # Собираем все статусы деталей убытка
+    item_status_titles = incase.items.includes(:item_status)
+      .map { |item| item.item_status&.title }
+      .compact
+    
+    return if item_status_titles.empty?
+    
+    # Вычисляем статус убытка на основе логики из carpats
+    new_status_title = calculate_incase_status(item_status_titles)
+    
+    # Находим IncaseStatus по названию и устанавливаем
+    if new_status_title.present?
+      incase_status = IncaseStatus.find_by(title: new_status_title)
+      incase.update_column(:incase_status_id, incase_status.id) if incase_status
+    end
+  end
+
   private
   
   def calculate_totalsum
@@ -81,6 +102,75 @@ class Incase < ApplicationRecord
     if items_to_check.empty?
       errors.add(:base, I18n.t('activerecord.errors.models.incase.items_required'))
     end
+  end
+
+  def self.calculate_incase_status(item_status_titles)
+    array = item_status_titles.uniq
+    
+    # Если есть "Да"
+    if array.include?('Да')
+      # Сначала проверяем специальные случаи (до проверки на "Частично")
+      # Специальный случай: "Да" + "Нет (Стекло)" + "Нет (Отсутствовала)" без "Нет" и "Долг"
+      if array.include?('Нет (Стекло)') && array.include?('Нет (Отсутствовала)')
+        a2 = ['Нет', 'Долг']
+        return 'Да (кроме отсутствовавших и стекла)' unless array.any? { |e| a2.include?(e) }
+      end
+      
+      # Специальный случай: "Да" + "Нет (Стекло)" без "Нет" и "Нет (Отсутствовала)"
+      if array.include?('Нет (Стекло)')
+        a2 = ['Нет', 'Нет (Отсутствовала)']
+        return 'Да (кроме стекла)' unless array.any? { |e| a2.include?(e) }
+      end
+      
+      # Специальный случай: "Да" + "Нет (Отсутствовала)" без "Нет" и "Долг"
+      if array.include?('Нет (Отсутствовала)')
+        a2 = ['Нет', 'Долг']
+        return 'Да (кроме отсутствовавших)' unless array.any? { |e| a2.include?(e) }
+      end
+      
+      # Специальный случай: "Да" + "Не запрашиваем" без "В работе", "Нет", "Долг"
+      if array.include?('Не запрашиваем')
+        a2 = ['В работе', 'Нет', 'Долг']
+        return 'Да (кроме не запрашивать)' unless array.any? { |e| a2.include?(e) }
+      end
+      
+      # Теперь проверяем общие случаи
+      a2 = ['Нет', 'Долг', 'Нет (Отсутствовала)', 'Нет (Стекло)', 'Не запрашиваем']
+      return 'Да' unless array.any? { |e| a2.include?(e) }
+      
+      a2_chastichno = ['Нет', 'Долг', 'Нет (Отсутствовала)', 'В работе']
+      return 'Частично' if array.any? { |e| a2_chastichno.include?(e) }
+    end
+    
+    # Если есть "Нет"
+    if array.include?('Нет')
+      a2 = ['Да', 'Долг']
+      return 'Нет' unless array.any? { |e| a2.include?(e) }
+      # Если есть конфликт, возвращаем "Частично"
+      return 'Частично'
+    end
+    
+    # Если есть "Долг"
+    if array.include?('Долг')
+      return 'Долг' unless array.include?('Да')
+      # Если есть "Да", возвращаем "Частично"
+      return 'Частично'
+    end
+    
+    # Проверки на одинаковые статусы
+    return 'Не ездили' if array.all? { |e| e == 'В работе' }
+    return 'Нет (ДРМ)' if array.all? { |e| e == 'Нет (ДРМ)' }
+    return 'Нет (Срез)' if array.all? { |e| e == 'Нет (Срез)' }
+    return 'Нет (Стекло)' if array.all? { |e| e == 'Нет (Стекло)' }
+    return 'Нет з/ч' if array.all? { |e| e == 'Нет (Отсутствовала)' }
+    return 'Не запрашиваем' if array.all? { |e| e == 'Не запрашиваем' }
+    return 'Нет (область)' if array.all? { |e| e == 'Нет (МО)' }
+    
+    # Если все статусы nil или пустые
+    return 'Не ездили' if array.all?(&:nil?)
+    
+    # По умолчанию - если разные статусы
+    'Частично'
   end
   
 end

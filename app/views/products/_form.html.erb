@@ -43,10 +43,10 @@
             <%= turbo_stream_from product, :variants %>
             
             <%= turbo_frame_tag product, :variants, class: "w-full" do %>
-              <div class="grid grid-cols-[50px_240px_1fr_1fr_1fr_125px] gap-2 py-2 border-t hover:bg-gray-50">
+              <div class="grid grid-cols-[50px_200px_1fr_140px_140px_125px] gap-2 py-2 border-t hover:bg-gray-50">
                 <div>#</div>
-                <div><%= t("products.form.sku") %></div>
-                <div></div>
+                <div><%# t("products.form.sku") %></div>
+                <div><%= t("products.form.quantity") %></div>
                 <div><%= t("products.form.cost_price") %></div>
                 <div><%= t("products.form.price") %></div>
                 <div></div>

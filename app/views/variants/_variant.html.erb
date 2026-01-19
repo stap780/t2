@@ -1,15 +1,15 @@
-<%= turbo_frame_tag dom_id(product, dom_id(variant)), class: "grid grid-cols-[50px_240px_1fr_1fr_1fr_125px] gap-2 py-2 border-t hover:bg-gray-50" do %>
+<%= turbo_frame_tag dom_id(product, dom_id(variant)), class: "grid grid-cols-[50px_200px_1fr_140px_140px_125px] gap-2 py-2 border-t hover:bg-gray-50" do %>
   <div><%= variant.id %></div>
   <div class="flex flex-col">
     <div class="text-sm">sku: <%= variant.sku %></div>
-    <div class="text-sm">barcode: <%= variant.barcode %></div>
+    <div class="text-sm"><%= variant.barcode %></div>
   </div>
   <div><%= variant.quantity %></div>
   <div><%= variant.cost_price %></div>
-  <div><%= variant.price %></div>
+  <div><%# variant.price %><%= render 'products/inline/price', product: product, variant: variant %></div>
   <div class="flex justify-end space-x-1">
     <%= link_to barcode_icon, print_etiketka_product_variant_path(product, variant), target: "_blank",
-        class: "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center",
+        class: "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center h-8",
         title: t('print_barcode') %>
     <%= link_to_varbind product_variant_path(product, variant), 
         data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>

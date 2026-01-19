@@ -57,6 +57,26 @@ class Product < ApplicationRecord
   scope :with_images, -> { joins(:images).where.not(images: {product_id: nil}).distinct }
   scope :without_images, -> { left_joins(:images).where(images: {product_id: nil}) }
 
+  # Scopes для фильтрации по опасным/предупреждающим ценам
+  scope :danger_true, -> { 
+    joins(:variants)
+      .joins("LEFT JOIN detals ON detals.sku = variants.sku")
+      .where("variants.price IS NOT NULL")
+      .where("detals.oszz_price IS NOT NULL")
+      .where("variants.price < detals.oszz_price * 0.8")
+      .distinct
+  }
+
+  scope :warning_true, -> {
+    joins(:variants)
+      .joins("LEFT JOIN detals ON detals.sku = variants.sku")
+      .where("variants.price IS NOT NULL")
+      .where("detals.oszz_price IS NOT NULL")
+      .where("ABS((variants.price - detals.oszz_price) / detals.oszz_price * 100) >= 10")
+      .where("ABS((variants.price - detals.oszz_price) / detals.oszz_price * 100) < 20")
+      .distinct
+  }
+
   # Константы для статусов и типов
   STATUS = %w[draft pending in_progress active archived].freeze
   TIP = %w[product service kit].freeze
@@ -71,9 +91,62 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images]
+    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images danger_true warning_true]
   end
 
+  # Ransackers для фильтрации по истории изменений (изменения Variant через associated_audits)
+  # Ransacker для фильтрации по наличию атрибута в audited_changes
+  # Ищет только в associated_audits (изменения Variant: price, quantity)
+  ransacker :audits_model_attribute do |parent|
+    products_table = parent.table
+    Arel.sql("EXISTS (
+      SELECT 1 FROM audits 
+      WHERE audits.associated_type = 'Product' 
+      AND audits.associated_id = #{products_table[:id].to_sql}
+      AND audits.audited_changes ? #{Arel::Nodes::BindParam.new}
+    )")
+  end
+
+  # Ransacker для проверки наличия старого значения (первый элемент массива)
+  # Ищет только в associated_audits (изменения Variant)
+  # Возвращает булево значение для работы с предикатом present
+  ransacker :audits_old_value_present do |parent|
+    products_table = parent.table
+    Arel.sql("CASE WHEN EXISTS (
+      SELECT 1 FROM audits 
+      WHERE audits.associated_type = 'Product' 
+      AND audits.associated_id = #{products_table[:id].to_sql}
+      AND jsonb_typeof(audits.audited_changes) = 'object'
+      AND EXISTS (
+        SELECT 1 FROM jsonb_object_keys(audits.audited_changes) AS key
+        WHERE jsonb_typeof(audits.audited_changes->key) = 'array'
+        AND (audits.audited_changes->key)->0 IS NOT NULL
+      )
+    ) THEN true ELSE false END")
+  end
+
+  # Ransacker для проверки наличия нового значения (второй элемент массива)
+  # Ищет только в associated_audits (изменения Variant)
+  # Возвращает булево значение для работы с предикатом present
+  ransacker :audits_new_value_present do |parent|
+    products_table = parent.table
+    Arel.sql("CASE WHEN EXISTS (
+      SELECT 1 FROM audits 
+      WHERE audits.associated_type = 'Product' 
+      AND audits.associated_id = #{products_table[:id].to_sql}
+      AND jsonb_typeof(audits.audited_changes) = 'object'
+      AND EXISTS (
+        SELECT 1 FROM jsonb_object_keys(audits.audited_changes) AS key
+        WHERE jsonb_typeof(audits.audited_changes->key) = 'array'
+        AND (audits.audited_changes->key)->1 IS NOT NULL
+      )
+    ) THEN true ELSE false END")
+  end
+
+  # Алиасы для совместимости с carpats
+  ransack_alias :h_m_a, :audits_model_attribute
+  ransack_alias :h_o_v, :audits_old_value_present
+  ransack_alias :h_n_v, :audits_new_value_present
 
   # Bindable methods
   def broadcast_target_for_bindings

@@ -75,6 +75,7 @@ class ProductsController < ApplicationController
   end
 
   def filter
+    @price_filter = params[:price].present? ? true : false
     @search = Product.ransack(search_params)
     @search.sorts = "id desc" if @search.sorts.empty?
     @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)

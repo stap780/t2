@@ -1,3 +1,4 @@
-<%= render "shared/offcanvas_inner", title: t('products.filter.heading'), width: '40rem' do %>
-    <%= render "filter" %>
+<%= render "shared/offcanvas_inner", title: @price_filter ? t('products.filter.heading_price') : t('products.filter.heading'), width: '40rem' do %>
+    <%= render "filter_price" if @price_filter %>
+    <%= render "filter" unless @price_filter %>
 <% end %>

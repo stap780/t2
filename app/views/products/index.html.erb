@@ -3,9 +3,9 @@
   <div class="flex space-x-2">
     <%= search_form_for @search, url: products_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
       <%= f.label :title_or_variants_sku_cont, t("products.index.search_by_title_sku"), class: "sr-only" %>
-      <%= f.search_field :title_or_variants_sku_or_variants_barcode_cont, value: params.dig(:q, :title_or_variants_sku_or_variants_barcode_cont), placeholder: t("products.index.search_by_title_sku"), class: "h-8 px-2 py-1 border rounded", style: "width: 350px;" %>
-      <%= f.submit t("products.index.search"), class: "h-8 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
-      <%= link_to products_path(search_cancel: true), class: "h-8 px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("products.index.clear") do %>
+      <%= f.search_field :title_or_variants_sku_or_variants_barcode_cont, value: params.dig(:q, :title_or_variants_sku_or_variants_barcode_cont), placeholder: t("products.index.search_by_title_sku"), class: "h-8 px-2 py-1 border rounded", style: "width: 300px;" %>
+      <%= f.submit t("products.index.search"), class: "h-8 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+      <%= link_to products_path(search_cancel: true), class: "h-8 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t("products.index.clear") do %>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -13,11 +13,11 @@
     <% end %>
   </div>
 
-  <div class="flex space-x-2">
+  <div class="flex space-x-1">
     <%= form_with url: products_path, method: :post, id: :bulk_action_form, local: false do |f| %>
       <!-- Price Update Button -->
       <%= f.button type: :submit, 
-          class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
+          class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
           id: 'price-update', 
           formaction: price_edit_products_path,
           data: { turbo_frame: 'offcanvas', turbo_prefetch: false } do %>
@@ -33,8 +33,9 @@
       <!-- Bulk Delete Buttons -->
       <%= render 'shared/bulk_delete_buttons', f: f, object: Product.new %>
     <% end %>
-    <%= link_to t('.filter'), filter_products_path, class: "inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
-    <%= link_to t("products.index.new"), new_product_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+    <%= link_to t('.filter'), filter_products_path, class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter')+' Ц', filter_products_path(price: true), class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t("products.index.new"), new_product_path, class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 </div>
 

@@ -8,7 +8,7 @@ class PropertiesController < ApplicationController
 
   def show
     @search = @property.characteristics.ransack(params[:q])
-    @search.sorts = 'id asc' if @search.sorts.empty?
+    @search.sorts = 'title asc' if @search.sorts.empty?
     @characteristics = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
 

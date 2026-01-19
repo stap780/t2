@@ -23,7 +23,13 @@ incase_statuses = [
   { title: "Нет (Срез)", color: "#000000", position: 7 },
   { title: "Нет (Стекло)", color: "#000000", position: 8 },
   { title: "Нет з/ч", color: "#000000", position: 9 },
-  { title: "Нет (область)", color: "#000000", position: 10 }
+  { title: "Нет (область)", color: "#000000", position: 10 },
+  { title: "Частично", color: "#000000", position: 11 },
+  { title: "Не ездили", color: "#000000", position: 12 },
+  { title: "Да (кроме не запрашивать)", color: "#000000", position: 13 },
+  { title: "Получено", color: "#000000", position: 14 },
+  { title: "Не получены", color: "#000000", position: 15 },
+  { title: "Долг", color: "#000000", position: 16 }
 ]
 
 incase_statuses.each do |status_data|
