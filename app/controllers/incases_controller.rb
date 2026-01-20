@@ -30,7 +30,8 @@ class IncasesController < ApplicationController
   end
 
   def show
-    @incase = Incase.includes(:company, :strah, :incase_status, :incase_tip, :items, :comments).find(params[:id])
+    # @incase = Incase.includes(:company, :strah, :incase_status, :incase_tip, :items, :comments).find(params[:id])
+    redirect_to edit_incase_path(@incase)
   end
 
   def new
