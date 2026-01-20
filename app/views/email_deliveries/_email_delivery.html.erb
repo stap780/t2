@@ -22,7 +22,7 @@
     <%=tag.div email_delivery.subject %>
     <%=tag.div do %>
       <% if email_delivery.record.present? %>
-        <%=link_to email_delivery.record.model_name.human(count: 1), email_delivery.record, class: "text-blue-600 hover:text-blue-800" %>
+        <%=link_to email_delivery.record.model_name.human(count: 1), email_delivery.record, class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %>
       <% elsif email_delivery.record_type.present? %>
         <%= email_delivery.record_type.constantize.model_name.human(count: 1) rescue email_delivery.record_type %>
       <% end %>
