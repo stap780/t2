@@ -7,15 +7,17 @@
   </div>
 
   <div class="w-full min-w-0 px-0" data-controller="choose">
-    <div class="grid grid-cols-[1fr_150px_140px_140px_70px_50px_90px_90px_30px] gap-2 py-2 border-t hover:bg-gray-50 font-medium text-gray-700">
+    <div class="grid grid-cols-[1fr_30px_30px_150px_140px_140px_70px_60px_90px_90px_40px] gap-1 py-1 border-t hover:bg-gray-50 font-sm text-gray-700">
       <div><%= t('activerecord.attributes.item.title') %></div>
+      <div></div>
+      <div></div>
       <div><%= t('activerecord.attributes.item.katnumber') %></div>
       <div><%= t('activerecord.attributes.item.supplier_code') %></div>
       <div>
         <%= select_tag "incase_item_status_label", 
             options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
             { prompt: t('activerecord.attributes.item.item_status_id'),
-              class: "px-2 py-1 border rounded-md text-sm w-full", 
+              class: "px-2 ps-1 py-1 border rounded-md text-sm w-full", 
               data: {
                 action: "change->choose#changeBulkItemStatus", 
                 choose_target: "itemSelected" 

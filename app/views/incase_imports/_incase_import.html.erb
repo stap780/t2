@@ -1,20 +1,31 @@
-<%= turbo_frame_tag dom_id(incase_import), class: "grid grid-cols-[1fr_140px_120px_100px_100px_100px_150px_100px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center #{IncaseDubl.exists? ? 'bg-red-300' : ''}" do %>
+<%= turbo_frame_tag dom_id(incase_import), class: "grid grid-cols-[1fr_140px_120px_100px_100px_100px_150px_100px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center #{incase_import.incase_dubls.any? ? 'bg-red-300' : ''}" do %>
   <div class="text-sm">
     <%= link_to incase_import.file.filename, rails_blob_url(incase_import.file, disposition: "attachment"), class: "text-blue-600 hover:underline", target: "_blank", rel: "noopener" if incase_import.file.attached? %>
   </div>
   <div class="text-sm text-gray-600">
     <%= incase_import.created_at.strftime('%d.%m.%Y %H:%M') if incase_import.created_at %>
   </div>
-  <div>
-    <span class="px-2 py-1 text-xs font-medium rounded <%= incase_import.status_color %>" title="<%= incase_import.error_message %>">
+  <div class="flex flex-col gap-1">
+    <span class="px-2 py-1 text-xs font-medium rounded <%= incase_import.status_color %>">
       <%= t("incase_imports.status.#{incase_import.status_before_type_cast}") %>
     </span>
+    <% if incase_import.error_message.present? %>
+      <%= link_to incase_import_path(incase_import), 
+          class: "text-xs text-red-600 hover:underline", 
+          title: "Нажмите для просмотра деталей ошибок",
+          data: { turbo: false } do %>
+        <%= truncate(incase_import.error_message, length: 50) %>
+      <% end %>
+    <% end %>
   </div>
   <div class="text-sm text-gray-600"><%= incase_import.total_rows %></div>
   <div class="text-sm text-green-600"><%= incase_import.success_count %></div>
   <div class="text-sm text-red-600"><%= incase_import.failed_count %></div>
   <div class="text-sm text-gray-600"><%= incase_import.user.email_address %></div>
-  <div class="flex justify-end">
+  <div class="flex justify-end space-x-2">
+    <% if incase_import.has_errors? || incase_import.incase_dubls.any? %>
+      <%= link_to_show incase_import_path(incase_import), data: { turbo: false } %>
+    <% end %>
     <%= link_to_delete incase_import_path(incase_import), 
         data: { turbo_method: :delete, turbo_confirm: t('actions.delete_confirm') }%>
   </div>

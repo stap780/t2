@@ -9,6 +9,7 @@ class ZipXlsxService
     @filename = "#{@model.downcase}.xlsx"
     @template = "#{@model.downcase.pluralize}/index"
     @error_message = 'We have error whith zip create'
+    @download_kind = options[:download_kind]
   end
 
   def call
@@ -42,7 +43,7 @@ class ZipXlsxService
       handlers: [:axlsx],
       formats: [:xlsx],
       template: @template,
-      locals: { collection: @collection }
+      locals: { collection: @collection, download_kind: @download_kind }
     )
 
     Zip::OutputStream.write_buffer do |zos|

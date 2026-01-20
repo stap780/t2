@@ -12,6 +12,7 @@ module DownloadExcel
       # Использовать существующий ExportService или создать новый
       CreateZipXlsxJob.perform_later(excel_collection_ids, {
         model: controller_name, 
+        download_kind: params[:download_kind].presence ? params[:download_kind] : nil,
         current_user_id: Current.user&.id
       })
 

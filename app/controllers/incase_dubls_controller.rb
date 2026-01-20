@@ -38,6 +38,8 @@ class IncaseDublsController < ApplicationController
     end
     
     selected_items = @incase_dubl.incase_item_dubls.where(id: selected_item_ids)
+    # Сохраняем количество ДО транзакции, так как после destroy связанные записи удалятся
+    items_count = selected_items.count
     
     ActiveRecord::Base.transaction do
       selected_items.each do |item_dubl|
@@ -53,9 +55,9 @@ class IncaseDublsController < ApplicationController
       @incase_dubl.destroy
     end
     
-    flash.now[:success] = t('.success', count: selected_items.count)
+    flash.now[:success] = t('.success', count: items_count)
     respond_to do |format|
-      format.html { redirect_to incase_dubls_path, notice: t('.success', count: selected_items.count) }
+      format.html { redirect_to incase_dubls_path, notice: t('.success', count: items_count) }
       format.turbo_stream do
         render turbo_stream: [
           render_turbo_flash,

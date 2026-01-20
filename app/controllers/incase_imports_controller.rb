@@ -26,7 +26,7 @@ class IncaseImportsController < ApplicationController
         flash.now[:success] = t('.success')
         format.turbo_stream do
           render turbo_stream: turbo_close_offcanvas_flash + [
-            turbo_stream.append(
+            turbo_stream.prepend(
               "incase_imports",
               partial: "incase_imports/incase_import",
               locals: { incase_import: @incase_import }

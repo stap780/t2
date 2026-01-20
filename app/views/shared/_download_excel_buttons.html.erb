@@ -21,6 +21,17 @@
       <%= f.button 'Всё', type: :submit, 
           class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
           formaction: polymorphic_path(object, action: 'download', download_type: :all) %>
+      <% if object.is_a?(Incase) %>
+        <%= f.button 'Выбранное часть', type: :submit, 
+            class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+            formaction: polymorphic_path(object, action: 'download', download_type: :selected, download_kind: :mono) %>
+        <%= f.button 'Отфильтрованное часть', type: :submit, 
+            class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+            formaction: polymorphic_path(object, action: 'download', download_type: :filtered, download_kind: :mono) %>
+        <%= f.button 'Всё часть', type: :submit, 
+            class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+            formaction: polymorphic_path(object, action: 'download', download_type: :all, download_kind: :mono) %>
+      <% end %>
     </div>
   </div>
 </div>

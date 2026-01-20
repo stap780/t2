@@ -1,17 +1,28 @@
 wb = xlsx_package.workbook
 inc_attributes = Incase.file_export_attributes
-item_attributes = Item.file_export_attributes
+
+# Приводим download_kind к строке для надежного сравнения (может быть символом :mono или строкой "mono")
+# Проверяем, что download_kind существует и равен 'mono'
+is_mono = !download_kind.nil? && download_kind.to_s == 'mono'
+
+item_attributes = is_mono ? [] : Item.file_export_attributes
 all_attributes = inc_attributes + item_attributes
 check_int = ["id","price","quantity","cost_price"]
-wb.add_worksheet(name: "Incase") do |sheet|
+wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row all_attributes
   types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
   collection.find_each(batch_size: 1000) do |item|
     inc_values = inc_attributes.map { |attr| item.send(attr) }
-    item.items.each do |it|
-      it_values = item_attributes.map { |attr| it.send(attr) }
-      values = inc_values + it_values
-      sheet.add_row values, types: types
+    if is_mono
+      # Для mono режима добавляем только строку с данными убытка (без позиций)
+      sheet.add_row inc_values, types: types
+    else
+      # Для обычного режима добавляем строку для каждой позиции
+      item.items.each do |it|
+        it_values = item_attributes.map { |attr| it.send(attr) }
+        values = inc_values + it_values
+        sheet.add_row values, types: types
+      end
     end
   end
 end

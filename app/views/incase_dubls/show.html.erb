@@ -1,5 +1,5 @@
 <div class="mb-4">
-  <%= link_to t('.back'), incase_dubls_path, class: "text-blue-600 hover:underline" %>
+  <%= link_to_back incase_dubls_path %>
 </div>
 
 <% if @existing_incase.blank? %>
@@ -111,7 +111,7 @@
     </div>
     
     <h3 class="font-medium mb-2"><%= t('.items') %></h3>
-    <%= form_with url: merge_incase_dubl_path(@incase_dubl), method: :post, local: true do |f| %>
+    <%= form_with url: merge_incase_dubl_path(@incase_dubl), method: :post, local: true, data: { turbo: false } do |f| %>
       <div class="space-y-2 mb-4">
         <% @incase_dubl.incase_item_dubls.each do |item_dubl| %>
           <div class="p-2 bg-gray-50 rounded border">

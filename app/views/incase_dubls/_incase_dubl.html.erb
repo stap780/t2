@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(incase_dubl), class: "grid grid-cols-[170px_170px_150px_150px_150px_150px_100px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(incase_dubl), class: "grid grid-cols-[170px_1fr_150px_150px_150px_150px_100px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
   <div class="text-sm"><%= incase_dubl.unumber %></div>
   <div class="text-sm"><%= incase_dubl.company&.short_title %></div>
   <div class="text-sm">
@@ -22,7 +22,7 @@
     <%= incase_dubl.incase_import.created_at.strftime('%d.%m.%Y') %>
   </div>
   <div class="flex justify-end space-x-2">
-    <%= link_to t('actions.view'), incase_dubl_path(incase_dubl), class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %>
+    <%= link_to_show incase_dubl_path(incase_dubl), data: { turbo: false } %>
     <%= link_to_delete incase_dubl_path(incase_dubl), title: 'delete', data: { turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
   </div>
 <% end %>

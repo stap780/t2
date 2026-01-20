@@ -67,7 +67,7 @@ class IncaseService
   def open_spreadsheet(file_path, filename)
     case File.extname(filename).downcase
     when ".csv" 
-      Roo::CSV.new(file_path, csv_options: {col_sep: ";"})
+      Roo::CSV.new(file_path, csv_options: {col_sep: ","})
     when ".xls" 
       Roo::Excel.new(file_path)
     when ".xlsx" 
@@ -92,26 +92,28 @@ class IncaseService
       return
     end
     
-    unumber = row['Номер дела']&.strip
+    unumber = row['Номер дела']&.to_s&.strip
     return if unumber.blank?
     
     begin
       # Поиск/создание компаний
-      strah_company = find_or_create_company(row['Страховая компания']&.strip, 'strah')
-      company = find_or_create_company(row['Контрагент']&.strip, 'standart')
+      strah_company = find_or_create_company(row['Страховая компания']&.to_s&.strip, 'strah')
+      company = find_or_create_company(row['Контрагент']&.to_s&.strip, 'standart')
       
       # Поиск существующего убытка
       existing_incase = Incase.find_by(unumber: unumber)
       
       if existing_incase.present?
-        # Проверка отличий
-        if has_differences?(existing_incase, row, strah_company, company)
-          # Есть отличия - создаем дубль
-          create_incase_dubl(row, strah_company, company)
+        # Проверка на дату для создания вторых и так далее деталей убытка (как в carpats)
+        parsed_date = parse_date(row['Дата выкладки Акта п-п в папку СК'])
+        
+        if parsed_date.to_date == existing_incase.date.to_date
+          # Дата совпадает - добавляем позицию в существующий убыток
+          add_item_if_not_exists(existing_incase, row)
           @success_count += 1
         else
-          # Все совпадает - добавляем позицию, если её нет
-          add_item_if_not_exists(existing_incase, row)
+          # Дата не совпадает - создаем дубль (как в carpats)
+          create_incase_dubl(row, strah_company, company)
           @success_count += 1
         end
       else
@@ -155,73 +157,76 @@ class IncaseService
     end
   end
   
-  def has_differences?(existing_incase, row_data, strah_company, company)
-    parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
-    modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".strip
-    
-    existing_incase.date != parsed_date ||
-    existing_incase.stoanumber != row_data['Номер З/Н СТОА']&.strip ||
-    existing_incase.company_id != company.id ||
-    existing_incase.strah_id != strah_company.id ||
-    existing_incase.carnumber != row_data['Гос номер']&.strip ||
-    existing_incase.modelauto != modelauto ||
-    existing_incase.region != row_data['Регион']&.strip
-  end
   
   def create_incase_dubl(row_data, strah_company, company)
     parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
-    modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".strip
-    unumber = row_data['Номер дела']&.strip
+    modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".to_s.strip
+    unumber = row_data['Номер дела']&.to_s&.strip
+    stoanumber = row_data['Номер З/Н СТОА']&.to_s&.strip
+    title = row_data['Деталь']&.to_s&.strip
+    katnumber = row_data['Каталожный_номер']&.to_s&.strip
     
-    # Ищем существующий дубль для этого unumber в текущем импорте
-    incase_dubl = @incase_import.incase_dubls.find_by(unumber: unumber)
+    # Ищем существующий дубль по unumber и stoanumber (как в carpats)
+    incase_dubls = @incase_import.incase_dubls.where(unumber: unumber, stoanumber: stoanumber)
     
-    if incase_dubl.nil?
-      # Создаем новый дубль только если его еще нет
+    if incase_dubls.present?
+      # Дубль есть - добавляем позицию к каждому дублю (как в carpats)
+      incase_dubls.each do |icd|
+        # Проверяем позицию по title и katnumber (как в carpats - detalname и katnumber)
+        existing_item = icd.incase_item_dubls.where(title: title, katnumber: katnumber).first
+        unless existing_item
+          icd.incase_item_dubls.create!(
+            title: title,
+            quantity: parse_integer(row_data['Кол-во']) || 1,
+            price: parse_decimal(row_data['Сумма запчастей']) || 0,
+            katnumber: katnumber,
+            supplier_code: row_data['Код поставщика']&.to_s&.strip
+          )
+        end
+      end
+      incase_dubls.first
+    else
+      # Дубля нет - создаем новый дубль (как в carpats)
       incase_dubl = @incase_import.incase_dubls.create!(
-        region: row_data['Регион']&.strip,
+        region: row_data['Регион']&.to_s&.strip,
         strah_id: strah_company.id,
-        stoanumber: row_data['Номер З/Н СТОА']&.strip,
+        stoanumber: stoanumber,
         unumber: unumber,
         company_id: company.id,
-        carnumber: row_data['Гос номер']&.strip,
+        carnumber: row_data['Гос номер']&.to_s&.strip,
         date: parsed_date,
         modelauto: modelauto,
         totalsum: parse_decimal(row_data['Сумма заказ наряда'])
       )
-    end
-    
-    # Добавляем позицию к дублю (проверяем, чтобы не дублировать позиции)
-    katnumber = row_data['Каталожный_номер']&.strip
-    existing_item = incase_dubl.incase_item_dubls.find_by(katnumber: katnumber) if katnumber.present?
-    
-    unless existing_item
+      
+      # Создаем первую позицию для дубля
       incase_dubl.incase_item_dubls.create!(
-        title: row_data['Деталь']&.strip,
+        title: title,
         quantity: parse_integer(row_data['Кол-во']) || 1,
         price: parse_decimal(row_data['Сумма запчастей']) || 0,
         katnumber: katnumber,
-        supplier_code: row_data['Код поставщика']&.strip
+        supplier_code: row_data['Код поставщика']&.to_s&.strip
       )
+      
+      incase_dubl
     end
-    
-    incase_dubl
   end
   
   def add_item_if_not_exists(incase, row_data)
-    katnumber = row_data['Каталожный_номер']&.strip
-    return if katnumber.blank?
+    title = row_data['Деталь']&.to_s&.strip
+    katnumber = row_data['Каталожный_номер']&.to_s&.strip
     
-    existing_item = incase.items.find_by(katnumber: katnumber)
+    # Проверяем позицию по title и katnumber (как в carpats - detalname и katnumber)
+    existing_item = incase.items.where(title: title, katnumber: katnumber).first
     return if existing_item.present?
     
     # Создать новую позицию (автоматически создастся Product и Variant)
     incase.items.create!(
-      title: row_data['Деталь']&.strip,
+      title: title,
       quantity: parse_integer(row_data['Кол-во']) || 1,
       price: parse_decimal(row_data['Сумма запчастей']) || 0,
       katnumber: katnumber,
-      supplier_code: row_data['Код поставщика']&.strip
+      supplier_code: row_data['Код поставщика']&.to_s&.strip
     )
   end
   
@@ -229,7 +234,9 @@ class IncaseService
     parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
     modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".strip
     
-    incase = Incase.create!(
+    # Создаем убыток с позицией через accepts_nested_attributes_for
+    # чтобы валидация items_presence прошла успешно
+    incase = Incase.new(
       region: row_data['Регион']&.strip,
       strah_id: strah_company.id,
       stoanumber: row_data['Номер З/Н СТОА']&.strip,
@@ -237,17 +244,19 @@ class IncaseService
       company_id: company.id,
       carnumber: row_data['Гос номер']&.strip,
       date: parsed_date,
-      modelauto: modelauto
+      modelauto: modelauto,
+      items_attributes: {
+        '0' => {
+          title: row_data['Деталь']&.strip,
+          quantity: parse_integer(row_data['Кол-во']) || 1,
+          price: parse_decimal(row_data['Сумма запчастей']) || 0,
+          katnumber: row_data['Каталожный_номер']&.strip,
+          supplier_code: row_data['Код поставщика']&.strip
+        }
+      }
     )
     
-    # Создать первую позицию (автоматически создастся Product и Variant)
-    incase.items.create!(
-      title: row_data['Деталь']&.strip,
-      quantity: parse_integer(row_data['Кол-во']) || 1,
-      price: parse_decimal(row_data['Сумма запчастей']) || 0,
-      katnumber: row_data['Каталожный_номер']&.strip,
-      supplier_code: row_data['Код поставщика']&.strip
-    )
+    incase.save!
     
     @created_incases << incase.id
     
@@ -270,13 +279,43 @@ class IncaseService
       return date_string.to_date
     end
     
-    # Пробуем парсить как строку
-    Date.parse(date_string.to_s)
-  rescue ArgumentError
-    # Если не получилось, пробуем через Time
-    Time.parse(date_string.to_s).to_date
-  rescue
-    raise ArgumentError, "Invalid date format: #{date_string}"
+    date_str = date_string.to_s.strip
+    
+    # Пробуем разные форматы даты
+    # 1. MM/DD/YYYY (американский формат, часто используется в CSV)
+    if date_str.match?(/^\d{1,2}\/\d{1,2}\/\d{4}$/)
+      begin
+        return Date.strptime(date_str, '%m/%d/%Y')
+      rescue ArgumentError
+        # Пробуем DD/MM/YYYY если MM/DD/YYYY не подошел
+        begin
+          return Date.strptime(date_str, '%d/%m/%Y')
+        rescue ArgumentError
+          # Продолжаем к другим форматам
+        end
+      end
+    end
+    
+    # 2. DD.MM.YYYY (европейский формат)
+    if date_str.match?(/^\d{1,2}\.\d{1,2}\.\d{4}$/)
+      begin
+        return Date.strptime(date_str, '%d.%m.%Y')
+      rescue ArgumentError
+        # Продолжаем к другим форматам
+      end
+    end
+    
+    # 3. Стандартный парсинг Ruby (ISO формат и другие)
+    begin
+      return Date.parse(date_str)
+    rescue ArgumentError
+      # Пробуем через Time
+      begin
+        return Time.parse(date_str).to_date
+      rescue ArgumentError, TypeError
+        raise ArgumentError, "Invalid date format: #{date_string}"
+      end
+    end
   end
   
   def parse_decimal(value)
