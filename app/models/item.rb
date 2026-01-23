@@ -39,7 +39,7 @@ class Item < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    %w[incase item_status variant]
+    %w[incase item_status variant acts act_items]
   end
 
   # Ransacker for virtual barcode attribute that uses variant.barcode

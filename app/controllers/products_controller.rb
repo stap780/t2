@@ -5,6 +5,7 @@ class ProductsController < ApplicationController
   include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
+  include PrintEtiketkas
 
   def index
     # COUNT запрос БЕЗ includes (быстрый) - Ransack сам добавит нужные JOIN для условий поиска

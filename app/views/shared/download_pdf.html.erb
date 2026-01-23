@@ -1,0 +1,24 @@
+<%= turbo_frame_tag "offcanvas", "" %>
+<%= render "shared/offcanvas_inner", title: "Печать этикеток", width: "30rem" do %>
+  <% if @pdf_blob %>
+    <div class="space-y-4">
+      <div class="flex items-center text-green-600">
+        <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm font-medium">Этикетки успешно сгенерированы</p>
+      </div>
+      <div class="flex justify-center">
+        <%= link_to 'Открыть в новом окне', rails_blob_path(@pdf_blob, disposition: 'inline'), 
+            class: "px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600",
+            target: "_blank",
+            data: { turbo: false } %>
+      </div>
+    </div>
+  <% else %>
+    <div class="text-red-600">
+      <p>Ошибка при генерации этикеток</p>
+    </div>
+  <% end %>
+<% end %>
+<%= turbo_stream_action_tag :set_unchecked, targets: '.checkboxes' %>

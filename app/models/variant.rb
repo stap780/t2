@@ -12,7 +12,7 @@ class Variant < ApplicationRecord
   belongs_to :product
   
   audited associated_with: :product
-  has_many :list_items, as: :item
+  has_many :items
   has_one_attached :etiketka
   
   after_initialize :set_default_new, if: :new_record?
@@ -41,7 +41,7 @@ class Variant < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["bindings", "etiketka_attachment", "etiketka_blob", "list_items", "product"]
+    ["bindings", "etiketka_attachment", "etiketka_blob", "list_items", "product", "items"]
   end
 
   # scopes for slimselect
@@ -115,6 +115,11 @@ class Variant < ApplicationRecord
     #   result << 'list_items'
     # end
     result.count.zero? ? [false, ''] : [true, result]
+  end
+
+  # Возвращает последний item для этого варианта (для обратной совместимости)
+  def item
+    items.order(created_at: :desc).first
   end
 
   def create_barcode

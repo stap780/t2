@@ -1,10 +1,11 @@
 class IncasesController < ApplicationController
-  before_action :set_incase, only: %i[ show edit update destroy act send_email ]
+  before_action :set_incase, only: %i[ show edit update destroy act send_email print_etiketkas ]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
   include BulkDelete
   include BulkStatus
+  include PrintEtiketkas
 
   def index
     if search_params.present?
@@ -201,6 +202,7 @@ class IncasesController < ApplicationController
       end
     end
   end
+
 
   private
 

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       post :price_update
       post :download
       post :bulk_delete
+      post :bulk_print_etiketkas, format: :pdf
       get :filter
     end
     member do
@@ -188,6 +189,7 @@ Rails.application.routes.draw do
     member do
       get :act
       post :send_email
+      get :print_etiketkas, format: :pdf
     end
     collection do
       post :bulk_print

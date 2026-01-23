@@ -13,11 +13,7 @@
   <div class="flex justify-end space-x-2">
     <%= link_to_edit act_path(act), data: { turbo: false } %>
     <%= link_to "PDF", print_act_path(act, format: :pdf), class: "px-2 py-1 rounded-md border border-blue-300 hover:bg-violet-200", target: '_blank' %>
-    <%= link_to print_etiketkas_act_path(act, format: :pdf), target: "_blank",
-        class: "p-2 py-1 rounded-md border border-blue-300 hover:bg-violet-200 flex items-center justify-center",
-        title: t('print_barcode') do %>
-      <%= barcode_icon %>
-    <% end %>
+    <%= link_to_print_barcode print_etiketkas_act_path(act, format: :pdf) %>
     <%= link_to_delete act_path(act), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
   </div>
 <% end %>

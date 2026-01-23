@@ -61,7 +61,7 @@
       <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" data-controller="choose">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
-          <div class="grid grid-cols-1 md:grid-cols-[1fr_200px_200px] gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-[1fr_50px_200px_200px] gap-4">
             <div>
               <span class="text-sm font-semibold text-gray-900">
                 <%= incase.stoanumber.present? ? "Номер З/Н #{incase.stoanumber}" : "Заявка ##{incase.id}" %>
@@ -75,16 +75,17 @@
                 <%=link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800 cursor-pointer", target: '_blank', data: { turbo: false } %> от <%= incase.date&.strftime('%d.%m.%Y') %>
               </span>
             </div>
+            <div><%= link_to_print_barcode print_etiketkas_incase_path(incase, format: :pdf) %></div>
             <div>
               <%= select_tag "incase_item_status_label", 
-            options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
-            { prompt: t('activerecord.attributes.item.item_status_id'),
-              class: "px-2 py-1 border rounded-md text-sm w-full", 
-              data: {
-                action: "change->choose#changeBulkItemStatus", 
-                choose_target: "itemSelected" 
+              options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
+              { prompt: t('activerecord.attributes.item.item_status_id'),
+                class: "px-2 py-1 border rounded-md text-sm w-full", 
+                data: {
+                  action: "change->choose#changeBulkItemStatus", 
+                  choose_target: "itemSelected" 
               } } %>
-              </div>
+            </div>
             <div>Состояние</div>
           </div>
         </div>
@@ -96,6 +97,7 @@
             <%= render "items/act_show", item: item, incase: incase %>
           <% end %>
         </div>
+
       </div>
     <% end %>
   </div>

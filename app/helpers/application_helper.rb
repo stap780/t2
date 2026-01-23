@@ -16,9 +16,27 @@ module ApplicationHelper
   end
 
   def barcode_icon
-    '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 4h2v16H2V4zM6 4h1v16H6V4zM9 4h2v16H9V4zM13 4h1v16h-1V4zM16 4h2v16h-2V4zM20 4h2v16h-2V4z" />
-      </svg>'.html_safe
+    '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
+            <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="13" y="6" width="1" height="12" fill="currentColor"/>
+            <rect x="16" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="20" y="6" width="1" height="12" fill="currentColor"/>
+          </svg>'.html_safe
+  end
+
+  def link_to_print_barcode(path, **options)
+    if options[:class]
+      options[:class]
+    elsif !options[:class]
+      options[:class] = "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center h-8"
+    end
+    options[:title] ||= t('print_barcode')
+    options[:target] ||= "_blank"
+    link_to path, options do
+      barcode_icon
+    end
   end
 
   def link_to_varbind(path, **options)

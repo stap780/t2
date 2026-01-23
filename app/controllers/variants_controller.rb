@@ -75,7 +75,6 @@ class VariantsController < ApplicationController
     end
   end
   
-
   def print_etiketka
     # Если этикетка уже существует, используем её
     if @variant.etiketka.attached?

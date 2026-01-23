@@ -29,6 +29,7 @@
   <%= render 'products/inline/price', product: product, variant: variant %>
   <div class="text-center"><%= product.variants&.first&.quantity %></div>
   <div class="flex justify-end space-x-2">
+    <%= link_to_print_barcode print_etiketka_product_variant_path(product, product.variants.first) %>
     <%= link_to sync_with_moysklad_product_path(product), 
         method: :post,
         class: "p-2 rounded-md bg-green-100 hover:bg-green-200 flex items-center justify-center",

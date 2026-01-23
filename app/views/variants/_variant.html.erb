@@ -8,9 +8,7 @@
   <div><%= variant.cost_price %></div>
   <div><%# variant.price %><%= render 'products/inline/price', product: product, variant: variant %></div>
   <div class="flex justify-end space-x-1">
-    <%= link_to barcode_icon, print_etiketka_product_variant_path(product, variant), target: "_blank",
-        class: "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center h-8",
-        title: t('print_barcode') %>
+    <%= link_to_print_barcode print_etiketka_product_variant_path(product, variant) %>
     <%= link_to_varbind product_variant_path(product, variant), 
         data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
     <%= link_to_edit edit_product_variant_path(product, variant), 

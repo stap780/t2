@@ -83,7 +83,7 @@ class Product < ApplicationRecord
 
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
-    attribute_names
+    attribute_names + %w[acts_number]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -141,6 +141,18 @@ class Product < ApplicationRecord
         AND (audits.audited_changes->key)->1 IS NOT NULL
       )
     ) THEN true ELSE false END")
+  end
+
+  # Ransacker для фильтрации по номеру акта через variants -> items -> acts
+  ransacker :acts_number do |parent|
+    Arel.sql("(
+      SELECT string_agg(DISTINCT acts.number::text, ', ')
+      FROM variants
+      INNER JOIN items ON items.variant_id = variants.id
+      INNER JOIN act_items ON act_items.item_id = items.id
+      INNER JOIN acts ON acts.id = act_items.act_id
+      WHERE variants.product_id = products.id
+    )")
   end
 
   # Алиасы для совместимости с carpats
