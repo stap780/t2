@@ -16,16 +16,16 @@
 <%= search_form_for @search, url: incases_path, method: :get, html: { class: "flex items-center space-x-2 flex-wrap  mb-4" } do |f| %>
   <%= f.search_field :unumber_or_items_barcode_or_carnumber_cont, value: params.dig(:q, :unumber_or_items_barcode_or_carnumber_cont), placeholder: t('.incases_search'), class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "min-width: 400px;" %>
   <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.incase.company_id'), 
-  class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "min-width: 200px;" %>
+  class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" %>
   <%= f.collection_select :incase_status_id_eq, IncaseStatus.all, :id, :title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.incase_status_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "min-width: 200px;" } %>
+      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <%= f.collection_select :incase_tip_id_eq, IncaseTip.all, :id, :title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.incase_tip_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "min-width: 200px;" } %>
+      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <%= f.collection_select :strah_id_eq, Company.strah.limit(20), :id, :short_title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.strah_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "min-width: 200px;" } %>
+      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <div>
     <%= f.label :date_gteq, "Дата от", class: "block text-sm font-medium text-gray-700 mb-1" %>
     <%= f.date_field :date_gteq, class: "h-8 px-2 py-1 mb-4 border border-gray-300 rounded-md" %>
