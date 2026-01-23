@@ -178,6 +178,7 @@ Rails.application.routes.draw do
     member do
       get :print, format: :pdf
       get :print_etiketkas, format: :pdf
+      post :print_selected_etiketkas, format: :pdf
     end
     collection do
       post :create_multi

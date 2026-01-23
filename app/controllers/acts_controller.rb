@@ -234,6 +234,35 @@ class ActsController < ApplicationController
     end
   end
 
+  # Печать этикеток только для выбранных позиций акта
+  def print_selected_etiketkas
+    @act = Act.find(params[:id])
+
+    item_ids = params[:item_ids]
+
+    if item_ids.blank?
+      flash[:alert] = 'Выберите позиции для печати этикеток'
+      redirect_back(fallback_location: act_path(@act))
+      return
+    end
+
+    # Получаем ID вариантов из выбранных позиций
+    variant_ids = Item.where(id: item_ids).pluck(:variant_id).compact.uniq
+
+    if variant_ids.empty?
+      flash[:alert] = 'Нет вариантов для печати'
+      redirect_back(fallback_location: act_path(@act))
+      return
+    end
+
+    print_etiketkas_from_variant_ids(
+      variant_ids,
+      fallback_path: act_path(@act),
+      file_identifier: @act.number,
+      record_name: 'акте'
+    )
+  end
+
 
   private
 

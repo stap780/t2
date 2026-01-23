@@ -2,10 +2,56 @@
   <div class="flex items-center justify-between mb-6">
     <%= link_to t('.back_to_list'), acts_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
     <h1 class="text-2xl font-semibold text-gray-900"><%= t('.heading') %> №<%= @act.number %></h1>
-    <div class="flex space-x-2">
+    <div class="flex space-x-2 items-center">
       <%= link_to "PDF", print_act_path(@act, format: :pdf), class: "px-3 py-1 rounded-md border border-blue-300 hover:bg-violet-200", target: '_blank' %>
+
+      <!-- Print Etiketkas Dropdown for Act -->
+      <div class="relative inline-block" data-controller="dropdown">
+        <button type="button"
+                class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                data-action="click->dropdown#toggle">
+          <!-- Simple barcode icon -->
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
+            <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="13" y="6" width="1" height="12" fill="currentColor"/>
+            <rect x="16" y="6" width="2" height="12" fill="currentColor"/>
+            <rect x="20" y="6" width="1" height="12" fill="currentColor"/>
+          </svg>
+          <!-- Dropdown arrow -->
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-10" data-dropdown-target="menu">
+          <div class="py-1">
+            <!-- All items in act -->
+            <%= link_to t('.print_etiketkas_all'),
+                        print_etiketkas_act_path(@act, format: :pdf),
+                        class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100",
+                        target: "_blank",
+                        data: { turbo: false } %>
+            <!-- Selected items in act -->
+            <button type="submit"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    form="act_items_print_form"
+                    formaction="<%= print_selected_etiketkas_act_path(@act, format: :pdf) %>"
+                    formmethod="post">
+              <span><%= t('.print_etiketkas_selected') %></span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Hidden form for printing selected items' etiketas -->
+  <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf),
+                method: :post,
+                id: :act_items_print_form,
+                local: true do |f| %>
+  <% end %>
 
   <div class="bg-white rounded-lg shadow-md p-6 mb-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
