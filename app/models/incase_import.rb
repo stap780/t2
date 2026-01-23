@@ -21,7 +21,7 @@ class IncaseImport < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   
   def has_errors?
-    failed? && import_errors.present?
+    import_errors.present? && import_errors.is_a?(Array) && import_errors.any?
   end
   
   def status_color

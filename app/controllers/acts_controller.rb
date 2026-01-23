@@ -337,6 +337,5 @@ class ActsController < ApplicationController
     [new_css, color_id]
   end
 
-  
 end
 

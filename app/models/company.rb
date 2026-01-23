@@ -53,10 +53,14 @@ class Company < ApplicationRecord
   scope :standart_first_five, -> { standart.limit(5).map { |p| [p.short_title, p.id] } }
   scope :standart_collection_for_select, ->(id) { where(id: id).map { |p| [p.short_title, p.id] } + standart_first_five }
   
+  def self.file_export_attributes
+    attribute_names - ["id", "okrug_id", "created_at", "updated_at"]
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     attribute_names
   end
-  
+
   def self.ransackable_associations(auth_object = nil)
     %w[audits incases client_companies company_plan_dates okrug]
   end

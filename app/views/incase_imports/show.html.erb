@@ -50,7 +50,7 @@
     <% end %>
   </div>
   
-  <% if @incase_import.has_errors? && @incase_import.import_errors.present? %>
+  <% if @incase_import.has_errors? %>
     <div class="mt-6">
       <h2 class="text-lg font-semibold mb-4"><%= t('.errors') %></h2>
       <div class="overflow-x-auto">
@@ -65,11 +65,11 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <% @incase_import.import_errors.each do |error| %>
               <tr>
-                <td class="px-4 py-2 text-sm"><%= error['row'] %></td>
-                <td class="px-4 py-2 text-sm"><%= error['unumber'] %></td>
+                <td class="px-4 py-2 text-sm"><%= error['row'] || error[:row] %></td>
+                <td class="px-4 py-2 text-sm"><%= error['unumber'] || error[:unumber] %></td>
                 <td class="px-4 py-2 text-sm text-red-600">
                   <ul class="list-disc list-inside">
-                    <% error['errors'].each do |err| %>
+                    <% (error['errors'] || error[:errors] || []).each do |err| %>
                       <li><%= err %></li>
                     <% end %>
                   </ul>

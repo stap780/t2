@@ -10,12 +10,22 @@
       <%= t("incase_imports.status.#{incase_import.status_before_type_cast}") %>
     </span>
     <% if incase_import.error_message.present? %>
-      <%= link_to incase_import_path(incase_import), 
-          class: "text-xs text-red-600 hover:underline", 
-          title: "Нажмите для просмотра деталей ошибок",
-          data: { turbo: false } do %>
-        <%= truncate(incase_import.error_message, length: 50) %>
-      <% end %>
+      <div class="flex flex-col gap-1">
+        <%= link_to incase_import_path(incase_import), 
+            class: "text-xs text-red-600 hover:underline", 
+            title: "Нажмите для просмотра деталей ошибок",
+            data: { turbo: false } do %>
+          <%= truncate(incase_import.error_message, length: 80) %>
+        <% end %>
+        <% if incase_import.import_errors.present? && incase_import.import_errors.is_a?(Array) %>
+          <% error_rows = incase_import.import_errors.map { |e| e['row'] || e[:row] }.compact.sort %>
+          <% if error_rows.any? %>
+            <span class="text-xs text-gray-500">
+              Строки: <%= error_rows.first(5).join(', ') %><%= " и еще #{error_rows.count - 5}" if error_rows.count > 5 %>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
     <% end %>
   </div>
   <div class="text-sm text-gray-600"><%= incase_import.total_rows %></div>

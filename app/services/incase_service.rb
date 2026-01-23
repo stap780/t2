@@ -26,9 +26,19 @@ class IncaseService
           failed_count: @failed_count
         )
       else
+        # Формируем информативное сообщение об ошибках с номерами строк
+        error_rows = @errors.map { |e| e['row'] || e[:row] }.compact.sort
+        rows_info = if error_rows.count <= 10
+          "строки: #{error_rows.join(', ')}"
+        else
+          "строки: #{error_rows.first(10).join(', ')} и еще #{error_rows.count - 10}"
+        end
+        
+        error_message = "Ошибки в #{@failed_count} строках (#{rows_info})"
+        
         @incase_import.update!(
           status: @success_count > 0 ? 'completed' : 'failed',
-          error_message: "Ошибки в #{@failed_count} строках",
+          error_message: error_message,
           import_errors: @errors,
           success_count: @success_count,
           failed_count: @failed_count,
@@ -87,7 +97,7 @@ class IncaseService
     # Валидация строки
     validation_errors = validate_row(row, index)
     if validation_errors.any?
-      @errors << {row: index, unumber: row['Номер дела']&.strip, errors: validation_errors}
+      @errors << {'row' => index, 'unumber' => row['Номер дела']&.to_s&.strip, 'errors' => validation_errors}
       @failed_count += 1
       return
     end
@@ -122,7 +132,7 @@ class IncaseService
         @success_count += 1
       end
     rescue => e
-      @errors << {row: index, unumber: unumber, errors: ["#{e.class}: #{e.message}"]}
+      @errors << {'row' => index, 'unumber' => unumber, 'errors' => ["#{e.class}: #{e.message}"]}
       @failed_count += 1
       Rails.logger.error "Error processing row #{index}: #{e.message}"
     end
@@ -151,16 +161,19 @@ class IncaseService
   def find_or_create_company(title, tip)
     return nil if title.blank?
     
+    # Преобразуем в строку на случай, если пришло число
+    title_str = title.to_s.strip
+    
     # Company использует short_title для уникальности
-    Company.find_or_create_by(short_title: title.strip, tip: tip) do |c|
-      c.title = title.strip
+    Company.find_or_create_by(short_title: title_str, tip: tip) do |c|
+      c.title = title_str
     end
   end
   
   
   def create_incase_dubl(row_data, strah_company, company)
     parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
-    modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".to_s.strip
+    modelauto = "#{row_data['Марка ТС']&.to_s} #{row_data['Модель ТС']&.to_s}".strip
     unumber = row_data['Номер дела']&.to_s&.strip
     stoanumber = row_data['Номер З/Н СТОА']&.to_s&.strip
     title = row_data['Деталь']&.to_s&.strip
@@ -232,26 +245,27 @@ class IncaseService
   
   def create_new_incase(row_data, strah_company, company)
     parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
-    modelauto = "#{row_data['Марка ТС']} #{row_data['Модель ТС']}".strip
+    modelauto = "#{row_data['Марка ТС']&.to_s} #{row_data['Модель ТС']&.to_s}".strip
     
     # Создаем убыток с позицией через accepts_nested_attributes_for
     # чтобы валидация items_presence прошла успешно
     incase = Incase.new(
-      region: row_data['Регион']&.strip,
+      region: row_data['Регион']&.to_s&.strip,
       strah_id: strah_company.id,
-      stoanumber: row_data['Номер З/Н СТОА']&.strip,
-      unumber: row_data['Номер дела']&.strip,
+      stoanumber: row_data['Номер З/Н СТОА']&.to_s&.strip,
+      unumber: row_data['Номер дела']&.to_s&.strip,
       company_id: company.id,
-      carnumber: row_data['Гос номер']&.strip,
+      carnumber: row_data['Гос номер']&.to_s&.strip,
       date: parsed_date,
       modelauto: modelauto,
+      totalsum: parse_decimal(row_data['Сумма заказ наряда']),
       items_attributes: {
         '0' => {
-          title: row_data['Деталь']&.strip,
+          title: row_data['Деталь']&.to_s&.strip,
           quantity: parse_integer(row_data['Кол-во']) || 1,
           price: parse_decimal(row_data['Сумма запчастей']) || 0,
-          katnumber: row_data['Каталожный_номер']&.strip,
-          supplier_code: row_data['Код поставщика']&.strip
+          katnumber: row_data['Каталожный_номер']&.to_s&.strip,
+          supplier_code: row_data['Код поставщика']&.to_s&.strip
         }
       }
     )

@@ -1,0 +1,12 @@
+wb = xlsx_package.workbook
+company_attributes = Company.file_export_attributes
+
+check_int = ["id"]
+wb.add_worksheet(name: "Компании") do |sheet|
+  sheet.add_row company_attributes
+  types = company_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
+  collection.find_each(batch_size: 1000) do |company|
+    company_values = company_attributes.map { |attr| company.send(attr) }
+    sheet.add_row company_values, types: types
+  end
+end

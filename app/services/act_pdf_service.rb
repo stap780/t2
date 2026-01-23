@@ -117,7 +117,7 @@ class ActPdfService
       # Добавляем отступ (15) для безопасности, чтобы контент не накладывался на футер
       footer_min_height = 20 + 15  # 35 точек от bounds.bottom
 
-      incases.each do |incase|
+      incases.sort_by(&:created_at).reverse_each do |incase|
         # Проверяем доступное место перед добавлением заголовка заявки
         # Заголовок занимает примерно 20-25 точек
         if pdf.cursor < footer_min_height + 25
@@ -153,7 +153,11 @@ class ActPdfService
           item_data = [
             [
               { content: "#{item.title} (#{item.katnumber})", colspan: 2 },
-              { content: "☐ Да ☐ Нет Примечание: #{item.item_status&.title || ''}", colspan: 1 }
+              if item.item_status&.title == "Долг"
+                { content: "☐ Долг Примечание: #{item.item_status.title}", colspan: 1 }
+              else
+                { content: "☐ Да ☐ Нет Примечание: ", colspan: 1 }
+              end
             ]
           ]
 
