@@ -65,7 +65,7 @@ class Incase < ApplicationRecord
     return '' unless incase_status.present?
     incase_status.title
   end
-
+  
   def incase_tip_title
     return '' unless incase_tip.present?
     incase_tip.title

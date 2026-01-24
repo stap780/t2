@@ -215,6 +215,8 @@ Rails.application.routes.draw do
   resources :incase_dubls, only: [:index, :show, :destroy] do
     member do
       post :merge
+      post :merge_to_existing
+      post :merge_to_new
     end
   end
 

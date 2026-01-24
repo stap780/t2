@@ -10,7 +10,6 @@ class Detal < ApplicationRecord
   has_many :properties, through: :features
   accepts_nested_attributes_for :features, allow_destroy: true
 
-
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
     attribute_names
@@ -79,6 +78,54 @@ class Detal < ApplicationRecord
 
   def variants
     Variant.where(sku: sku)
+  end
+
+  def copy_features_from_products
+    return { success: false, message: "SKU отсутствует" } if sku.blank?
+    
+    # Найти все variants с таким же sku
+    variants = Variant.where(sku: sku)
+    return { success: false, message: "Товары с таким артикулом не найдены" } if variants.empty?
+    
+    # Получить все products
+    product_ids = variants.pluck(:product_id).uniq
+    products = Product.where(id: product_ids).includes(:features)
+    
+    return { success: false, message: "Товары не найдены" } if products.empty?
+    
+    # Собрать все features из товаров
+    copied_count = 0
+    skipped_count = 0
+    existing_property_ids = features.pluck(:property_id)
+    
+    products.each do |product|
+      product.features.each do |product_feature|
+        # Пропускаем, если такой property уже есть в детали
+        if existing_property_ids.include?(product_feature.property_id)
+          skipped_count += 1
+          next
+        end
+        
+        # Создаем новый feature для детали
+        begin
+          features.create!(
+            property_id: product_feature.property_id,
+            characteristic_id: product_feature.characteristic_id
+          )
+          copied_count += 1
+          existing_property_ids << product_feature.property_id
+        rescue => e
+          Rails.logger.error "Error copying feature: #{e.message}"
+          # Продолжаем обработку других features
+        end
+      end
+    end
+    
+    if copied_count > 0
+      { success: true, message: "Скопировано #{copied_count} параметров", count: copied_count, skipped: skipped_count }
+    else
+      { success: false, message: "Не удалось скопировать параметры. Все параметры уже присутствуют в детали или произошла ошибка." }
+    end
   end
 
 end

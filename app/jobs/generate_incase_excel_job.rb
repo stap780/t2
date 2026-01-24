@@ -14,7 +14,7 @@ class GenerateIncaseExcelJob < ApplicationJob
     incase_ids = Array(incase_ids)
     return if incase_ids.empty?
     
-    # Загружаем убытки
+    # Загружаем убытки с items и их статусами
     incases = Incase.where(id: incase_ids).includes(:company, :strah, items: :item_status)
     return if incases.empty?
     
@@ -23,22 +23,17 @@ class GenerateIncaseExcelJob < ApplicationJob
     company = Company.find(company_id)
     
     begin
-      # Находим статусы "Долг" и "В работе"
-      item_statuses = ItemStatus.where(title: ['Долг', 'В работе'])
-      item_status_ids = item_statuses.pluck(:id)
-      
       # Генерируем Excel файл
       p = Axlsx::Package.new
       wb = p.workbook
       
       wb.add_worksheet(name: 'Позиции') do |sheet|
         # Заголовки
-        sheet.add_row ['Контрагент', 'Страховая компания', 'Номер З/Н СТОА', 'Номер дела', 'Марка и Модель ТС', 'Гос номер', 'Деталь']
+        sheet.add_row ['Контрагент', 'Страховая компания', 'Номер З/Н СТОА', 'Номер дела', 'Марка и Модель ТС', 'Гос номер', 'Деталь', 'Статус детали']
         
-        # Данные из всех убытков
+        # Данные из всех убытков - включаем все items, не только "Долг" и "В работе"
         incases.each do |incase|
-          items = incase.items.where(item_status_id: item_status_ids)
-          items.each do |item|
+          incase.items.each do |item|
             sheet.add_row [
               incase.company.title,
               incase.strah&.title || '',
@@ -46,7 +41,8 @@ class GenerateIncaseExcelJob < ApplicationJob
               incase.unumber || '',
               incase.modelauto || '',
               incase.carnumber || '',
-              item.title || ''
+              item.title || '',
+              item.item_status&.title || ''
             ]
           end
         end

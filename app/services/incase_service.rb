@@ -25,6 +25,16 @@ class IncaseService
           success_count: @success_count,
           failed_count: @failed_count
         )
+        
+        # Групповая отправка писем для всех созданных убытков
+        if @created_incases.any?
+          begin
+            IncaseEmailService.send(@created_incases)
+          rescue => e
+            Rails.logger.error "Failed to send grouped emails for import #{@incase_import.id}: #{e.message}"
+            # Не прерываем процесс импорта из-за ошибки отправки
+          end
+        end
       else
         # Формируем информативное сообщение об ошибках с номерами строк
         error_rows = @errors.map { |e| e['row'] || e[:row] }.compact.sort
@@ -44,6 +54,16 @@ class IncaseService
           failed_count: @failed_count,
           imported_at: Time.current
         )
+        
+        # Групповая отправка писем для всех созданных убытков (даже если были ошибки)
+        if @created_incases.any?
+          begin
+            IncaseEmailService.send(@created_incases)
+          rescue => e
+            Rails.logger.error "Failed to send grouped emails for import #{@incase_import.id}: #{e.message}"
+            # Не прерываем процесс импорта из-за ошибки отправки
+          end
+        end
       end
     rescue => e
       Rails.logger.error "IncaseService ERROR: #{e.class} - #{e.message}"
@@ -274,13 +294,7 @@ class IncaseService
     
     @created_incases << incase.id
     
-    # Автоматическая отправка письма для нового убытка (Сценарий 3)
-    begin
-      IncaseEmailService.send_one(incase.id)
-    rescue => e
-      Rails.logger.error "Failed to auto-send email for incase #{incase.id}: #{e.message}"
-      # Не прерываем процесс импорта из-за ошибки отправки
-    end
+    # Отправка писем будет выполнена групповым образом после завершения импорта
     
     incase
   end

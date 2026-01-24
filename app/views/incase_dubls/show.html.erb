@@ -43,6 +43,10 @@
           <span class="font-medium"><%= t('.region') %>:</span>
           <span><%= @existing_incase.region %></span>
         </div>
+        <div>
+          <span class="font-medium"><%= t('.stoanumber') %>:</span>
+          <span><%= @existing_incase.stoanumber || '-' %></span>
+        </div>
       </div>
       
       <h3 class="font-medium mb-2"><%= t('.items') %></h3>
@@ -108,10 +112,16 @@
           <%= @incase_dubl.region %>
         </span>
       </div>
+      <div>
+        <span class="font-medium"><%= t('.stoanumber') %>:</span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:stoanumber] %>">
+          <%= @incase_dubl.stoanumber || '-' %>
+        </span>
+      </div>
     </div>
     
     <h3 class="font-medium mb-2"><%= t('.items') %></h3>
-    <%= form_with url: merge_incase_dubl_path(@incase_dubl), method: :post, local: true, data: { turbo: false } do |f| %>
+    <%= form_with url: merge_to_existing_incase_dubl_path(@incase_dubl), method: :post, local: true, data: { turbo: false } do |f| %>
       <div class="space-y-2 mb-4">
         <% @incase_dubl.incase_item_dubls.each do |item_dubl| %>
           <div class="p-2 bg-gray-50 rounded border">
@@ -131,8 +141,13 @@
       </div>
       
       <div class="flex space-x-3">
-        <%= f.submit t('.merge_selected'), class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
-        <%# link_to t('.delete_dubl'), incase_dubl_path(@incase_dubl), 
+        <%= f.submit t('.merge_to_existing'), 
+            class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+        <%= f.button t('.merge_to_new'), 
+            type: :submit,
+            formaction: merge_to_new_incase_dubl_path(@incase_dubl),
+            class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
+        <%= link_to t('.delete_dubl'), incase_dubl_path(@incase_dubl), 
             method: :delete, 
             data: { turbo_method: :delete, turbo_confirm: t('.delete_confirm'), turbo: false },
             class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>

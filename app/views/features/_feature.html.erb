@@ -5,9 +5,9 @@
 %>
 <%= turbo_frame_tag "feature_#{turbo_id_for(feature)}" do %>
   <%= fields_for "#{featureable_type}[features_attributes][#{turbo_id_for(feature)}]", feature do |ff| %>
-    <div class="grid grid-cols-[1fr_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50" id="feature_<%= turbo_id_for(feature) %>">
+    <div class="grid grid-cols-[1fr_1fr_60px] gap-2 p-1 border-t hover:bg-gray-50" id="feature_<%= turbo_id_for(feature) %>">
       <%= ff.collection_select :property_id, Property.all.order(title: :asc), :id, :title, { prompt: t("features.select_property"), selected: feature.property_id }, 
-      { class: "flex-1 px-2 py-1 border rounded-md w-full",
+      { class: "flex-1 px-2 py-1 border rounded-md",
         data: {
           controller: "slimselect",
           search_url: search_properties_path,
@@ -42,7 +42,15 @@
           path = feature_path(id: turbo_id_for(feature))
         end
       %>
-      <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+      <div class="flex justify-end items-center space-x-1">
+        <%= link_to new_property_characteristic_path(feature.property), data: { turbo_frame: :offcanvas }, class: "text-blue-600 hover:text-blue-800 inline-flex items-center" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 20 20" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 5v10m5-5H5" />
+          </svg>
+        <% end if feature.property_id.present?  %>
+
+        <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+      </div>
     </div>
   <% end %>
 <% end %>

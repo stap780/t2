@@ -18,28 +18,28 @@
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
-  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
 
-  <!-- Fancybox CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5/dist/fancybox/fancybox.css" />
+    <!-- Fancybox CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5/dist/fancybox/fancybox.css" />
 
-  <!-- SlimSelect CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slim-select@2.8.2/dist/slimselect.css" />
+    <!-- SlimSelect CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slim-select@2.8.2/dist/slimselect.css" />
 
-  <!-- Flatpickr CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" />
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" />
 
-  <!-- CodeMirror v5 CSS/JS (global) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/htmlmixed/htmlmixed.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/selection/active-line.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/edit/matchbrackets.min.js"></script>
+    <!-- CodeMirror v5 CSS/JS (global) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.11/addon/edit/matchbrackets.min.js"></script>
 
-  <%= javascript_importmap_tags %>
+    <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= Current.user ? 'bg-gray-50 h-screen flex' : 'bg-gray-50' %>">
+  <body class="<%= Current.user ? 'bg-gray-50 min-h-screen flex' : 'bg-gray-50' %>">
     <% if Current.user %>
       <%= render "shared/flash" %>
       <!-- Sidebar -->
