@@ -7,9 +7,14 @@ is_mono = !download_kind.nil? && download_kind.to_s == 'mono'
 
 item_attributes = is_mono ? [] : Item.file_export_attributes
 all_attributes = inc_attributes + item_attributes
+
+# Локализованные заголовки колонок
+inc_headers  = inc_attributes.map  { |attr| Incase.human_attribute_name(attr) }
+item_headers = item_attributes.map { |attr| Item.human_attribute_name(attr) }
+headers      = inc_headers + item_headers
 check_int = ["id","price","quantity","cost_price"]
 wb.add_worksheet(name: "Убытки") do |sheet|
-  sheet.add_row all_attributes
+  sheet.add_row headers
   types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
   collection.find_each(batch_size: 1000) do |item|
     inc_values = inc_attributes.map { |attr| item.send(attr) }

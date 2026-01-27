@@ -19,7 +19,7 @@ class Client < ApplicationRecord
   scope :collection_for_select, ->(id) { where(id: id).map { |p| [p.full_name, p.id] } + first_five }
 
   def full_name
-    [name, surname, email].join(' ')
+    [name, surname, email, phone].join(' ')
   end
 
   def self.ransackable_attributes(auth_object = nil)

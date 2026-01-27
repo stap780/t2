@@ -39,7 +39,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= Current.user ? 'bg-gray-50 min-h-screen flex' : 'bg-gray-50' %>">
+  <body class="<%= Current.user ? 'bg-gray-50 h-screen flex' : 'bg-gray-50' %>">
     <% if Current.user %>
       <%= render "shared/flash" %>
       <!-- Sidebar -->
@@ -61,7 +61,7 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="flex-1 px-4 pb-4 space-y-1">
+        <nav class="flex-1 min-h-0 px-4 pb-4 space-y-1 sidebar-nav-scroll">
           <!-- Dashboard -->
           <%= link_to dashboard_path, 
               class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path == dashboard_path}" do %>
@@ -191,69 +191,70 @@
             </svg>
             <%= t("nav.jobs_monitor") %>
           <% end %>
+
+          <!-- Settings (collapsible) -->
+          <div class="mt-2">
+            <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/users') || request.path.start_with?('/incase_statuses') || request.path.start_with?('/incase_tips') || request.path.start_with?('/item_statuses') %>>
+              <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+                <div class="flex items-center text-sm font-medium text-violet-100">
+                  <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <%= t("nav.settings") %>
+                </div>
+                <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div class="mt-1 space-y-1">
+                <%= link_to insales_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/insales')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <%= t("nav.insales") %>
+                <% end %>
+                <%= link_to moysklads_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklads')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <%= t("nav.moysklads") %>
+                <% end %>
+                <%= link_to users_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/users')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <%= t("nav.users") %>
+                <% end %>
+                <%= link_to incase_statuses_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_statuses')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <%= t("nav.incase_statuses", default: "Статусы заявок") %>
+                <% end %>
+                <%= link_to incase_tips_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_tips')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <%= t("nav.incase_tips", default: "Типы заявок") %>
+                <% end %>
+                <%= link_to item_statuses_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/item_statuses')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <%= t("nav.item_statuses", default: "Статусы позиций") %>
+                <% end %>
+              </div>
+            </details>
+          </div>
         </nav>
 
-        <!-- Settings at bottom (collapsible) -->
-        <div class="flex-shrink-0 px-4 pb-4">
-          <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/users') || request.path.start_with?('/incase_statuses') || request.path.start_with?('/incase_tips') || request.path.start_with?('/item_statuses') %>>
-            <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
-              <div class=" flex items-center text-sm font-medium text-violet-100">
-                <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <%= t("nav.settings") %>
-              </div>
-              <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="mt-1 space-y-1">
-              <%= link_to insales_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/insales')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                <%= t("nav.insales") %>
-              <% end %>
-              <%= link_to moysklads_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklads')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                <%= t("nav.moysklads") %>
-              <% end %>
-              <%= link_to users_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/users')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-                <%= t("nav.users") %>
-              <% end %>
-              <%= link_to incase_statuses_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_statuses')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                <%= t("nav.incase_statuses", default: "Статусы заявок") %>
-              <% end %>
-              <%= link_to incase_tips_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/incase_tips')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                <%= t("nav.incase_tips", default: "Типы заявок") %>
-              <% end %>
-              <%= link_to item_statuses_path,
-                  class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/item_statuses')}" do %>
-                <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-                <%= t("nav.item_statuses", default: "Статусы позиций") %>
-              <% end %>
-            </div>
-          </details>
-        </div>
       </div>
 
       <!-- Main content area -->

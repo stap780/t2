@@ -74,7 +74,7 @@
               <div></div>
             </div>
 
-            <% product.features.each do |feature| %>  
+            <% product.features.order(:property_id).each do |feature| %>  
               <%= render "features/feature", feature: feature, product: product %>
             <% end %>
           <% end %>

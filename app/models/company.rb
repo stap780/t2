@@ -73,6 +73,11 @@ class Company < ApplicationRecord
     clients.first&.email
   end
 
+  def contacts_data
+    return '' unless client_companies.any?
+    client_companies.map { |client_company| client_company.client.full_name }.join(', ')
+  end
+  
   def company_plan_dates_data
     return '' unless company_plan_dates.present? && company_plan_dates.last.date.present?
 

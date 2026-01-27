@@ -317,267 +317,6 @@ ru:
     upload: "Загрузить"
     view: "Просмотр"
   access_denied: "Доступ запрещён. Требуются права администратора."
-  activerecord:
-    models:
-      import:
-        one: "Импорт"
-        few: "Импорта"
-        many: "Импортов"
-        other: "Импортов"
-      export:
-        one: "Экспорт"
-        few: "Экспорта"
-        many: "Экспортов"
-        other: "Экспортов"
-      import_schedule:
-        one: "Расписание импорта"
-        few: "Расписания импорта"
-        many: "Расписаний импорта"
-        other: "Расписания импорта"
-      user:
-        one: "Пользователь"
-        few: "Пользователя"
-        many: "Пользователей"
-        other: "Пользователей"
-      insale:
-        one: "InSales"
-        few: "InSales"
-        many: "InSales"
-        other: "InSales"
-      feature:
-        one: "Параметр"
-        few: "Параметра"
-        many: "Параметров"
-        other: "Параметров"
-      property:
-        one: "Параметр"
-        few: "Параметра"
-        many: "Параметров"
-        other: "Параметров"
-      characteristic:
-        one: "Значение"
-        few: "Значения"
-        many: "Значений"
-        other: "Значений"
-      product:
-        one: "Товар"
-        few: "Товара"
-        many: "Товаров"
-        other: "Товаров"
-      variant:
-        one: "Вариант"
-        few: "Варианта"
-        many: "Вариантов"
-        other: "Вариантов"
-      feature:
-        one: "Параметр товара"
-        few: "Параметра товара"
-        many: "Параметров товара"
-        other: "Параметров товара"
-      action_text/rich_text:
-        one: "Текстовое содержимое"
-        few: "Текстовых содержимых"
-        many: "Текстовых содержимых"
-        other: "Текстовых содержимых"
-      incase:
-        one: "Убыток"
-        few: "Убытки"
-        many: "Убытков"
-        other: "Убытков"
-      item:
-        one: "Позиция убытка"
-        few: "Позиции убытка"
-        many: "Позиций убытка"
-        other: "Позиций убытка"
-      incase_status:
-        one: "Статус убытка"
-        few: "Статусы убытка"
-        many: "Статусов убытка"
-        other: "Статусов убытка"
-      incase_tip:
-        one: "Тип убытка"
-        few: "Типы убытка"
-        many: "Типов убытка"
-        other: "Типов убытка"
-      item_status:
-        one: "Статус позиции"
-        few: "Статусы позиции"
-        many: "Статусов позиции"
-        other: "Статусов позиции"
-      company:
-        one: "Компания"
-        few: "Компании"
-        many: "Компаний"
-        other: "Компаний"
-      comment:
-        one: "Комментарий"
-        few: "Комментария"
-        many: "Комментариев"
-        other: "Комментариев"
-      client:
-        one: "Клиент"
-        few: "Клиента"
-        many: "Клиентов"
-        other: "Клиентов"
-      client_company:
-        one: "Связь клиента и компании"
-        few: "Связи клиента и компании"
-        many: "Связей клиента и компании"
-        other: "Связей клиента и компании"
-      company_plan_date:
-        one: "Планируемая дата компании"
-        few: "Планируемые даты компании"
-        many: "Планируемых дат компании"
-        other: "Планируемых дат компании"
-      okrug:
-        one: "Округ"
-        few: "Округа"
-        many: "Округов"
-        other: "Округов"
-      act:
-        one: "Акт"
-        few: "Акта"
-        many: "Актов"
-        other: "Актов"
-      audit:
-        one: "Аудит"
-        few: "Аудита"
-        many: "Аудитов"
-        other: "Аудитов"
-    attributes:
-      import:
-        name: "Название"
-        status: "Статус"
-        error_message: "Сообщение об ошибке"
-        zip_file: "ZIP-файл"
-        created_at: "Создано"
-        updated_at: "Обновлено"
-        file_header: "Заголовки файла"
-        imported_at: "Завершено"
-        user: "Пользователь"
-        id: "ID"
-      export:
-        name: "Название"
-        time: "Время"
-        format: "Формат"
-        template: "Шаблон"
-      import_schedule:
-        name: "Название"
-        time: "Время"
-        recurrence: "Периодичность"
-        active: "Активно"
-        scheduled_for: "Запланировано на"
-        created_at: "Создано"
-        updated_at: "Обновлено"
-      user:
-        email_address: "Email"
-        password: "Пароль"
-        password_confirmation: "Подтверждение пароля"
-        role: "Роль"
-      variant:
-        sku: "Артикул"
-        barcode: "Штрихкод"
-        quantity: "Кол-во"
-        cost_price: "Вх. цена"
-        price: "Цена"
-      insale:
-        api_key: "API ключ"
-        api_password: "API пароль"
-        api_link: "API ссылка"
-      incase:
-        region: "Регион"
-        strah_id: "Страховая компания"
-        strah: "Страховая компания"
-        stoanumber: "Номер З/Н"
-        unumber: "Номер убытка"
-        company_id: "Компания"
-        company: "Компания"
-        carnumber: "Номер автомобиля"
-        date: "Дата акта"
-        modelauto: "Модель автомобиля"
-        totalsum: "Сумма"
-        incase_status_id: "Статус"
-        incase_tip_id: "Тип"
-      item:
-        title: "Название"
-        quantity: "Кол-во"
-        katnumber: "Кат номер"
-        supplier_code: "Код поставщика"
-        price: "Цена"
-        sum: "Сумма"
-        item_status_id: "Статус позиции"
-        variant_id: "Вариант товара"
-        vat: "НДС"
-        condition: "Состояние"
-      incase_status:
-        title: "Название"
-        color: "Цвет"
-        position: "Позиция"
-      incase_tip:
-        title: "Название"
-        color: "Цвет"
-        position: "Позиция"
-      item_status:
-        title: "Название"
-        color: "Цвет"
-        position: "Позиция"
-      company:
-        title: "Полное название"
-        short_title: "Краткое название"
-        tip: "Тип компании"
-        inn: "ИНН"
-        kpp: "КПП"
-        ur_address: "Юридический адрес"
-        fact_address: "Фактический адрес"
-        ogrn: "ОГРН"
-        okpo: "ОКПО"
-        bik: "БИК"
-        bank_title: "Название банка"
-        bank_account: "Расчётный счёт"
-        info: "Дополнительная информация"
-      comment:
-        body: "Текст комментария"
-        user_id: "Автор"
-      client:
-        surname: "Фамилия"
-        name: "Имя"
-        middlename: "Отчество"
-        phone: "Телефон"
-        email: "Email"
-        insid: "ID InSales"
-      company_plan_date:
-        date: "Дата"
-        company_id: "Компания"
-      okrug:
-        title: "Название"
-        position: "Позиция"
-      act:
-        number: "Номер"
-        date: "Дата"
-        status: "Статус"
-        company_id: "Компания"
-        strah_id: "Страховая компания"
-        okrug_id: "Округ"
-      product:
-        title: "Название"
-        description: "Описание"
-        status: "Статус"
-        tip: "Тип"
-        not_a_number: "не является числом"
-        not_an_integer: "должно быть целым числом"
-        greater_than: "должно быть больше %{count}"
-        greater_than_or_equal_to: "должно быть больше или равно %{count}"
-        equal_to: "должно быть равно %{count}"
-        less_than: "должно быть меньше %{count}"
-        less_than_or_equal_to: "должно быть меньше или равно %{count}"
-        other_than: "должно отличаться от %{count}"
-        odd: "должно быть нечётным"
-        even: "должно быть чётным"
-        taken: "уже существует"
-        record_invalid: "Валидация не пройдена: %{errors}"
-        restrict_dependent_destroy:
-          has_one: "Нельзя удалить запись, так как существует зависимая %{record}"
-          has_many: "Нельзя удалить запись, так как существуют зависимые %{record}"
   dashboard:
     search:
       no_results: "Результаты не найдены"
@@ -940,6 +679,7 @@ ru:
     index:
       heading: "Акты"
       search: "Поиск"
+      acts_search: "Поиск по номеру, названию детали, штрихкоду или номеру автомобиля"
       new: "Новый акт"
     new:
       heading: "Создание акта"
@@ -1246,8 +986,11 @@ ru:
         katnumber: "Кат номер"
         supplier_code: "Код поставщика"
         item_status_id: "Статус позиции"
+        item_status_title: "Статус позиции"
+        barcode: "Штрихкод"
         variant_id: "Вариант"
         incase_id: "Убыток"
+        condition: "Состояние"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
       incase:
@@ -1264,6 +1007,12 @@ ru:
         incase_tip_id: "Тип"
         auto: "Авто"
         okrug: "Округ"
+        sendstatus: "Отправлено"
+        strah_title: "Название страховой компании"
+        company_title: "Название контрагента"
+        company_contacts_data: "Контакты контрагента"
+        incase_status_title: "Статус убытка"
+        incase_tip_title: "Тип убытка"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
       company:
@@ -1295,6 +1044,8 @@ ru:
         driver_id: "Водитель"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
+      acts:
+        company_id: "Компания по акту"
       variant:
         price: "Цена"
         quantity: "Кол-во"
@@ -1329,6 +1080,14 @@ ru:
       comment:
         body: "Текст комментария"
         user_id: "Автор"
+      characteristic:
+        title: "Значение"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
+      property:
+        title: "Название"
+        created_at: "Дата создания"
+        updated_at: "Дата обновления"
       company_plan_date:
         date: "Дата"
         company_id: "Компания"
@@ -1336,6 +1095,18 @@ ru:
         "comments.body": "Текст комментария"
         comments:
           body: "Текст комментария"
+      user:
+        email_address: "Email"
+        password: "Пароль"
+        password_confirmation: "Подтверждение пароля"
+        role: "Роль"
+      client:
+        surname: "Фамилия"
+        name: "Имя"
+        middlename: "Отчество"
+        phone: "Телефон"
+        email: "Email"
+        insid: "ID InSales"
     errors:
       format: "%{attribute} %{message}"
       models:

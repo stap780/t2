@@ -42,7 +42,7 @@
             <div></div>
           </div>
 
-          <% detal.features.each do |feature| %>  
+          <% detal.features.order(:property_id).each do |feature| %>  
             <%= render "features/feature", feature: feature, detal: detal %>
           <% end %>
         <% end %>

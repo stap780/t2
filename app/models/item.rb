@@ -22,11 +22,11 @@ class Item < ApplicationRecord
   }
   
   after_initialize :set_default_new
+  before_create :set_default_status
   before_create :create_product_variant, if: -> { variant_id.blank? }
   after_save :recalculate_incase_status, if: :saved_change_to_item_status_id?
   after_destroy :recalculate_incase_status_after_destroy
   
-  attribute :barcode, :string
   attribute :item_status_title
 	
 	def self.file_export_attributes
@@ -34,20 +34,11 @@ class Item < ApplicationRecord
 	end
   
   def self.ransackable_attributes(auth_object = nil)
-    # attribute_names
-    super + %w(barcode)
+    super
   end
 
   def self.ransackable_associations(auth_object = nil)
     %w[incase item_status variant acts act_items]
-  end
-
-  # Ransacker for virtual barcode attribute that uses variant.barcode
-  ransacker :barcode do |parent|
-    variants_table = Arel::Table.new(:variants)
-    # Reference the variant's barcode through the association
-    # This requires variant to be joined in the query
-    variants_table[:barcode]
   end
 
   def sum
@@ -55,7 +46,7 @@ class Item < ApplicationRecord
   end
 
   def barcode
-    variant.barcode
+    variant&.barcode
   end
 
   def last_status_change_date
@@ -77,6 +68,14 @@ class Item < ApplicationRecord
   
   private
   
+  def set_default_status
+    return if item_status_id.present?
+    
+    # Устанавливаем статус "Не ездили" для новой детали, если статус не указан
+    v_rabote_status = ItemStatus.find_by(title: 'В работе')
+    self.item_status_id = v_rabote_status.id if v_rabote_status
+  end
+
   def set_default_new
     self.quantity ||= 0 if new_record?
   end

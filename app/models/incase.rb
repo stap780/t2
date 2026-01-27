@@ -29,6 +29,7 @@ class Incase < ApplicationRecord
 
   attribute :strah_title
   attribute :company_title
+  attribute :company_contacts_data
   attribute :incase_status_title
   attribute :incase_tip_title
 
@@ -59,6 +60,11 @@ class Incase < ApplicationRecord
   def company_title
     return '' unless company.present?
     company.title
+  end
+
+  def company_contacts_data
+    return '' unless company.present?
+    company.contacts_data
   end
 
   def incase_status_title

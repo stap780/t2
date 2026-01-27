@@ -34,7 +34,10 @@
       <div class="space-y-2">
         <%= form.label :role, class: "block text-sm font-semibold text-gray-800" %>
         <%= form.select :role, 
-            options_for_select(User.roles.map { |k, v| [k.humanize, k] }, selected: user.role),
+            options_for_select(
+              User.roles.keys.map { |k| [t("enums.user.role.#{k}"), k] },
+              selected: user.role
+            ),
             {},
             class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
         %>
@@ -43,14 +46,14 @@
   </div>
 
   <!-- Action Buttons -->
-  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+  <div class="flex items-center gap-2 pt-6 border-t border-gray-200">
     <button type="button" 
             data-action="click->offcanvas#close"
-            class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out">
+            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
       <%= t("actions.cancel") %>
     </button>
     <%= form.submit data: { disable_with: t("helpers.submit.saving") },
-      class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
+      class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 <% end %>
 

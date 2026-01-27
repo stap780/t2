@@ -28,7 +28,7 @@ class ActPdfService
     font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
     pdf.font(font_name) do
       pdf.text company.title, size: 12, style: :bold if company&.title.present?
-      pdf.text company.ur_address, size: 10 if company&.ur_address.present?
+      pdf.text company.fact_address, size: 10 if company&.fact_address.present?
       pdf.move_down 10
 
 
@@ -117,7 +117,7 @@ class ActPdfService
       # Добавляем отступ (15) для безопасности, чтобы контент не накладывался на футер
       footer_min_height = 20 + 15  # 35 точек от bounds.bottom
 
-      incases.sort_by(&:created_at).reverse_each do |incase|
+      incases.sort_by(&:date).reverse_each do |incase|
         # Проверяем доступное место перед добавлением заголовка заявки
         # Заголовок занимает примерно 20-25 точек
         if pdf.cursor < footer_min_height + 25

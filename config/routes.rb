@@ -147,7 +147,7 @@ Rails.application.routes.draw do
 
   resources :clients do
     collection do
-      get :search
+      post :search
       post :download
       post :bulk_delete
     end

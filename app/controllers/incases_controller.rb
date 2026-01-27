@@ -295,24 +295,26 @@ class IncasesController < ApplicationController
   end
 
   def process_multiple_unumber_search(search_params_hash)
-    search_key = :unumber_or_company_title_or_items_barcode_or_carnumber_cont
-    
+    # В params[:q] ключи приходят строками, не символами.
+    # Поле поиска по номеру убытка и др. сейчас называется:
+    #   unumber_or_items_barcode_or_carnumber_cont
+    search_key = 'unumber_or_items_barcode_or_carnumber_cont'
+
     return search_params_hash unless search_params_hash[search_key].present?
-    
+
     search_value = search_params_hash[search_key].to_s.strip
-    
-    # Check if search value contains spaces (multiple values)
+
+    # Если введено несколько значений через пробел — пытаемся поискать по массиву номеров убытков
     if search_value.include?(' ')
       parts = search_value.split(/\s+/).map(&:strip).reject(&:blank?)
-      
-      # If we have multiple parts and they all look like unumber values (short strings)
-      # Use unumber_in for array search
+
       if parts.length > 1 && parts.all? { |part| part.length <= 50 }
+        # Переключаемся с общего поля поиска на точный поиск по массиву unumber
         search_params_hash.delete(search_key)
-        search_params_hash[:unumber_in] = parts
+        search_params_hash['unumber_in'] = parts
       end
     end
-    
+
     search_params_hash
   end
 

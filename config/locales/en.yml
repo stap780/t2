@@ -329,6 +329,9 @@ en:
         record_id: "Record ID"
         created_at: "Created At"
         updated_at: "Updated At"
+  acts:
+    index:
+      acts_search: "Search by number, item title, barcode or car number"
   activerecord:
     models:
       import_schedule:
@@ -343,6 +346,8 @@ en:
         scheduled_for: "Scheduled for"
         created_at: "Created at"
         updated_at: "Updated at"
+      acts:
+        company_id: "Act company"
   products:
     index:
       title: "Products"

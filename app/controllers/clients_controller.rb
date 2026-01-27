@@ -14,9 +14,11 @@ class ClientsController < ApplicationController
   def show
   end
 
+
   def search
     if params[:title].present?
-      @search_results = Client.all.where('name ILIKE ?', "%#{params[:title]}%").map { |p| {title: p.full_name, id: p.id} }.reject(&:blank?)
+      # Ransack *_cont сам добавляет %...%, поэтому передаём "сырой" title
+      @search_results = Client.ransack(name_or_surname_or_email_cont: params[:title]).result.map { |p| {title: p.full_name, id: p.id} }.reject(&:blank?)
       render json: @search_results, status: :ok
     else
       render json: [], status: :unprocessable_entity

@@ -1,7 +1,8 @@
-<%= turbo_frame_tag dom_id(act), class: "grid grid-cols-[50px_100px_150px_150px_150px_120px_100px_200px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(act), class: "grid grid-cols-[40px_100px_100px_150px_150px_150px_100px_50px_200px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
   <div><%= act.id %></div>
   <div class="text-sm text-gray-600"><%=link_to "Акт № #{act.number}", act_path(act), class: "text-blue-600 hover:text-blue-800 cursor-pointer", data: { turbo: false } %></div>
   <div class="text-sm text-gray-600"><%= act.date&.strftime('%d.%m.%Y') %></div>
+  <div class="text-sm text-gray-600"><%= act.okrug&.title %></div>
   <div class="text-sm text-gray-600"><%= act.company&.short_title %></div>
   <div class="text-sm text-gray-600"><%= act.strah&.short_title %></div>
   <div>

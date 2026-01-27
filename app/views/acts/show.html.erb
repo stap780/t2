@@ -114,7 +114,7 @@
     <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('.items') %></h2>
 
     <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
-    <% incases.sort_by(&:created_at).reverse_each do |incase| %>
+    <% incases.sort_by(&:date).reverse_each do |incase| %>
       <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
