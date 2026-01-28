@@ -34,7 +34,24 @@ class Incase < ApplicationRecord
   attribute :incase_tip_title
 
   def self.file_export_attributes
-    attribute_names - ["strah_id","company_id","incase_status_id","incase_tip_id","created_at","updated_at"]
+    # Базовый порядок колонок для экспорта
+    base = %w[
+      unumber          # Номер убытка
+      stoanumber       # Номер з/н
+      strah_title      # СК
+      company_title    # СТО
+      modelauto        # модель а/м
+      carnumber        # номер а/м
+      date             # дата
+      totalsum         # сумма
+      incase_status_title # статус убытка
+      incase_tip_title    # тип
+    ]
+
+    attrs = attribute_names - %w[id strah_id company_id incase_status_id incase_tip_id created_at updated_at]
+
+    # Сначала атрибуты в нужном порядке, затем остальные
+    (base & attrs) + (attrs - base)
   end
   
   def self.ransackable_attributes(auth_object = nil)

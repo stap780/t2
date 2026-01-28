@@ -13,6 +13,9 @@ class IncaseDubl < ApplicationRecord
   def differences
     return {} unless existing_incase
     
+    existing_total = existing_incase.totalsum || existing_incase.items.sum(:sum)
+    dubl_total     = totalsum || incase_item_dubls.sum('price * quantity')
+
     {
       date: existing_incase.date != date,
       stoanumber: existing_incase.stoanumber != stoanumber,
@@ -20,7 +23,8 @@ class IncaseDubl < ApplicationRecord
       strah_id: existing_incase.strah_id != strah_id,
       carnumber: existing_incase.carnumber != carnumber,
       modelauto: existing_incase.modelauto != modelauto,
-      region: existing_incase.region != region
+      region: existing_incase.region != region,
+      totalsum: existing_total.to_f != dubl_total.to_f
     }
   end
   

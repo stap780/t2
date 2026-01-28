@@ -126,14 +126,14 @@
       </div>
       <div>
         <span class="font-medium"><%= t('activerecord.attributes.incase.totalsum') %>:</span>
-        <span>
+        <span class="<%= 'text-red-600 font-bold' if @differences[:totalsum] %>">
           <%= (@incase_dubl.totalsum || @incase_dubl.incase_item_dubls.sum('price * quantity')).to_f %>
         </span>
       </div>
     </div>
     
     <h3 class="font-medium mb-2"><%= t('.items') %></h3>
-    <%= form_with url: merge_to_existing_incase_dubl_path(@incase_dubl), method: :post, local: true, data: { turbo: false } do |f| %>
+    <%= form_with url: merge_to_existing_incase_dubl_path(@incase_dubl), method: :post, local: false do |f| %>
       <div class="space-y-2 mb-4">
         <% @incase_dubl.incase_item_dubls.each do |item_dubl| %>
           <% is_duplicate = @duplicate_item_ids.include?(item_dubl.id) %>
@@ -156,14 +156,15 @@
       <div class="flex space-x-3">
         <%= f.submit t('.merge_to_existing'), 
             class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" %>
+        <%= f.button t('.update_totalsum'),
+            type: :submit,
+            formaction: update_totalsum_incase_dubl_path(@incase_dubl),
+            class: "px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600" %>
         <%= f.button t('.merge_to_new'), 
             type: :submit,
             formaction: merge_to_new_incase_dubl_path(@incase_dubl),
             class: "px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700" %>
-        <%= link_to t('.delete_dubl'), incase_dubl_path(@incase_dubl), 
-            method: :delete, 
-            data: { turbo_method: :delete, turbo_confirm: t('.delete_confirm'), turbo: false },
-            class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
+        <%= link_to t('.delete_dubl'), incase_dubls_path, class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
       </div>
     <% end %>
   </div>

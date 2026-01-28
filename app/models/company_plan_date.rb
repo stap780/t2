@@ -1,7 +1,7 @@
 class CompanyPlanDate < ApplicationRecord
   belongs_to :company
   has_many :comments, as: :commentable, dependent: :destroy
-  accepts_nested_attributes_for :comments, allow_destroy: true
+  accepts_nested_attributes_for :comments, allow_destroy: true, reject_if: ->(attrs) { attrs['body'].blank? }
 
   validates :date, presence: true
 

@@ -217,6 +217,7 @@ Rails.application.routes.draw do
       post :merge
       post :merge_to_existing
       post :merge_to_new
+      post :update_totalsum
     end
   end
 

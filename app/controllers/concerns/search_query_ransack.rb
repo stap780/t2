@@ -10,7 +10,9 @@ module SearchQueryRansack
 
   # CHECK THE SESSION FOR SEARCH PARAMETERS IS THEY AREN'T IN THE REQUEST
   def search_params
-    # puts "search_params => #{params[:q]}"
+    # Если контроллер IncasesController, просто возвращаем params[:q]
+    return params[:q] if self.class.name == "IncasesController"
+
     if params[:q] == nil
       params[:q] = session[search_key]
     end
@@ -22,8 +24,8 @@ module SearchQueryRansack
 
   # DELETE SEARCH PARAMETERS FROM THE SESSION
   def clear_search_index
-    puts 'clear_search_index'
-    puts "controller_name => #{controller_name.singularize}"
+    # puts 'clear_search_index'
+    # puts "controller_name => #{controller_name.singularize}"
     if params[:search_cancel]
       params.delete(:search_cancel)
       if(!search_params.nil?)

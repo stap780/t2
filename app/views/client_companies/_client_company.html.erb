@@ -4,7 +4,7 @@
 %>
 <%= turbo_frame_tag "client_company_#{turbo_id_for(client_company)}" do %>
   <%= fields_for "#{company_type}[client_companies_attributes][#{turbo_id_for(client_company)}]", client_company do |f| %>
-    <div class="grid grid-cols-[1fr_50px] gap-4 p-2 border-t hover:bg-gray-50" id="client_company_<%= turbo_id_for(client_company) %>">
+    <div class="grid grid-cols-[1fr_100px] gap-4 p-2 border-t border-gray-200 hover:bg-gray-50" id="client_company_<%= turbo_id_for(client_company) %>">
       <%= f.select :client_id, options_for_select(Client.collection_for_select(client_company.client_id), client_company.client_id),
           { prompt: t("client_companies.select_client") }, 
           { 
@@ -17,15 +17,17 @@
       
       <%= f.hidden_field :id %>
       <%= f.hidden_field :company_id, value: company.persisted? ? company.id : nil %>
-      
-      <% 
-        if company.persisted?
-          path = company_client_company_path(company, turbo_id_for(client_company))
-        else
-          path = client_company_path(id: turbo_id_for(client_company))
-        end
-      %>
-      <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
+      <div class="flex justify-end space-x-2">
+        <% 
+          if company.persisted?
+            path = company_client_company_path(company, turbo_id_for(client_company))
+          else
+            path = client_company_path(id: turbo_id_for(client_company))
+          end
+        %>
+        <%= link_to_edit edit_client_path(client_company.client), data: { turbo_frame: 'offcanvas', turbo_prefetch: false } if client_company.client_id.present?%>
+        <%= link_to_delete path, data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
+      </div>
     </div>
   <% end %>
 <% end %>

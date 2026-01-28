@@ -130,6 +130,19 @@ en:
   summary_title: "Liquid Template (Required for XML)"
   click_to_customize: "Click to customize"
   example_xml_template: "Example XML Template:"
+  company:
+    tip:
+      standart: "Service station"
+      strah: "Insurance company"
+      our: "Our company"
+  weekdays:
+    monday: "Monday"
+    tuesday: "Tuesday"
+    wednesday: "Wednesday"
+    thursday: "Thursday"
+    friday: "Friday"
+    saturday: "Saturday"
+    sunday: "Sunday"
   imports:
     index:
       title: "Imports"
@@ -294,6 +307,8 @@ en:
         tip: "Type"
         weekdays: "Weekdays"
         okrug_id: "District"
+        contacts_data: "Contacts"
+        company_plan_dates_data: "Planned dates"
         created_at: "Created At"
         updated_at: "Updated At"
       act:

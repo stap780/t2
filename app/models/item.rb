@@ -34,7 +34,16 @@ class Item < ApplicationRecord
 	end
   
   def self.ransackable_attributes(auth_object = nil)
-    super
+    # Разрешаем поиск не только по колонкам, но и по вычисляемому атрибуту `barcode`,
+    # который проксирует штрихкод варианта (variant.barcode). Это нужно, чтобы
+    # работал фильтр `unumber_or_items_barcode_or_carnumber_cont` в убытках.
+    super + %w[barcode]
+  end
+
+  # ransacker для поиска по штрихкоду варианта через items_barcode_*
+  ransacker :barcode do |parent|
+    # Используем подзапрос к variants.barcode, связанному по variant_id
+    Arel.sql('(SELECT variants.barcode FROM variants WHERE variants.id = items.variant_id)')
   end
 
   def self.ransackable_associations(auth_object = nil)

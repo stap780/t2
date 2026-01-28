@@ -135,7 +135,7 @@ ru:
         user: "Пользователь"
   company:
     tip:
-      standart: "Стандартная"
+      standart: "СТО"
       strah: "Страховая"
       our: "Наша"
   exports:
@@ -679,7 +679,7 @@ ru:
     index:
       heading: "Акты"
       search: "Поиск"
-      acts_search: "Поиск по номеру, названию детали, штрихкоду или номеру автомобиля"
+      acts_search: "Поиск по названию детали, штрихкоду или номеру автомобиля"
       new: "Новый акт"
     new:
       heading: "Создание акта"
@@ -785,8 +785,9 @@ ru:
       quantity: "Кол-во"
       price: "Цена"
       merge_selected: "Добавить выбранные"
-      merge_to_existing: "Добавить в текущий убыток"
-      merge_to_new: "Создать новый убыток"
+      merge_to_existing: "Добавить в текущий"
+      merge_to_new: "Создать новый"
+      update_totalsum: "Обновить сумму"
       delete_dubl: "Отменить"
       delete_confirm: "Вы уверены, что хотите удалить этот дубль?"
       incase_not_found: "Существующий убыток не найден"
@@ -798,6 +799,12 @@ ru:
       incase_not_found: "Существующий убыток не найден"
       no_items_selected: "Выберите хотя бы одну позицию для добавления"
       error: "Ошибка при объединении: %{message}"
+    merge_to_new:
+      no_items_selected: "Выберите хотя бы одну позицию для добавления"
+    update_totalsum:
+      success: "Сумма существующего убытка обновлена"
+      incase_not_found: "Существующий убыток не найден"
+      error: "Ошибка при обновлении суммы: %{message}"
     destroy:
       success: "Дубль успешно удален"
   incase_tips:
@@ -1021,6 +1028,8 @@ ru:
         tip: "Тип"
         weekdays: "Дни недели"
         okrug_id: "Округ"
+        contacts_data: "Контакты компании"
+        company_plan_dates_data: "Планируемые даты"
         inn: "ИНН"
         kpp: "КПП"
         ur_address: "Юридический адрес"

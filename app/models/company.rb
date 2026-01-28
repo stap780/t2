@@ -23,7 +23,10 @@ class Company < ApplicationRecord
   scope :our, -> { where(tip: 'our') }
   scope :strah, -> { where(tip: 'strah') }
   scope :standart, -> { where(tip: 'standart') }
-  
+
+  attribute :contacts_data
+  attribute :company_plan_dates_data
+
   TIP = %w[standart strah our].freeze
   WEEKDAYS = %w[monday tuesday wednesday thursday friday saturday sunday].freeze
   
@@ -64,6 +67,16 @@ class Company < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     %w[audits incases client_companies company_plan_dates okrug]
   end
+
+  def tip_human
+    return '' if tip.blank?
+    I18n.t(tip, scope: %i[company tip], default: tip.humanize)
+  end
+  
+  def weekdays_human
+    return '' if weekdays.blank?
+    weekdays.map { |day| I18n.t(day, scope: :weekdays, default: day.humanize) }.join(', ')
+  end
   
   def emails
     clients.pluck(:email).join
@@ -94,6 +107,10 @@ class Company < ApplicationRecord
       # Для вложенных атрибутов company_plan_dates используем перевод из CompanyPlanDate
       nested_attr = attr_str.sub(/^company_plan_dates\./, '')
       CompanyPlanDate.human_attribute_name(nested_attr, options)
+    elsif attr_str == 'tip_human'
+      super('tip', **options)
+    elsif attr_str == 'weekdays_human'
+      super('weekdays', **options)
     else
       super
     end
@@ -120,5 +137,6 @@ class Company < ApplicationRecord
     
     throw(:abort) if errors.present?
   end
+
 end
 

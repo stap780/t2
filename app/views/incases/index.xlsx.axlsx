@@ -17,7 +17,15 @@ wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row headers
   types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
   collection.find_each(batch_size: 1000) do |item|
-    inc_values = inc_attributes.map { |attr| item.send(attr) }
+    inc_values = inc_attributes.map do |attr|
+      value = item.send(attr)
+
+      if attr.to_s == 'date' && value.respond_to?(:strftime)
+        value.strftime('%d.%m.%Y')
+      else
+        value
+      end
+    end
     if is_mono
       # Для mono режима добавляем только строку с данными убытка (без позиций)
       sheet.add_row inc_values, types: types

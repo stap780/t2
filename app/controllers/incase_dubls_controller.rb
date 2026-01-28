@@ -166,6 +166,36 @@ class IncaseDublsController < ApplicationController
       format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
+
+  def update_totalsum
+    existing_incase = @incase_dubl.existing_incase
+
+    if existing_incase.blank?
+      flash.now[:error] = t('.incase_not_found')
+      respond_to do |format|
+        format.html { redirect_to incase_dubls_path }
+        format.turbo_stream { render turbo_stream: [render_turbo_flash] }
+      end
+      return
+    end
+
+    dubl_total = @incase_dubl.totalsum || @incase_dubl.incase_item_dubls.sum('price * quantity')
+
+    existing_incase.update!(totalsum: dubl_total)
+
+    flash.now[:success] = t('.success')
+    respond_to do |format|
+      format.html { redirect_to incase_dubl_path(@incase_dubl), notice: t('.success') }
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
+    end
+  rescue => e
+    Rails.logger.error "Error updating totalsum from dubl: #{e.message}"
+    flash.now[:error] = t('.error', message: e.message)
+    respond_to do |format|
+      format.html { redirect_to incase_dubl_path(@incase_dubl) }
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
+    end
+  end
   
   def destroy
     @incase_dubl.destroy

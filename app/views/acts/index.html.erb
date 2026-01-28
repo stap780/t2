@@ -6,12 +6,12 @@
 </div>
 
 <%= search_form_for @search, url: acts_path, method: :get, html: { class: "flex items-center space-x-2 flex-wrap  mb-4" } do |f| %>
-  <%= f.search_field :number_or_items_title_or_items_variant_barcode_or_incases_carnumber_cont,
-      value: params.dig(:q, :number_or_items_title_or_items_variant_barcode_or_incases_carnumber_cont),
-      placeholder: t('.acts_search'),
-      class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ",
-      style: "min-width: 400px;" %>
-  <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.acts.company_id'),
+  <%= f.search_field :number_eq, value: params.dig(:q, :number_eq),
+      placeholder: t('activerecord.attributes.act.number'), class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "max-width: 150px;" %>
+  <%= f.search_field :items_title_or_items_variant_barcode_or_incases_carnumber_cont,  placeholder: t('.acts_search'),
+      value: params.dig(:q, :items_title_or_items_variant_barcode_or_incases_carnumber_cont),
+      class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "min-width: 300px;" %>
+  <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.act.company_id'),
       class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" %>
   <%= f.collection_select :status_eq,
       Act.statuses.keys.map { |k| [t("enums.act.status.#{k}"), k] },

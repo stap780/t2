@@ -43,7 +43,12 @@
               <%= f.label :short_title, class: "block text-sm font-medium text-gray-700 mb-1" %>
               <%= f.text_field :short_title, class: "w-full px-3 py-2 h-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", required: true %>
             </div>
+            <div class="sm:col-span-4">
+              <%= f.label :fact_address, class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.text_field :fact_address, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" %>
+            </div>
           </div>
+
           <div class="flex flex-col gap-2 border-t pt-6">
             <div class="mb-2 flex items-center justify-between">
               <legend class="text-sm font-medium text-gray-700"><%= t("client_companies.title") %></legend>
@@ -55,18 +60,12 @@
               </div>
             </div>      
             <%= turbo_frame_tag "client_companies" do %>
-              <% if company.client_companies.any? %>
-                <div class="grid grid-cols-[1fr_50px] gap-4 p-2 border-t hover:bg-gray-50">
-                  <div class="font-medium text-gray-700"><%= Client.model_name.human %></div>
-                  <div></div>
-                </div>
-              <% end %>
-
               <% company.client_companies.each do |client_company| %>  
                 <%= render "client_companies/client_company", client_company: client_company, company: company %>
               <% end %>
             <% end %>
           </div>
+
           <div class="flex flex-col gap-2 border-t pt-6">
             <div class="mb-6 pb-6 border-b">
               <h3 class="text-sm font-medium text-gray-700 mb-3">
@@ -93,14 +92,12 @@
             </div>
             
             <!-- Plan Dates Section -->
-            <div class="mb-2 flex items-center justify-between">
-              <legend class="text-sm font-medium text-gray-700">
-                <%= t("company_plan_dates.title") %>
-              </legend>
+            <%= turbo_frame_tag "company_plan_dates_header", class: "mb-2 flex items-center justify-between" do %>
+              <legend class="text-sm font-medium text-gray-700"><%= t("company_plan_dates.title") %></legend>
               <% path = company.new_record? ? new_company_plan_date_path(company_id: nil) : new_company_company_plan_date_path(company) %>
-              <%= link_to t("company_plan_dates.add_date"), path, data: { turbo_stream: "true" },
+              <%= link_to t("company_plan_dates.add_date"), path, data: { turbo_stream: "true"},
                 class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" unless company.company_plan_dates.any? %>
-            </div>
+            <% end %>
             
             <%= turbo_frame_tag "company_plan_dates" do %>
               <% if company.company_plan_dates.any? %>
@@ -162,10 +159,6 @@
               <div class="sm:col-span-2">
                 <%= f.label :ur_address, class: "block text-sm font-medium text-gray-700 mb-1" %>
                 <%= f.text_field :ur_address, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" %>
-              </div>
-              <div class="sm:col-span-2">
-                <%= f.label :fact_address, class: "block text-sm font-medium text-gray-700 mb-1" %>
-                <%= f.text_field :fact_address, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" %>
               </div>
             </div>
           </details>
