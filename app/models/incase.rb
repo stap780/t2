@@ -48,7 +48,7 @@ class Incase < ApplicationRecord
       incase_tip_title    # тип
     ]
 
-    attrs = attribute_names - %w[id strah_id company_id incase_status_id incase_tip_id created_at updated_at]
+    attrs = attribute_names - %w[company_contacts_data id strah_id company_id incase_status_id incase_tip_id created_at updated_at]
 
     # Сначала атрибуты в нужном порядке, затем остальные
     (base & attrs) + (attrs - base)

@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "company_plan_dates_header", class: "mb-2 flex items-center justify-between" do %>
+    <legend class="text-sm font-medium text-gray-700"><%= t("company_plan_dates.title") %></legend>
+    <% path = company.new_record? ? new_company_plan_date_path(company_id: nil) : new_company_company_plan_date_path(company) %>
+    <%= link_to t("company_plan_dates.add_date"), path, data: { turbo_stream: "true"},
+    class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" unless company.company_plan_dates.any? %>
+<% end %>

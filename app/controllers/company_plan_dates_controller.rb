@@ -69,6 +69,7 @@ class CompanyPlanDatesController < ApplicationController
         if check_destroy == true
           render turbo_stream: [
             turbo_stream.remove(dom_id(@company_plan_date)),
+            turbo_stream.replace("company_plan_dates_header", partial: "company_plan_dates/company_plan_dates_header", locals: { company: @company }),
             render_turbo_flash
           ]
         else

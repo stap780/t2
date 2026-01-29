@@ -92,21 +92,16 @@
             </div>
             
             <!-- Plan Dates Section -->
-            <%= turbo_frame_tag "company_plan_dates_header", class: "mb-2 flex items-center justify-between" do %>
-              <legend class="text-sm font-medium text-gray-700"><%= t("company_plan_dates.title") %></legend>
-              <% path = company.new_record? ? new_company_plan_date_path(company_id: nil) : new_company_company_plan_date_path(company) %>
-              <%= link_to t("company_plan_dates.add_date"), path, data: { turbo_stream: "true"},
-                class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" unless company.company_plan_dates.any? %>
-            <% end %>
+            <%= render "company_plan_dates/company_plan_dates_header", company: company %>
             
             <%= turbo_frame_tag "company_plan_dates" do %>
-              <% if company.company_plan_dates.any? %>
-                <div class="grid grid-cols-[200px_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50">
-                  <div class="font-medium text-gray-700"><%= t("company_plan_dates.date") %></div>
-                  <div class="font-medium text-gray-700"><%= t("company_plan_dates.comment") %></div>
-                  <div></div>
-                </div>
-              <% end %>
+              <%# if company.company_plan_dates.any? %>
+              <%#   = tag.div(class: "grid grid-cols-[200px_1fr_50px] gap-4 p-2 border-t hover:bg-gray-50") do %>
+              <%#     = tag.div t("company_plan_dates.date"), class: "font-medium text-gray-700" %>
+              <%#     = tag.div t("company_plan_dates.comment"), class: "font-medium text-gray-700" %>
+              <%#     = tag.div "" %>
+              <%#   end %>
+              <%# end %>
 
               <% company.company_plan_dates.each do |company_plan_date| %>
                 <%= render "company_plan_dates/company_plan_date", 

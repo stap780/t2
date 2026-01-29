@@ -3,6 +3,29 @@
 
   <div class="flex space-x-2 items-center">    
     <%= form_with url: incases_path, method: :post, id: :bulk_action_form, local: false do |f| %>
+      <div class="relative inline-block" data-controller="dropdown">
+        <button type="button" 
+                class="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700"
+                data-action="click->dropdown#toggle">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Экспорт C
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-1" data-dropdown-target="menu">
+          <div class="py-1">
+            <%= f.button 'Общий', type: :submit, 
+                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+                formaction: polymorphic_path(Incase.new, action: 'download', download_type: :filtered, download_kind: :mono) %>
+            <%= f.button 'Детально', type: :submit, 
+                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+                formaction: polymorphic_path(Incase.new, action: 'download', download_type: :filtered) %>
+          </div>
+        </div>
+      </div>      
       <%= render 'shared/download_excel_buttons', f: f, object: Incase.new %>
       <%= render 'shared/bulk_delete_buttons', f: f, object: Incase.new %>
       <%= render 'send_incase' %>
@@ -16,13 +39,39 @@
 <%= search_form_for @search, url: incases_path, method: :get, html: { class: "flex items-center space-x-2 flex-wrap  mb-4" } do |f| %>
   <%= f.search_field :unumber_or_items_barcode_or_carnumber_cont, value: params.dig(:q, :unumber_or_items_barcode_or_carnumber_cont), placeholder: t('.incases_search'), class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "min-width: 400px;" %>
   <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.incase.company_id'), 
-  class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" %>
-  <%= f.collection_select :incase_status_id_eq, IncaseStatus.all, :id, :title, 
-      { include_blank: false, prompt: t('activerecord.attributes.incase.incase_status_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
-  <%= f.collection_select :incase_tip_id_eq, IncaseTip.all, :id, :title, 
-      { include_blank: false, prompt: t('activerecord.attributes.incase.incase_tip_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
+  class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md"%>
+  <% selected_status_ids = Array(params.dig(:q, :incase_status_id_in)).reject(&:blank?).map(&:to_s) %>
+  <div class="relative mb-3" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
+    <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_status_id') %>" data-action="click->multiselect-dropdown#toggle"
+            class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 180px;" >
+      <span data-multiselect-dropdown-target="label"><%= selected_status_ids.size == 0 ? t('activerecord.attributes.incase.incase_status_id') : "#{selected_status_ids.size} выбрано" %></span>
+      <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+    </button>
+    <div data-multiselect-dropdown-target="panel" class="hidden absolute top-full left-0 mt-1 w-full max-h-80 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg z-10 py-1">
+      <% IncaseStatus.all.each do |status| %>
+        <label class="flex items-center gap-1 px-1 py-1 hover:bg-gray-50 cursor-pointer text-sm">
+          <%= check_box_tag "q[incase_status_id_in][]", status.id, selected_status_ids.include?(status.id.to_s), class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500" %>
+          <%= status.title %>
+        </label>
+      <% end %>
+    </div>
+  </div>
+  <% selected_tip_ids = Array(params.dig(:q, :incase_tip_id_in)).reject(&:blank?).map(&:to_s) %>
+  <div class="relative mb-3" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
+    <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_tip_id') %>" data-action="click->multiselect-dropdown#toggle"
+            class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 180px;" >
+      <span data-multiselect-dropdown-target="label"><%= selected_tip_ids.size == 0 ? t('activerecord.attributes.incase.incase_tip_id') : "#{selected_tip_ids.size} выбрано" %></span>
+      <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+    </button>
+    <div data-multiselect-dropdown-target="panel" class="hidden absolute top-full left-0 mt-1 w-full max-h-80 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg z-10 py-1">
+      <% IncaseTip.all.each do |tip| %>
+        <label class="flex items-center gap-1 px-1 py-1 hover:bg-gray-50 cursor-pointer text-sm">
+          <%= check_box_tag "q[incase_tip_id_in][]", tip.id, selected_tip_ids.include?(tip.id.to_s), class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500" %>
+          <%= tip.title %>
+        </label>
+      <% end %>
+    </div>
+  </div>
   <%= f.collection_select :strah_id_eq, Company.strah.limit(20), :id, :short_title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.strah_id') }, 
       { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>

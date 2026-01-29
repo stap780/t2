@@ -1,7 +1,7 @@
 class IncaseDublsController < ApplicationController
   include ActionView::RecordIdentifier
   
-  before_action :set_incase_dubl, only: %i[show merge merge_to_existing merge_to_new destroy]
+  before_action :set_incase_dubl, only: %i[show merge merge_to_existing merge_to_new update_totalsum destroy]
   
   def index
     @search = IncaseDubl.ransack(params[:q])

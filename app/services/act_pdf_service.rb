@@ -24,11 +24,40 @@ class ActPdfService
     company = @act.company
     strahcompany = @act.strah
 
-    # Шапка: Информация о компании (принимающая сторона)
     font_name = @use_cyrillic_font ? 'Verdana' : 'Helvetica'
     pdf.font(font_name) do
-      pdf.text company.title, size: 12, style: :bold if company&.title.present?
-      pdf.text company.fact_address, size: 10 if company&.fact_address.present?
+      # Шапка: Информация о компании (принимающая сторона) + контакты справа
+      left_header_lines = []
+      left_header_lines << company.title if company&.title.present?
+      left_header_lines << company.fact_address if company&.fact_address.present?
+      # Последняя планируемая дата визита + комментарий (если есть)
+      left_header_lines << company.company_plan_dates_data if company&.company_plan_dates_data.present?
+
+      right_header_lines = []
+      if company
+        # Берём всех контактов компании с заполненным телефоном
+        contacts_with_phone =
+          company.client_companies.includes(:client).map(&:client).compact.select { |c| c.phone.present? }
+
+        contacts_with_phone.each do |client|
+          # Используем full_name, чтобы не придумывать новый формат
+          right_header_lines << client.full_name
+        end
+      end
+
+      header_data = [[
+        left_header_lines.join("\n"),
+        right_header_lines.join(", ")
+      ]]
+
+      pdf.table(header_data, header: false, column_widths: [pdf.bounds.width * 0.5, pdf.bounds.width * 0.5]) do |table|
+        table.cells.font = font_name
+        table.cells.size = 9
+        table.cells.border_width = 0
+        table.row(0).columns(0).font_style = :bold
+        table.row(0).columns(1).align = :right
+      end
+
       pdf.move_down 10
 
 
@@ -112,15 +141,19 @@ class ActPdfService
       incases = @act.items.includes(:incase).map(&:incase).uniq.compact
 
       # Минимальная высота для футера с подписями
-      # Футер размещается на footer_y = 35 от низа страницы, имеет высоту 25
-      # margin bottom = 15, поэтому относительно bounds.bottom футер начинается на высоте 35 - 15 = 20
-      # Добавляем отступ (15) для безопасности, чтобы контент не накладывался на футер
       footer_min_height = 20 + 15  # 35 точек от bounds.bottom
+      # Оценка высоты: заголовок заявки ~25pt, одна строка позиции ~25pt, отступ после блока 10pt
+      row_height = 25
+      incase_header_height = 25
+      incase_footer_gap = 10
 
       incases.sort_by(&:date).each do |incase|
-        # Проверяем доступное место перед добавлением заголовка заявки
-        # Заголовок занимает примерно 20-25 точек
-        if pdf.cursor < footer_min_height + 25
+        act_items_from_incase = @act.items.where(incase: incase).order(:title)
+        block_height = incase_header_height + act_items_from_incase.size * row_height + incase_footer_gap
+        available_height = pdf.cursor - footer_min_height
+
+        # Если вся заявка не помещается на текущей странице — переносим её целиком на новую
+        if block_height > available_height
           pdf.start_new_page
         end
 
@@ -140,13 +173,9 @@ class ActPdfService
           table.cells.size = 9
         end
 
-        # Позиции этой заявки, включенные в акт
-        act_items_from_incase = @act.items.where(incase: incase).order(:title)
-
         act_items_from_incase.each do |item|
-          # Проверяем доступное место перед добавлением каждой позиции
-          # Каждая позиция занимает примерно 20-25 точек
-          if pdf.cursor < footer_min_height + 25
+          # На случай очень длинной заявки: не рисовать поверх футера
+          if pdf.cursor < footer_min_height + row_height
             pdf.start_new_page
           end
 

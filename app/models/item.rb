@@ -29,9 +29,14 @@ class Item < ApplicationRecord
   
   attribute :item_status_title
 	
-	def self.file_export_attributes
-    attribute_names - ["id","incase_id","item_status_id","variant_id","created_at","updated_at"]
-	end
+  def self.file_export_attributes
+    # Базовый порядок: сначала название и статус, затем остальные поля
+    attrs = attribute_names - %w[id incase_id item_status_id variant_id created_at updated_at]
+    base  = %w[title item_status_title]
+
+    # Сначала base в заданном порядке, затем все остальные атрибуты
+    (base & attrs) + (attrs - base)
+  end
   
   def self.ransackable_attributes(auth_object = nil)
     # Разрешаем поиск не только по колонкам, но и по вычисляемому атрибуту `barcode`,

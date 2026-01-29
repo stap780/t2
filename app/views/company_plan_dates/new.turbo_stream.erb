@@ -1,6 +1,4 @@
 <%= turbo_stream.append "company_plan_dates",
     partial: "company_plan_dates/company_plan_date",
     locals: { company_plan_date: @company_plan_date, company: @company } %>
-<%= turbo_stream.update "company_plan_dates_header" do %>
-  <legend class="text-sm font-medium text-gray-700"><%= t("company_plan_dates.title") %></legend>
-<% end %>
+<%= turbo_stream.replace "company_plan_dates_header", partial: "company_plan_dates/company_plan_dates_header", locals: { company: @company } %>
