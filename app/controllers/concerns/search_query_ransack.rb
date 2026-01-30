@@ -11,7 +11,7 @@ module SearchQueryRansack
   # CHECK THE SESSION FOR SEARCH PARAMETERS IS THEY AREN'T IN THE REQUEST
   def search_params
     # Если контроллер IncasesController, просто возвращаем params[:q]
-    return params[:q] if self.class.name == "IncasesController"
+    # return params[:q] if self.class.name == "IncasesController"
 
     if params[:q] == nil
       params[:q] = session[search_key]

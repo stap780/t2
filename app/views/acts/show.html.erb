@@ -1,3 +1,4 @@
+<%= turbo_stream_from dom_id(@act, :show) %>
 <div class="max-w-7xl mx-auto" data-controller="choose">
   <div class="flex items-center justify-between mb-6">
     <%= link_to t('.back_to_list'), acts_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
@@ -47,9 +48,7 @@
 
   <!-- Hidden form for printing selected items' etiketas -->
   <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf),
-                method: :post,
-                id: :act_items_print_form,
-                local: true do |f| %>
+      method: :post, id: :act_items_print_form, local: true do |f| %>
   <% end %>
 
   <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -80,12 +79,7 @@
         </div>
         <div>
           <span class="text-sm text-gray-500"><%= t('.status') %>:</span>
-          <%= form_with model: @act do |f| %>
-            <%= f.select :status, options_for_select(Act.statuses.keys.map { |k| [t("enums.act.status.#{k}"), k] }, @act.status), { include_blank: false }, 
-                onchange: 'this.form.requestSubmit();', 
-                class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
-                style: "max-width: 250px;" %>
-          <% end %>
+          <%= render "acts/status", act: @act %>
         </div>
         <div>
           <% if @act.driver.present? %>

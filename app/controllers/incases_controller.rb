@@ -203,7 +203,6 @@ class IncasesController < ApplicationController
     end
   end
 
-
   private
 
   def generate_pdf_for_incase(incase)
@@ -324,7 +323,7 @@ class IncasesController < ApplicationController
 
   def incase_params
     params.require(:incase).permit(
-      :region, :strah_id, :stoanumber, :unumber, :company_id, :carnumber, 
+      :region, :sendstatus, :strah_id, :stoanumber, :unumber, :company_id, :carnumber, 
       :date, :modelauto, :totalsum, :incase_status_id, :incase_tip_id,
       items_attributes: [:id, :variant_id, :title, :quantity, :katnumber, 
                          :price, :sum, :item_status_id, :vat, :supplier_code, :_destroy],

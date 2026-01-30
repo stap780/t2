@@ -1,6 +1,6 @@
 <div class="bg-white w-full min-w-0" data-action="itemSumChanged@window->totalsum-calculator#updateTotal">
   <div class="mb-2 flex items-center justify-between">
-    <legend class="text-sm font-medium text-gray-700"><%= t('items.heading') %></legend>
+    <legend class="text-sm font-medium text-gray-700"><%= t('items.heading') %><span class="text-xs text-gray-500 ms-2"><%= incase.items.count %></span></legend>
     <% path = incase.new_record? ? new_item_path(incase_id: nil) : new_incase_item_path(incase) %>
     <%= link_to t('items.new.title'), path, data: { turbo_stream: true },
         class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" %>

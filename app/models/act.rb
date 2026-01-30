@@ -17,7 +17,7 @@ class Act < ApplicationRecord
   
   after_create :set_number_from_id
   after_create_commit { broadcast_prepend_to 'acts' }
-  after_update_commit { broadcast_replace_to 'acts' }
+  after_update_commit { broadcast_replace_to dom_id(self, :show), target: dom_id(self, :status), partial: "acts/status", locals: { act: self } }
   
   enum :status, {
     pending: 'pending',
@@ -205,6 +205,23 @@ class Act < ApplicationRecord
     end
 
     created_act_ids
+  end
+
+  # Пересчёт статуса акта по статусам позиций убытков (как в carpats).
+  # Если у хотя бы одного убытка в акте есть позиция со статусом «Да», «Нет» или «Долг» — акт закрывается.
+  def self.recalculate_status_from_items(act)
+    return unless act.pending? || act.in_progress? || act.sent?
+
+    act.incases.each do |incase|
+      status_titles = incase.items.includes(:item_status).map { |item| item.item_status&.title }.compact
+      next if status_titles.empty?
+
+      closing_statuses = %w[Да Нет Долг]
+      if status_titles.any? { |title| closing_statuses.include?(title) }
+        act.update(status: :closed)
+        break
+      end
+    end
   end
 
   # Вычисление следующего рабочего дня (понедельник-пятница)

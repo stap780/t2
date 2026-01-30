@@ -113,6 +113,7 @@ class Item < ApplicationRecord
   def recalculate_incase_status
     return unless incase_id.present?
     Incase.recalculate_status_from_items(incase_id)
+    acts.each { |act| Act.recalculate_status_from_items(act) }
   end
 
   def recalculate_incase_status_after_destroy

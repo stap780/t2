@@ -47,8 +47,8 @@
       <span data-multiselect-dropdown-target="label"><%= selected_status_ids.size == 0 ? t('activerecord.attributes.incase.incase_status_id') : "#{selected_status_ids.size} выбрано" %></span>
       <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
     </button>
-    <div data-multiselect-dropdown-target="panel" class="hidden absolute top-full left-0 mt-1 w-full max-h-80 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg z-10 py-1">
-      <% IncaseStatus.all.each do |status| %>
+    <div data-multiselect-dropdown-target="panel" class="hidden absolute top-full left-0 mt-1 w-full max-h-120 overflow-auto bg-white border border-gray-300 rounded-md shadow-lg z-10 py-1">
+      <% IncaseStatus.all.reverse_each do |status| %>
         <label class="flex items-center gap-1 px-1 py-1 hover:bg-gray-50 cursor-pointer text-sm">
           <%= check_box_tag "q[incase_status_id_in][]", status.id, selected_status_ids.include?(status.id.to_s), class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500" %>
           <%= status.title %>

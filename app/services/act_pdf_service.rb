@@ -32,6 +32,7 @@ class ActPdfService
       left_header_lines << company.fact_address if company&.fact_address.present?
       # Последняя планируемая дата визита + комментарий (если есть)
       left_header_lines << company.company_plan_dates_data if company&.company_plan_dates_data.present?
+      left_header_lines << company.info
 
       right_header_lines = []
       if company
@@ -41,7 +42,7 @@ class ActPdfService
 
         contacts_with_phone.each do |client|
           # Используем full_name, чтобы не придумывать новый формат
-          right_header_lines << client.full_name
+          right_header_lines << client.full_name.gsub(client.email, '')
         end
       end
 
@@ -183,9 +184,9 @@ class ActPdfService
             [
               { content: "#{item.title} (#{item.katnumber})", colspan: 2 },
               if item.item_status&.title == "Долг"
-                { content: "☐ Да ☐ Нет Примечание: #{item.item_status.title}", colspan: 1 }
+                { content: "[ ] Да [ ] Нет Примечание: #{item.item_status.title}", colspan: 1 }
               else
-                { content: "☐ Да ☐ Нет Примечание: ", colspan: 1 }
+                { content: "[ ] Да [ ] Нет Примечание: ", colspan: 1 }
               end
             ]
           ]

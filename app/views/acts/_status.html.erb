@@ -1,0 +1,8 @@
+<%= turbo_frame_tag dom_id(act, :status) do %>
+    <%= form_with model: act do |f| %>
+        <%= f.select :status, options_for_select(Act.statuses.keys.map { |k| [t("enums.act.status.#{k}"), k] }, act.status), { include_blank: false }, 
+            onchange: 'this.form.requestSubmit();', 
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
+            style: "max-width: 250px;" %>
+    <% end %>
+<% end %>
