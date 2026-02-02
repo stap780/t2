@@ -7,7 +7,7 @@ class IncaseDubl < ApplicationRecord
   has_many :incase_item_dubls, dependent: :destroy
   
   def existing_incase
-    Incase.find_by(unumber: unumber)
+    Incase.find_by_unumber_and_stoanumber(unumber, stoanumber)
   end
   
   def differences

@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(incase), class: "grid grid-cols-[40px_95px_95px_170px_160px_100px_120px_110px_110px_40px_30px] gap-2 px-3 py-2 border-b hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(incase), class: "grid grid-cols-[40px_85px_85px_220px_160px_100px_120px_110px_110px_40px_30px] gap-1 px-2 py-2 border-b hover:bg-gray-50 items-center" do %>
   <div class="flex flex-col">
     <%= check_box_tag "incase_ids[]", incase.id, false, {
       class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
@@ -9,14 +9,14 @@
   </div>
   <div>
     <% if incase.incase_status.present? %>
-      <span class="px-2 py-1 text-xs font-medium rounded text-gray-600" style="border: 1px solid <%= incase.incase_status.color %>;">
+      <span class="px-1 py-1 text-xs font-medium rounded text-gray-600" style="border: 1px solid <%= incase.incase_status.color %>;">
         <%= incase.incase_status.title %>
       </span>
     <% end %>
   </div>
   <div>
     <% if incase.incase_tip.present? %>
-      <span class="px-2 py-1 text-xs font-medium rounded text-gray-600" style='border: 1px solid <%= incase.incase_tip.color %>;'>  
+      <span class="px-1 py-1 text-xs font-medium rounded text-gray-600" style='border: 1px solid <%= incase.incase_tip.color %>;'>  
         <%= incase.incase_tip.title %>
       </span>
     <% end %>

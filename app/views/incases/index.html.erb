@@ -83,6 +83,19 @@
     <%= f.label :date_lteq, "Дата до", class: "block text-sm font-medium text-gray-700 mb-1" %>
     <%= f.date_field :date_lteq, class: "h-8 px-2 py-1 mb-4 border border-gray-300 rounded-md" %>
   </div>
+  <div class="mb-4" data-controller="checkbox">
+    <div class="block text-sm font-medium text-gray-700 mb-1">Сумма</div>
+    <div class="flex flex-wrap gap-4 h-8">
+      <div class="flex items-center space-x-2">
+        <%= check_box_tag "q[totalsum_gteq]", "1", params.dig(:q, :totalsum_gteq).present?, class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500", data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" } %>
+        <%= label_tag "q_totalsum_gteq", "Есть", class: "text-sm text-gray-700" %>
+      </div>
+      <div class="flex items-center space-x-2">
+        <%= check_box_tag "q[totalsum_blank_eq]", "true", params.dig(:q, :totalsum_blank_eq).to_s == 'true', class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500", data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" } %>
+        <%= label_tag "q_totalsum_blank_eq", "Нет", class: "text-sm text-gray-700" %>
+      </div>
+    </div>
+  </div>
   <%= f.submit t('.search'), class: "h-8 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 mb-3 mt-5" %>
   <%= link_to incases_path(search_cancel: true), class: "h-8 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center mb-3 mt-5", title: t('.clear') do %>
     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +107,7 @@
 <%= turbo_stream_from "incases" %>
 
 <div class="bg-white rounded-lg shadow divide-y" data-controller="selectall">
-  <div class="grid grid-cols-[40px_95px_95px_170px_160px_100px_120px_110px_110px_40px_30px] gap-2 px-3 py-4 font-medium text-gray-700">
+  <div class="grid grid-cols-[40px_85px_85px_220px_160px_100px_120px_110px_110px_40px_30px] gap-1 px-2 py-4 font-medium text-gray-700">
     <div>
       <%= check_box_tag "select_all", "1", false, {
         class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500',

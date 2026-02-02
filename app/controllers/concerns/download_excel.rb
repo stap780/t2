@@ -45,8 +45,8 @@ module DownloadExcel
     when 'filtered'
       if controller_name == 'incases'
         base_relation = Incase.includes(:company, :strah)
-        search_params_hash = search_params || {}
-        processed_params = process_multiple_unumber_search(search_params_hash.dup)
+        search_params_hash = (search_params || {}).dup
+        processed_params = process_multiple_unumber_search(search_params_hash)
         searching_by_barcode = processed_params.keys.any? { |key| key.to_s.include?('items_barcode') }
         base_relation = base_relation.left_joins(items: :variant) if searching_by_barcode
         collection_ids = base_relation.ransack(processed_params).result(distinct: true).pluck(:id)

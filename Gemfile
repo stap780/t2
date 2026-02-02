@@ -75,6 +75,8 @@ gem 'acts_as_list'
 
 gem 'receipts'
 
+gem 'activerecord-session_store'
+
 # Audit trail for models
 gem 'audited', '~> 5.0'
 gem 'audited-ui'  # UI для audited

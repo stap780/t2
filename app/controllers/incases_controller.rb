@@ -13,10 +13,10 @@ class IncasesController < ApplicationController
     end
     # Join items and variants if searching by items_barcode
     base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
-    search_params_hash = search_params || {}
+    search_params_hash = (search_params || {}).dup
 
     # Process multiple unumber search
-    processed_params = process_multiple_unumber_search(search_params_hash.dup)
+    processed_params = process_multiple_unumber_search(search_params_hash)
     
     searching_by_barcode = processed_params.keys.any? { |key| key.to_s.include?('items_barcode') }
     

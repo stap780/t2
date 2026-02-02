@@ -55,12 +55,27 @@ class Incase < ApplicationRecord
   end
   
   def self.ransackable_attributes(auth_object = nil)
-    # attribute_names
-    super
+    super + %w[totalsum_blank]
+  end
+
+  # Ransacker для фильтра «Без суммы»: totalsum IS NULL OR totalsum = 0
+  ransacker :totalsum_blank do
+    Arel.sql("(#{table_name}.totalsum IS NULL OR #{table_name}.totalsum = 0)")
   end
 
   def self.ransackable_associations(auth_object = nil)
     %w[associated_audits audits company items strah incase_status incase_tip]
+  end
+
+  # Поиск убытка по паре (unumber, stoanumber). Пустой stoanumber (nil, '') считаем одним значением.
+  def self.find_by_unumber_and_stoanumber(unumber, stoanumber)
+    return nil if unumber.blank?
+    normalized_sto = stoanumber.to_s.strip.presence
+    if normalized_sto.nil?
+      where(unumber: unumber).where(stoanumber: [nil, '']).first
+    else
+      find_by(unumber: unumber, stoanumber: normalized_sto)
+    end
   end
 
   scope :unsent, -> { where(sendstatus: nil) }

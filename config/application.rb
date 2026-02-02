@@ -28,6 +28,10 @@ module T2
   # Localization
   config.i18n.available_locales = [:ru, :en]
   config.i18n.default_locale = :ru
-    # config.eager_load_paths << Rails.root.join("extras")
+
+  # Сессия в БД (таблица ar_sessions), чтобы не упираться в лимит cookie 4 KB
+  config.session_store :active_record_store, key: "_t2_session"
+
+  # config.eager_load_paths << Rails.root.join("extras")
   end
 end

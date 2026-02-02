@@ -10,14 +10,14 @@ module SearchQueryRansack
 
   # CHECK THE SESSION FOR SEARCH PARAMETERS IS THEY AREN'T IN THE REQUEST
   def search_params
-    # Если контроллер IncasesController, просто возвращаем params[:q]
-    # return params[:q] if self.class.name == "IncasesController"
-
-    if params[:q] == nil
+    if params[:q].nil?
       params[:q] = session[search_key]
     end
-    if params[:q]
-      session[search_key] = params[:q]
+    if params[:q].present?
+      # В сессию кладём только обычный Hash (без ActionController::Parameters),
+      # иначе Marshal.dump падает на "can't dump IO" при active_record_store
+      raw = params[:q]
+      session[search_key] = raw.respond_to?(:to_unsafe_h) ? raw.to_unsafe_h : raw.to_h
     end
     params[:q]
   end

@@ -271,8 +271,9 @@ module IncaseJsonImporter
       raise "Both strah_company and company are missing for unumber: #{unumber}"
     end
     
-    # Find existing incase
-    existing_incase = Incase.find_by(unumber: unumber)
+    # Find existing incase by (unumber, stoanumber) with normalization of blank stoanumber
+    stoanumber = (case_data['stoanumber'] || case_data['number_z_n_stoa'])&.strip
+    existing_incase = Incase.find_by_unumber_and_stoanumber(unumber, stoanumber)
     
     if existing_incase.present?
       # Check for differences

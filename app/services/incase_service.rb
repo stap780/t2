@@ -124,26 +124,31 @@ class IncaseService
     
     unumber = row['Номер дела']&.to_s&.strip
     return if unumber.blank?
-    
+    stoanumber = row['Номер З/Н СТОА']&.to_s&.strip
+
     begin
       # Поиск/создание компаний
       strah_company = find_or_create_company(row['Страховая компания']&.to_s&.strip, 'strah')
       company = find_or_create_company(row['Контрагент']&.to_s&.strip, 'standart')
-      
-      # Поиск существующего убытка
-      existing_incase = Incase.find_by(unumber: unumber)
-      
+
+      # Поиск существующего убытка по паре (unumber + stoanumber)
+      existing_incase = Incase.find_by_unumber_and_stoanumber(unumber, stoanumber)
+
       if existing_incase.present?
         # Проверка на дату для создания вторых и так далее деталей убытка (как в carpats)
         parsed_date = parse_date(row['Дата выкладки Акта п-п в папку СК'])
-        
+
         if parsed_date.to_date == existing_incase.date.to_date
           # Дата совпадает - добавляем позицию в существующий убыток
           add_item_if_not_exists(existing_incase, row)
           @success_count += 1
         else
-          # Дата не совпадает - создаем дубль (как в carpats)
-          create_incase_dubl(row, strah_company, company)
+          # Дата не совпадает
+          if avilon_ag?(company)
+            apply_avilon_ag_logic(existing_incase, row, strah_company, company)
+          else
+            create_incase_dubl(row, strah_company, company)
+          end
           @success_count += 1
         end
       else
@@ -248,11 +253,11 @@ class IncaseService
   def add_item_if_not_exists(incase, row_data)
     title = row_data['Деталь']&.to_s&.strip
     katnumber = row_data['Каталожный_номер']&.to_s&.strip
-    
+
     # Проверяем позицию по title и katnumber (как в carpats - detalname и katnumber)
     existing_item = incase.items.where(title: title, katnumber: katnumber).first
     return if existing_item.present?
-    
+
     # Создать новую позицию (автоматически создастся Product и Variant)
     incase.items.create!(
       title: title,
@@ -261,6 +266,54 @@ class IncaseService
       katnumber: katnumber,
       supplier_code: row_data['Код поставщика']&.to_s&.strip
     )
+  end
+
+  AVILON_AG_SHORT_TITLE = 'Авилон АГ'
+
+  def avilon_ag?(company)
+    company&.short_title == AVILON_AG_SHORT_TITLE
+  end
+
+  # Логика для станции «Авилон АГ» при импорте дублирующего убытка (другая дата).
+  # 1) Оба без суммы: новые детали добавляем; дублирующие — статус «Долг», кроме «Да»/«В работе».
+  # 2) Убыток без суммы, дубль с суммой: вносим сумму и дату из дубля; новые детали добавляем; дублирующие не трогаем.
+  # 3) Убыток с суммой, дубль без суммы: дублирующим ставим «Долг», кроме «Да»/«В работе»; дату и сумму не трогаем.
+  # 4) Оба с суммой: обычный дубль (create_incase_dubl).
+  def apply_avilon_ag_logic(existing_incase, row, strah_company, company)
+    incase_has_sum = existing_incase.totalsum.to_f.positive?
+    dubl_sum = parse_decimal(row['Сумма заказ наряда'])
+    dubl_has_sum = dubl_sum.to_f.positive?
+    katnumber = row['Каталожный_номер']&.to_s&.strip
+    duplicate_items = existing_incase.items.includes(:item_status).where(katnumber: katnumber).to_a
+
+    dolg_status = ItemStatus.find_by(title: 'Долг')
+    skip_status_titles = %w[Да В работе]
+
+    if !incase_has_sum && !dubl_has_sum
+      # 1) Оба без суммы
+      add_item_if_not_exists(existing_incase, row)
+      set_duplicate_items_to_dolg(existing_incase, duplicate_items, dolg_status, skip_status_titles)
+    elsif !incase_has_sum && dubl_has_sum
+      # 2) Убыток без суммы, дубль с суммой
+      parsed_date = parse_date(row['Дата выкладки Акта п-п в папку СК'])
+      existing_incase.update!(totalsum: dubl_sum, date: parsed_date)
+      add_item_if_not_exists(existing_incase, row)
+    elsif incase_has_sum && !dubl_has_sum
+      # 3) Убыток с суммой, дубль без суммы
+      set_duplicate_items_to_dolg(existing_incase, duplicate_items, dolg_status, skip_status_titles)
+    else
+      # 4) Оба с суммой — обычный дубль
+      create_incase_dubl(row, strah_company, company)
+    end
+  end
+
+  def set_duplicate_items_to_dolg(existing_incase, duplicate_items, dolg_status, skip_status_titles)
+    return if dolg_status.blank?
+    duplicate_items.each do |item|
+      next if item.item_status.blank?
+      next if skip_status_titles.include?(item.item_status.title)
+      item.update!(item_status_id: dolg_status.id)
+    end
   end
   
   def create_new_incase(row_data, strah_company, company)
