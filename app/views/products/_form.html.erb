@@ -12,9 +12,12 @@
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-white rounded-lg shadow p-6">
           
-          <%= turbo_frame_tag dom_id(product, :title), class: "mb-4" do %>
-            <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= f.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+          <%= turbo_frame_tag dom_id(product, :title), class: "mb-4", data: { controller: "character-counter" } do %>
+            <%=tag.div class: "flex items-center justify-between gap-1 mb-1" do %>
+              <%= f.label :title, class: "block text-sm font-medium text-gray-700" %>
+              <%=tag.span class: "text-sm text-gray-500", data: { character_counter_target: "counter" }%>
+            <% end %>
+            <%= f.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-md", data: { character_counter_target: "input" }, maxlength: "50" %>
           <% end %>
 
           <%= turbo_frame_tag dom_id(product, :description), class: "mb-4" do %>

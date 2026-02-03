@@ -19,6 +19,18 @@ class CompaniesController < ApplicationController
 
   def edit; end
 
+  def search
+    if params[:title].present?
+      @search_results = Company.ransack(short_title_cont: params[:title]).result
+        .limit(20)
+        .map { |company| { title: company.short_title, id: company.id } }
+        .reject(&:blank?)
+      render json: @search_results, status: :ok
+    else
+      render json: [], status: :ok
+    end
+  end
+
   def create
     @company = Company.new(company_params)
     respond_to do |format|
@@ -95,5 +107,6 @@ class CompaniesController < ApplicationController
         ]
       ])
   end
+
 end
 

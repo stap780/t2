@@ -137,6 +137,7 @@ Rails.application.routes.draw do
     collection do
       post :download
       post :bulk_delete
+      post :search
     end
     resources :client_companies, only: [:new, :create, :destroy]
     resources :company_plan_dates, only: [:new, :create, :destroy]
