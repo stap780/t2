@@ -167,7 +167,7 @@ class ActPdfService
           ]
         ]
 
-        pdf.table(incase_header_data, header: false, column_widths: [145, 205, 210]) do |table|
+        pdf.table(incase_header_data, header: false, column_widths: [145, 225, 190]) do |table|
           table.row(0).font_style = :bold
           table.row(0).background_color = 'E0E0E0'
           table.cells.font = font_name
@@ -182,16 +182,16 @@ class ActPdfService
 
           item_data = [
             [
-              { content: "#{item.title} (#{item.katnumber})", colspan: 2 },
+              { content: "#{item.title} (#{item.katnumber}) (#{item.barcode})", colspan: 2 },
               if item.item_status&.title == "Долг"
-                { content: "[ ] Да [ ] Нет Примечание: #{item.item_status.title}", colspan: 1 }
+                { content: "[ ] Да [ ] Нет / #{item.item_status.title}", colspan: 1 }
               else
-                { content: "[ ] Да [ ] Нет Примечание: ", colspan: 1 }
+                { content: "[ ] Да [ ] Нет / ", colspan: 1 }
               end
             ]
           ]
 
-          pdf.table(item_data, header: false, column_widths: [205, 145, 210]) do |table|
+          pdf.table(item_data, header: false, column_widths: [225, 145, 190]) do |table|
             table.row(0).borders = [:bottom]
             table.row(0).border_width = 0.5
             table.row(0).border_color = 'CCCCCC'
