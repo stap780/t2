@@ -97,6 +97,9 @@ Rails.application.routes.draw do
   end
 
   resources :exports, only: [:index, :new, :create, :edit, :update, :destroy] do
+    collection do
+      get :xml_avito_example
+    end
     member do
       get :download
       get :file

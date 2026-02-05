@@ -1,0 +1,179 @@
+<div class="bg-white p-3 rounded-lg border border-green-200">
+    <p class="text-xs font-semibold text-green-700 mb-2"><%= t("exports.form.example_avito_template") %></p>
+    <p class="text-xs text-green-600 mb-2"><%= t("exports.form.features_note") %></p>
+    <code class="block text-xs text-green-900 font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!-- 
+  ШАБЛОН XML ДЛЯ ЭКСПОРТА НА АВИТО
+  
+  Структура данных:
+  - export.data - массив всех товаров (Product)
+  - product - один товар из массива
+  - product.variants - массив вариантов товара (обычно используется первый)
+  - product.features - массив для итерации: [{ property: "...", characteristic: "..." }]
+  - product.images_zap - массив URL изображений с водяным знаком
+  
+  Доступ к features:
+  - Итерация: for feature in product.features
+--&gt;
+&lt;Ads formatVersion="3" target="Avito.ru"&gt;
+{%- comment -%} Перебираем все товары из экспорта {%- endcomment -%}
+{%- for product in export.data %}
+  {%- comment -%} Получаем первый вариант товара для основных данных (SKU, цена, количество) {%- endcomment -%}
+  {%- assign first_variant = product.variants.first %}
+  
+  {%- comment -%} Экспортируем только активные товары {%- endcomment -%}
+  {%- if product.status == 'active' %}
+    &lt;Ad&gt;
+      {%- comment -%} ОБЯЗАТЕЛЬНЫЕ ПОЛЯ АВИТО {%- endcomment -%}
+      &lt;Id&gt;{{ product.id }}&lt;/Id&gt;
+      &lt;ListingFee&gt;Package&lt;/ListingFee&gt;
+      &lt;AdStatus&gt;Free&lt;/AdStatus&gt;
+      &lt;Category&gt;Запчасти и аксессуары&lt;/Category&gt;
+      &lt;ContactPhone&gt;+74991104931&lt;/ContactPhone&gt;
+      
+      {%- comment -%} РЕГИОН И АДРЕС (через цикл по features) {%- endcomment -%}
+      {%- comment -%} Используйте реальное название свойства из вашей базы данных {%- endcomment -%}
+      {%- assign region_found = false %}
+      {%- assign address_found = false %}
+      {%- for feature in product.features %}
+        {%- if feature.property == 'Регион' %}
+        &lt;Region&gt;{{ feature.characteristic }}&lt;/Region&gt;
+        {%- assign region_found = true %}
+        {%- elsif feature.property == 'Адрес' %}
+        &lt;Address&gt;{{ feature.characteristic }}&lt;/Address&gt;
+        {%- assign address_found = true %}
+        {%- endif %}
+      {%- endfor %}
+      {%- unless region_found %}
+      &lt;Region&gt;Котельники&lt;/Region&gt;
+      {%- endunless %}
+      {%- unless address_found %}
+      &lt;Address&gt;Люберцы&lt;/Address&gt;
+      {%- endunless %}
+      
+      {%- comment -%} НАЗВАНИЕ ТОВАРА {%- endcomment -%}
+      &lt;Title&gt;{{ product.title }}&lt;/Title&gt;
+      
+      {%- comment -%} ОПИСАНИЕ ТОВАРА (формируем через capture для CDATA) {%- endcomment -%}
+      {%- capture desc %}
+        {%- comment -%} Итерация по всем свойствам (выводит все features) {%- endcomment -%}
+        {%- for feature in product.features %}
+        &lt;p&gt;&lt;b&gt;{{ feature.property }}:&lt;/b&gt; {{ feature.characteristic }}&lt;/p&gt;
+        {%- endfor %}
+        
+        {%- comment -%} Данные из варианта товара {%- endcomment -%}
+        {%- if first_variant.sku %}
+        &lt;p&gt;Номер запчасти: {{ first_variant.sku }}&lt;/p&gt;
+        {%- endif %}
+        
+        {%- if first_variant.barcode %}
+        &lt;p&gt;Артикул: {{ first_variant.barcode }}&lt;/p&gt;
+        {%- endif %}
+        
+        {%- if first_variant.quantity %}
+        &lt;p&gt;Количество: {{ first_variant.quantity }}&lt;/p&gt;
+        {%- endif %}
+        
+        {%- comment -%} Гарантия (через цикл по features) {%- endcomment -%}
+        {%- comment -%} Используйте реальное название свойства из вашей базы данных {%- endcomment -%}
+        {%- assign guaranty_found = false %}
+        {%- for feature in product.features %}
+          {%- if feature.property == 'Гарантия' %}
+            {%- if feature.characteristic == 'true' or feature.characteristic == 'да' %}
+            &lt;p&gt;Обмен и возврат в течение &lt;b&gt;14 дней&lt;/b&gt; при соблюдении условий эксплуатации&lt;/p&gt;
+            {%- else %}
+            &lt;p&gt;Обмена и возврата &lt;b&gt;нет&lt;/b&gt;&lt;/p&gt;
+            {%- endif %}
+            {%- assign guaranty_found = true %}
+          {%- endif %}
+        {%- endfor %}
+        {%- unless guaranty_found %}
+        &lt;p&gt;Обмена и возврата &lt;b&gt;нет&lt;/b&gt;&lt;/p&gt;
+        {%- endunless %}
+        
+        {%- comment -%} Описание товара {%- endcomment -%}
+        {%- if product.description %}
+        &lt;p&gt;{{ product.description }}&lt;/p&gt;
+        {%- endif %}
+        
+        {%- comment -%} Станция/склад (через цикл по features) {%- endcomment -%}
+        {%- comment -%} Используйте реальное название свойства из вашей базы данных {%- endcomment -%}
+        {%- for feature in product.features %}
+          {%- if feature.property == 'Станция' %}
+          &lt;p&gt;🚚 &lt;b&gt;Доставка и Самовывоз&lt;/b&gt; {{ feature.characteristic }}&lt;/p&gt;
+          {%- endif %}
+        {%- endfor %}
+        
+        {%- comment -%} Стандартная информация о доставке {%- endcomment -%}
+        &lt;p&gt;Доставка по Москве в пределах МКАД – 1000р.&lt;/p&gt;
+        &lt;p&gt;Доставка в регионы транспортными компаниями, доставка до ТК ПЭК – 250 р!&lt;/p&gt;
+        &lt;p&gt;Просьба перед выездом звонить для уточнения наличия и цены.&lt;/p&gt;
+        &lt;p&gt;Окончательное решение по применяемости б/у запчастей к своему ТС принимает клиент! В наличии более 50000 запчастей, б/у оригинал.&lt;/p&gt;
+      {%- endcapture %}
+      &lt;Description&gt;&lt;![CDATA[{{ desc }}]]&gt;&lt;/Description&gt;
+      
+      {%- comment -%} ЦЕНА (обязательное поле) {%- endcomment -%}
+      {%- if first_variant.price %}
+      &lt;Price&gt;{{ first_variant.price }}&lt;/Price&gt;
+      {%- endif %}
+      
+      {%- comment -%} OEM (номер запчасти) {%- endcomment -%}
+      {%- if first_variant.sku %}
+      &lt;OEM&gt;{{ first_variant.sku }}&lt;/OEM&gt;
+      {%- endif %}
+      
+      {%- comment -%} СПЕЦИАЛЬНЫЕ ПОЛЯ АВИТО (через цикл по features) {%- endcomment -%}
+      
+      {%- comment -%} 
+        Выводим специальные поля Avito через цикл по features
+        Используйте реальные названия свойств из вашей базы данных
+      {%- endcomment -%}
+      {%- assign has_condition = false %}
+      {%- for feature in product.features %}
+        {%- if feature.property == 'Марка' %}
+        &lt;Brand&gt;{{ feature.characteristic }}&lt;/Brand&gt;
+        {%- elsif feature.property == 'Состояние' %}
+        &lt;Condition&gt;{{ feature.characteristic }}&lt;/Condition&gt;
+        {%- assign has_condition = true %}
+        {%- elsif feature.property == 'TypeId' %}
+        &lt;TypeId&gt;{{ feature.characteristic }}&lt;/TypeId&gt;
+        {%- elsif feature.property == 'Видео' %}
+        &lt;VideoURL&gt;{{ feature.characteristic }}&lt;/VideoURL&gt;
+        {%- endif %}
+      {%- endfor %}
+      
+      {%- comment -%} Обязательное поле Condition, если не было найдено в features {%- endcomment -%}
+      {%- unless has_condition %}
+      &lt;Condition&gt;Б/у&lt;/Condition&gt;
+      {%- endunless %}
+      
+      {%- comment -%} Обязательное поле ProductType {%- endcomment -%}
+      &lt;ProductType&gt;Для автомобилей&lt;/ProductType&gt;
+      
+      {%- comment -%} ИЗОБРАЖЕНИЯ (используем zap варианты с водяным знаком, максимум 10 штук) {%- endcomment -%}
+      {%- if product.images_zap.size &gt; 0 %}
+      &lt;Images&gt;
+        {%- for image in product.images_zap limit: 10 %}
+        {%- if image %}
+        &lt;Image url="{{ image }}"/&gt;
+        {%- endif %}
+        {%- endfor %}
+      &lt;/Images&gt;
+      {%- elsif product.images.size &gt; 0 %}
+      {%- comment -%} Если zap вариантов нет, используем оригинальные {%- endcomment -%}
+      &lt;Images&gt;
+        {%- for image in product.images limit: 10 %}
+        {%- if image %}
+        &lt;Image url="{{ image }}"/&gt;
+        {%- endif %}
+        {%- endfor %}
+      &lt;/Images&gt;
+      {%- endif %}
+      
+    &lt;/Ad&gt;
+  {%- endif %}
+{%- endfor %}
+&lt;/Ads&gt;
+</code>
+</div>

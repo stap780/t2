@@ -52,7 +52,6 @@ class ExportsController < ApplicationController
     end
   end
 
-
   def cancel
     @export.cancel_pending_job
     @export.update(status: "pending")
@@ -105,6 +104,8 @@ class ExportsController < ApplicationController
     @export.destroy
     redirect_to exports_path, notice: t(".success")
   end
+
+  def xml_avito_example; end
 
   private
   

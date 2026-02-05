@@ -271,7 +271,12 @@ module CompanyJsonImporter
       company.weekdays = weekday_titles.map { |title| map_weekday_title_to_key(title) }.compact
     end
     
-    # Set info
+    # Set fact address (фактический адрес компании)
+    if company_data['address'].present?
+      company.fact_address = company_data['address'].strip
+    end
+    
+    # Set info (общая текстовая информация)
     info_parts = []
     info_parts << "#{company_data['phone']}" if company_data['phone'].present?
     info_parts << "#{company_data['email']}" if company_data['email'].present?

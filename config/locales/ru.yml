@@ -197,7 +197,7 @@ ru:
       deselect_all: "Снять выбор"
       no_item_fields: "Поля ещё недоступны. Сначала завершите импорт, чтобы появились поля."
       xml_required: "Требуется XML-шаблон"
-      xml_hint: "Используйте шаблоны Liquid для определения структуры XML. Импортированные данные доступны как структурированные объекты."
+      xml_hint: "Используйте переменные Liquid для определения структуры XML. Импортированные данные доступны как структурированные объекты."
       custom_xml_template: "Пользовательский XML-шаблон"
       template_placeholder: "Введите ваш Liquid XML шаблон здесь...\n\n<items>\n{% for item in data %}\n  <item>\n    <name>{{ item.name }}</name>\n    <email>{{ item.email }}</email>\n    <status>{{ item.status }}</status>\n  </item>\n{% endfor %}\n</items>"
       available_objects: "Доступные объекты Liquid"

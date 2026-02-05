@@ -15,7 +15,6 @@ export default class extends Controller {
 
     // Initialize CodeMirror from textarea
     this.editor = window.CodeMirror.fromTextArea(this.textarea, {
-      // mode: this.modeValue === "xml" ? "xml" : this.modeValue,
       mode: "htmlmixed",
       lineWrapping: true,
       lineNumbers: true,
@@ -30,8 +29,7 @@ export default class extends Controller {
       this.wrapper.appendChild(cmEl)
     }
 
-    this.editor.setSize("100%", "25rem")
-
+    this.editor.setSize("100%", "35rem")
 
     // Mirror changes back to textarea so form submits the value
     this.editor.on("change", () => {
@@ -39,7 +37,6 @@ export default class extends Controller {
       this.textarea.dispatchEvent(new Event("input", { bubbles: true }))
       this.textarea.dispatchEvent(new Event("change", { bubbles: true }))
     })
-
 
   }
 
