@@ -354,6 +354,21 @@ ru:
       saving: "Сохранение..."
       create: "Создать"
       update: "Обновить"
+  will_paginate:
+    previous_label: "&#8592; Назад"
+    next_label: "вперёд &#8594;"
+    page_gap: "&hellip;"
+    page_entries_info:
+      single_page:
+        zero:  "%{model} не найдена"
+        one:   "показана 1 %{model}"
+        other: "показаны все %{count} %{model}"
+      single_page_html:
+        zero:  "%{model} не найдена"
+        one:   "показана <b>1</b> %{model}"
+        other: "показаны <b>все&nbsp;%{count}</b> %{model}"
+      multi_page: "показана %{model} %{from} - %{to} из %{count} всего"
+      multi_page_html: "показана %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> из <b>%{count}</b> всего"  
   users:
     index:
       title: "Пользователи"
