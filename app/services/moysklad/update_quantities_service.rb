@@ -269,5 +269,6 @@ class Moysklad::UpdateQuantitiesService
     Rails.logger.error "Moysklad::UpdateQuantitiesService: Error creating email delivery: #{e.class} - #{e.message}"
     # Не прерываем выполнение, если не удалось создать EmailDelivery
   end
+  
 end
 
