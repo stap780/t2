@@ -1,6 +1,7 @@
 class Product::ImportSaveData
   # Маппинг полей CSV на названия свойств (Property)
   PROPERTY_MAPPING = {
+    'id' => 'old_id',
     'pathname' => 'Состояние',
     'station' => 'Станция',
     'marka' => 'Марка',
