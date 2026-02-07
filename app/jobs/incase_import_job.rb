@@ -5,5 +5,6 @@ class IncaseImportJob < ApplicationJob
     incase_import = IncaseImport.find(incase_import_id)
     IncaseService.new(incase_import).call
   end
+  
 end
 

@@ -192,15 +192,16 @@ class Export < ApplicationRecord
     update_columns(active_job_id: job.job_id)
   end
 
-  # Remove pending scheduled job if present
+  # Remove pending scheduled job if present.
+  # Order: ScheduledExecution first (so it disappears from Scheduled jobs UI), then Job.
   def cancel_pending_job
     return if active_job_id.blank?
 
-    if defined?(SolidQueue::Job)
-      SolidQueue::Job.where(active_job_id: active_job_id, finished_at: nil).delete_all
-    end
     if defined?(SolidQueue::ScheduledExecution)
       SolidQueue::ScheduledExecution.joins(:job).where(solid_queue_jobs: { active_job_id: active_job_id }).delete_all
+    end
+    if defined?(SolidQueue::Job)
+      SolidQueue::Job.where(active_job_id: active_job_id, finished_at: nil).delete_all
     end
     update_columns(active_job_id: nil)
   rescue => e
