@@ -170,8 +170,11 @@ class Export < ApplicationRecord
     candidate
   end
 
-  # Schedule the export job at the next occurrence and track scheduled_for
+  # Schedule the export job at the next occurrence and track scheduled_for.
+  # Cancel any existing scheduled job first (we store active_job_id for this).
   def schedule!
+    cancel_pending_job
+
     ts = next_run_at
     return unless ts
 
@@ -308,7 +311,6 @@ class Export < ApplicationRecord
 
   def handle_enqueue_on_update
     if saved_change_to_time?
-      cancel_pending_job
       schedule! if time.present?
     end
   end
