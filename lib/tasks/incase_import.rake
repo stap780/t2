@@ -612,6 +612,26 @@ namespace :incase do
     
     IncaseJsonImporter.run(url, email, password, page.to_i)
   end
+
+  desc "Import incases from JSON URL for a range of pages (e.g. 12 to 60)"
+  task :json_import_range, [:email, :password, :start_page, :end_page] => :environment do |t, args|
+    require 'net/http'
+    require 'uri'
+    require 'json'
+  
+    base_url = 'http://138.197.52.153/inbound_cases.json'
+    email = args[:email]
+    password = args[:password]
+    start_page = (args[:start_page] || 1).to_i
+    end_page = (args[:end_page] || 1).to_i
+  
+    (start_page..end_page).each do |page|
+      url = "#{base_url}?page=#{page}"
+      puts "=== Page #{page} ==="
+      IncaseJsonImporter.run(url, email, password, page)
+    end
+  end  
+
 end
 
 # rails 'incase:json_import[email,password,page]'
