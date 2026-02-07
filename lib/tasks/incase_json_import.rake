@@ -445,15 +445,19 @@ module IncaseJsonImporter
       
       # Find or create item status
       item_status = find_or_create_item_status(item_hash['status'] || item_hash[:status])
-      
-      incase.items.create!(
+      barcode = (item_hash['barcode'] || item_hash[:barcode])&.strip
+      variant_id = find_variant_id_by_barcode(barcode)
+
+      attrs = {
         title: detalname || item_hash['title'] || item_hash[:title] || item_hash['name'] || item_hash[:name] || '',
         quantity: parse_integer(item_hash['quantity'] || item_hash['item_qt'] || item_hash[:quantity] || item_hash[:item_qt]) || 1,
         price: parse_decimal(item_hash['price'] || item_hash['item_price'] || item_hash['summa_zapchastey'] || item_hash[:price] || item_hash[:item_price] || item_hash[:summa_zapchastey]) || 0,
         katnumber: katnumber || '',
         supplier_code: item_hash['supplier_code'] || item_hash[:supplier_code] || item_hash['kod_postavshika'] || item_hash[:kod_postavshika] || '',
         item_status_id: item_status&.id
-      )
+      }
+      attrs[:variant_id] = variant_id if variant_id.present?
+      incase.items.create!(attrs)
     end
   end
   
@@ -479,6 +483,12 @@ module IncaseJsonImporter
     ItemStatus.find_or_create_by(title: status_title.to_s.strip) do |s|
       # Status is created with default position from acts_as_list
     end
+  end
+
+  # Найти вариант по штрихкоду для связывания позиции убытка с товаром
+  def self.find_variant_id_by_barcode(barcode)
+    return nil if barcode.blank?
+    Variant.find_by(barcode: barcode.to_s.strip)&.id
   end
   
   def self.create_new_incase(case_data, strah_company, company)
@@ -512,8 +522,10 @@ module IncaseJsonImporter
         
         # Find or create item status
         item_status = find_or_create_item_status(item_hash['status'] || item_hash[:status])
-        
-        items_attributes << {
+        barcode = (item_hash['barcode'] || item_hash[:barcode])&.strip
+        variant_id = find_variant_id_by_barcode(barcode)
+
+        item_attrs = {
           title: title,
           quantity: parse_integer(item_hash['quantity'] || item_hash[:quantity] || item_hash['item_qt'] || item_hash[:item_qt]) || 1,
           price: parse_decimal(item_hash['price'] || item_hash[:price] || item_hash['item_price'] || item_hash[:item_price] || item_hash['summa_zapchastey'] || item_hash[:summa_zapchastey]) || 0,
@@ -521,13 +533,17 @@ module IncaseJsonImporter
           supplier_code: item_hash['supplier_code'] || item_hash[:supplier_code] || item_hash['kod_postavshika'] || item_hash[:kod_postavshika] || '',
           item_status_id: item_status&.id
         }
+        item_attrs[:variant_id] = variant_id if variant_id.present?
+        items_attributes << item_attrs
       end
     else
       # If no items in JSON, create a placeholder item to satisfy validation
       # Try to extract item data from case_data directly (for single-item cases)
       item_status = find_or_create_item_status(case_data['status'] || case_data[:status])
-      
-      items_attributes << {
+      barcode = (case_data['barcode'] || case_data[:barcode])&.strip
+      variant_id = find_variant_id_by_barcode(barcode)
+
+      placeholder_attrs = {
         title: case_data['detalname'] || case_data[:detalname] || case_data['detal'] || case_data[:detal] || case_data['title'] || case_data[:title] || 'Позиция',
         quantity: parse_integer(case_data['kol_vo'] || case_data[:kol_vo] || case_data['quantity'] || case_data[:quantity]) || 1,
         price: parse_decimal(case_data['summa_zapchastey'] || case_data[:summa_zapchastey] || case_data['item_price'] || case_data[:item_price] || case_data['price'] || case_data[:price]) || 0,
@@ -535,6 +551,8 @@ module IncaseJsonImporter
         supplier_code: case_data['supplier_code'] || case_data[:supplier_code] || case_data['kod_postavshika'] || case_data[:kod_postavshika] || '',
         item_status_id: item_status&.id
       }
+      placeholder_attrs[:variant_id] = variant_id if variant_id.present?
+      items_attributes << placeholder_attrs
     end
     
     # Parse totalsum from JSON if available

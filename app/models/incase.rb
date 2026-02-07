@@ -15,12 +15,13 @@ class Incase < ApplicationRecord
   accepts_nested_attributes_for :comments, allow_destroy: true
   has_many :email_deliveries, as: :record, dependent: :destroy
   
-  after_create_commit { broadcast_prepend_to 'incases' }
+  # after_create_commit { broadcast_prepend_to 'incases' }
   after_update_commit { broadcast_replace_to 'incases' }
   after_destroy_commit { broadcast_remove_to 'incases' }
   # before_save :calculate_totalsum - это пока не нужно так как сумма первоначальная должна сохранятся
   before_create :set_default_status
-  
+  before_destroy :check_items_not_in_acts, prepend: true
+
   validates :date, presence: true
   validates :unumber, presence: true
   validate :items_presence
@@ -138,6 +139,12 @@ class Incase < ApplicationRecord
     # Устанавливаем статус "Не ездили" для нового убытка, если статус не указан
     ne_ezdili_status = IncaseStatus.find_by(title: 'Не ездили')
     self.incase_status_id = ne_ezdili_status.id if ne_ezdili_status
+  end
+
+  def check_items_not_in_acts
+    return unless ActItem.where(item_id: items.select(:id)).exists?
+    errors.add(:base, I18n.t('activerecord.errors.models.incase.items_in_acts'))
+    throw(:abort)
   end
   
   def calculate_totalsum
