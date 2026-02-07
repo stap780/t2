@@ -21,6 +21,7 @@ class Incase < ApplicationRecord
   # before_save :calculate_totalsum - это пока не нужно так как сумма первоначальная должна сохранятся
   before_create :set_default_status
   before_destroy :check_items_not_in_acts, prepend: true
+  
 
   validates :date, presence: true
   validates :unumber, presence: true
