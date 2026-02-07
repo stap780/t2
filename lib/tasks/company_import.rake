@@ -276,13 +276,12 @@ module CompanyJsonImporter
       company.fact_address = company_data['address'].strip
     end
     
-    # Set info (общая текстовая информация)
+    # Set info (общая текстовая информация). Comment попадает в info только если нет plandate.
     info_parts = []
     info_parts << "#{company_data['phone']}" if company_data['phone'].present?
     info_parts << "#{company_data['email']}" if company_data['email'].present?
-    info_parts << "#{company_data['address']}" if company_data['address'].present?
     info_parts << "#{company_data['contact']}" if company_data['contact'].present?
-    info_parts << "#{company_data['comment']}" if company_data['comment'].present?
+    info_parts << "#{company_data['comment']}" if company_data['comment'].present? && company_data['plandate'].blank?
     company.info = info_parts.join("\n") if info_parts.any?
     
     # Set default tip for new companies
@@ -291,6 +290,16 @@ module CompanyJsonImporter
     # Save company
     company.save!
     action = company.new_record? ? :created : :updated
+
+    # Если есть plandate — создаём CompanyPlanDate (date + комментарий при наличии)
+    if company_data['plandate'].present?
+      plan_date_value = parse_plandate(company_data['plandate'])
+      if plan_date_value
+        cpd = company.company_plan_dates.build(date: plan_date_value)
+        cpd.comments.build(body: company_data['comment'].to_s.strip) if company_data['comment'].present?
+        cpd.save!
+      end
+    end
     
     # Process clients
     clients_stats = process_clients(company_data['clients'], company, cookies) if company_data['clients'].present?
@@ -390,6 +399,19 @@ module CompanyJsonImporter
     end
     
     okrug
+  end
+
+  def self.parse_plandate(value)
+    return nil if value.blank?
+    str = value.to_s.strip
+    return nil if str.blank?
+    Time.zone.parse(str)
+  rescue
+    begin
+      Date.parse(str).in_time_zone
+    rescue
+      nil
+    end
   end
   
   def self.load_okrug_from_api(okrug_id, cookies)
