@@ -1,5 +1,5 @@
 class IncasesController < ApplicationController
-  before_action :set_incase, only: %i[ show edit update destroy act send_email print_etiketkas ]
+  before_action :set_incase, only: %i[ show edit update destroy act send_email print_etiketkas calc ]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -199,6 +199,22 @@ class IncasesController < ApplicationController
             render_turbo_flash
           ]
         end
+      end
+    end
+  end
+  def calc
+    success, message = @incase.item_prices
+    notice = message.presence || (success ? 'Проставили цены позициям' : 'Ошибка при проставлении цен позициям')
+
+    respond_to do |format|
+      format.html { redirect_to incases_path, notice: notice }
+      format.turbo_stream do
+        @incase.reload
+        flash.now[success ? :notice : :alert] = notice
+        render turbo_stream: [
+          turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
+          render_turbo_flash
+        ]
       end
     end
   end

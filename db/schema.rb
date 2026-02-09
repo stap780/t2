@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_02_153813) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_09_113438) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -169,6 +169,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_02_153813) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "weekdays", default: []
+    t.decimal "rate", precision: 5, scale: 2, default: "100.0"
     t.index ["short_title"], name: "index_companies_on_short_title"
     t.index ["tip"], name: "index_companies_on_tip"
     t.index ["weekdays"], name: "index_companies_on_weekdays", using: :gin

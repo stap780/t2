@@ -15,6 +15,12 @@ module ApplicationHelper
       </svg>'.html_safe
   end
 
+  def sync_icon
+    '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>'.html_safe
+  end
+
   def barcode_icon
     '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
@@ -113,6 +119,18 @@ module ApplicationHelper
     options[:class] ||= "text-gray-600 hover:text-gray-900 flex items-center gap-1 text-sm"
     link_to path, options do
       raw('<span class="mr-1">&#8592;</span>') + t("common.back")
+    end
+  end
+
+  def link_to_sync(path, **options)
+    if options[:class]
+      options[:class]
+    elsif !options[:class]
+      options[:class] = "p-2 rounded-md bg-green-100 hover:bg-green-200 flex items-center justify-center h-8"
+    end
+    options[:title] ||= t('sync')
+    link_to path, options do
+      sync_icon
     end
   end
 

@@ -111,6 +111,88 @@ class Incase < ApplicationRecord
     incase_tip.title
   end
 
+  def item_prices
+    Rails.logger.info 'start calc_price'
+    errors = []
+
+    total = totalsum.present? ? totalsum.to_f : 0.0
+    if total <= 0
+      message = 'Сумма убытка не задана или равна нулю'
+      errors << message
+      Rails.logger.info(message)
+      return [false, errors.join('. ')]
+    end
+
+    procent = strah&.rate.present? ? strah.rate.to_f / 100.0 : 1.0
+    real_total = total * procent
+
+    work_items = []
+    not_use_statuses = ['Долг', 'Нет (Отсутствовала)', 'Нет (ДРМ)', 'Нет (Срез)', 'Нет (Стекло)', 'Нет', 'Не запрашиваем']
+
+    items.includes(:item_status, :variant).each do |item|
+      status_title = item.item_status&.title
+
+      if item.variant&.price.present?
+        work_items << {
+          item: item,
+          variant: item.variant,
+          sell_price: item.variant.price.to_f
+        }
+      elsif status_title.present? && not_use_statuses.include?(status_title)
+        work_items << {
+          item: item,
+          variant: item.variant,
+          sell_price: 0.0
+        }
+      else
+        msg = "Позиция ##{item.id} без цены и без подходящего статуса"
+        errors << msg
+        Rails.logger.info(msg)
+      end
+    end
+
+    if work_items.size != items.size
+      return [false, errors.join('. ')]
+    end
+
+    work_items_total = work_items.sum { |wi| wi[:sell_price] }
+
+    ActiveRecord::Base.transaction do
+      work_items.each do |wi|
+        sell_price = wi[:sell_price]
+        dolya = sell_price.to_i != 0 && work_items_total.positive? ? (sell_price * 100.0 / work_items_total) : 0.0
+        price = real_total * dolya / 100.0
+
+        wi[:item].update!(price: price)
+
+        if wi[:variant].present?
+          wi[:variant].update!(cost_price: price)
+        end
+      end
+
+      work_items.each do |wi|
+        next unless wi[:variant].present?
+
+        variant = wi[:variant]
+        product = variant.product
+        next unless product.present?
+
+        moysklad = Moysklad.first
+        next unless moysklad.present?
+
+        begin
+          Moysklad::SyncProductService.new(product, moysklad).call
+        rescue => e
+          Rails.logger.error "Failed to sync product #{product.id} to Moysklad: #{e.message}"
+        end
+      end
+    end
+
+    [true, 'Проставили цены позициям']
+  ensure
+    Rails.logger.info 'finish calc_price'
+  end
+
   def self.recalculate_status_from_items(incase_id)
     incase = find_by(id: incase_id)
     return unless incase

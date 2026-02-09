@@ -1,4 +1,4 @@
-<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[30px_80px_70px_80px_1fr_100px_85px_120px] gap-1 px-1 py-1 border-b hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[90px_70px_80px_1fr_100px_85px_120px] gap-1 px-1 py-1 border-b hover:bg-gray-50 items-center" do %>
   <div class="flex flex-col gap-2">
     <%= check_box_tag "product_ids[]", product.id, false, {
       class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
@@ -6,8 +6,8 @@
       form: :bulk_action_form 
     } %>
     <div class="text-xs text-gray-500"><%= product.id %></div>
+    <div class="text-xs text-gray-500"><%= product.created_at.strftime('%d.%m.%Y') %></div>
   </div>
-  <div class="text-xs text-center"><%= product.created_at.strftime('%d.%m.%Y') %></div>
   <div>
     <% first_image = product.images.first %>
     <% if first_image&.file&.attached? %>
@@ -30,15 +30,8 @@
   <div class="text-center"><%= product.variants&.first&.quantity %></div>
   <div class="flex justify-end space-x-2">
     <%= link_to_print_barcode print_etiketka_product_variant_path(product, product.variants.first) %>
-    <%= link_to sync_with_moysklad_product_path(product), 
-        method: :post,
-        class: "p-2 rounded-md bg-green-100 hover:bg-green-200 flex items-center justify-center",
-        title: t("products.sync_with_moysklad"),
-        data: { turbo_method: :post } do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-      </svg>
-    <% end %>
+    <%= link_to_sync sync_with_moysklad_product_path(product), title: t("products.sync_with_moysklad"),
+        data: { turbo_method: :post } %>
     <%= link_to_delete product_path(product), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
   </div>
 <% end %>

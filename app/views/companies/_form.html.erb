@@ -30,14 +30,18 @@
       <!-- Main Tab -->
       <div data-tabs-target="panel" data-tab-name="main" class="tab-panel w-full min-w-0">
         <div class="space-y-6">
-          <div class="grid grid-cols-[250px_250px_1fr] gap-4">
+          <div class="grid grid-cols-[250px_250px_250px_1fr] gap-4" data-controller="company-tip">
             <div>
               <%= f.label :okrug_id, "Округ", class: "block text-sm font-medium text-gray-700 mb-1" %>
               <%= f.collection_select :okrug_id, Okrug.all, :id, :title, { prompt: "Выберите округ" }, { class: "w-full px-3 py-2 h-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" } %>
             </div>
             <div>
               <%= f.label :tip, class: "block text-sm font-medium text-gray-700 mb-1" %>
-              <%= f.select :tip, Company.tip_collection, { prompt: "Выберите тип" }, { class: "w-full px-3 py-2 h-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500" } %>
+              <%= f.select :tip, Company.tip_collection, { prompt: "Выберите тип" }, { class: "w-full px-3 py-2 h-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", data: { action: "change->company-tip#toggleRate" } } %>
+            </div>
+            <div data-company-tip-target="rateField" style="<%= 'display: none;' unless company.tip == 'strah' %>">
+              <%= f.label :rate, "Процент оплаты (%)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= f.number_field :rate, step: 0.01, min: 0, max: 100, class: "w-full px-3 py-2 h-9 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", placeholder: "100.0" %>
             </div>
             <div>
               <%= f.label :short_title, class: "block text-sm font-medium text-gray-700 mb-1" %>

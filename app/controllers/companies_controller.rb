@@ -91,7 +91,7 @@ class CompaniesController < ApplicationController
   end
 
   def company_params
-    params.require(:company).permit(:tip, :inn, :kpp, :title, :short_title, :ur_address, :fact_address, :ogrn, :okpo, :bik, :bank_title, :bank_account, :info, :okrug_id, weekdays: [],
+    params.require(:company).permit(:tip, :rate, :inn, :kpp, :title, :short_title, :ur_address, :fact_address, :ogrn, :okpo, :bik, :bank_title, :bank_account, :info, :okrug_id, weekdays: [],
       client_companies_attributes: [:id, :client_id, :company_id, :_destroy],
       company_plan_dates_attributes: [
         :id, 

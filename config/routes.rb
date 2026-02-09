@@ -195,6 +195,7 @@ Rails.application.routes.draw do
       get :act
       post :send_email
       get :print_etiketkas, format: :pdf
+      get :calc
     end
     collection do
       post :bulk_print
