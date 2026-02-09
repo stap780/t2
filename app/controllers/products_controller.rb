@@ -222,7 +222,7 @@ class ProductsController < ApplicationController
   def refill
     detal = nil
 
-    if @product.variants.first&.sku.present? && @product.status == 'in_progress' || @product.status == 'draft'
+    if @product.variants.first&.sku.present? #&& @product.status == 'in_progress' || @product.status == 'draft'
       detal = Detal.find_by_sku(@product.variants.first&.sku)
     end
 
@@ -233,6 +233,7 @@ class ProductsController < ApplicationController
       @product.features.destroy_all
       new_features = detal.features.select(:property_id, :characteristic_id).map(&:attributes)
       @product.features_attributes = new_features
+      @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: [
