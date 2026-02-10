@@ -1,0 +1,4 @@
+<%= render "shared/offcanvas_inner", title: t("exports.download.title") do %>
+  <%= link_to 'Скачать', rails_blob_path(@export.export_file.blob, disposition: 'attachment') %>
+<% end %>
+

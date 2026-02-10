@@ -1125,6 +1125,8 @@ ru:
         password: "Пароль"
         password_confirmation: "Подтверждение пароля"
         role: "Роль"
+      export:
+        name: "Название экспорта"
       client:
         surname: "Фамилия"
         name: "Имя"
