@@ -264,6 +264,8 @@ class ExportService
     timestamp = Time.current.strftime("%Y%m%d_%H%M%S")
     filename = "export_#{@export.id}_#{timestamp}.#{format}"
 
+    @export.export_file.purge if @export.export_file.attached?
+    
     @export.export_file.attach(
       io: StringIO.new(content),
       filename: filename,
