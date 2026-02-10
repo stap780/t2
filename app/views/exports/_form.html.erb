@@ -2,41 +2,37 @@
   <%= render 'shared/errors', object: export %>
 
   <div class="grid grid-cols-1 gap-8">
-<div class="flex flex-wrap gap-6">
-  <!-- Export Name -->
-  <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px]">
-    <%= form.label :name, t("activerecord.attributes.export.name"), class: "block text-sm font-semibold text-gray-800 mb-2" %>
-    <%= form.text_field :name, 
-      placeholder: t("exports.form.name_placeholder"),
-      class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
-    %>
-  </div>
+    <div class="flex flex-wrap gap-6">
+      <!-- Export Name -->
+      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px]">
+        <%= form.label :name, t("activerecord.attributes.export.name"), class: "block text-sm font-semibold text-gray-800 mb-2" %>
+        <%= form.text_field :name, placeholder: t("exports.form.name_placeholder"),
+          class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+        %>
+      </div>
 
-  <!-- Test Mode Toggle -->
-  <div class="flex flex-col justify-center w-full sm:w-auto flex-1 min-w-[210px] max-w-[210px]">
-    <div class="flex items-center">
-      <%= form.check_box :test, 
-          class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"
-      %>
-      <div class="ml-3">
-        <%= form.label :test, t("exports.form.test_mode"), class: "font-semibold text-gray-800" %>
-        <p class="text-xs text-gray-600"><%= t("exports.form.test_limit_html", count: Export::TEST_LIMIT).html_safe %></p>
+      <!-- Test Mode Toggle -->
+      <div class="flex flex-col justify-center w-full sm:w-auto flex-1 min-w-[210px] max-w-[210px]">
+        <div class="flex items-center">
+          <%= form.check_box :test, class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"%>
+          <div class="ml-3">
+            <%= form.label :test, t("exports.form.test_mode"), class: "font-semibold text-gray-800" %>
+            <p class="text-xs text-gray-600"><%= t("exports.form.test_limit_html", count: Export::TEST_LIMIT).html_safe %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Time (15-minute intervals) -->
+      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[300px]">
+        <%= form.label :time, t("exports.form.scheduled_time"), class: "block text-sm font-semibold text-gray-800 mb-2" %>
+        <p class="text-xs text-gray-600 mb-2"><%= t("exports.form.time_hint") %></p>
+        <% time_options = (0..23).flat_map { |h| [0,15,30,45].map { |m| format("%02d:%02d", h, m) } } %>
+        <%= form.select :time, options_for_select(time_options, selected: form.object.time), 
+            { include_blank: t("exports.form.not_set") }, 
+            class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
+        %>
       </div>
     </div>
-  </div>
-
-  <!-- Export Time (15-minute intervals) -->
-  <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[300px]">
-    <%= form.label :time, t("exports.form.scheduled_time"), class: "block text-sm font-semibold text-gray-800 mb-2" %>
-    <p class="text-xs text-gray-600 mb-2"><%= t("exports.form.time_hint") %></p>
-    <% time_options = (0..23).flat_map { |h| [0,15,30,45].map { |m| format("%02d:%02d", h, m) } } %>
-    <%= form.select :time, 
-        options_for_select(time_options, selected: form.object.time), 
-        { include_blank: t("exports.form.not_set") }, 
-        class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
-    %>
-  </div>
-</div>
 
     <!-- Data Source Info -->
     <% if !export.has_data_source? %>
@@ -107,126 +103,124 @@
         </div>
       <% end %>
     </div>
-  </div>
 
-  <!-- Template Section (XML only) -->
-  <div id="template-section" data-export-form-target="templateSection" style="display: none;">
-    <div class="border-1 border-gray-200 rounded-xl overflow-hidden">
-      <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800">
-        <span class="flex items-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-          </svg>
-        </span>
-      </div>
-
-      <div class="p-4 bg-gray-50 border-t border-gray-200">
-        <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
-          <p class="text-sm text-blue-800 mb-3">
-            <span class="font-semibold">💡 <%= t("exports.form.xml_required") %>:</span> <%= t("exports.form.xml_hint") %>
-          </p>
-          
-          <div class="bg-white p-3 rounded-lg border border-blue-200 mb-4">
-            <p class="text-xs font-semibold text-blue-700 mb-2"><%= t("exports.form.example_xml_template") %></p>
-            <code class="block text-xs text-blue-900 font-mono leading-relaxed">
-              &lt;products&gt;<br>
-              {% for product in export.data %}<br>
-              &nbsp;&nbsp;&lt;product&gt;<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&lt;id&gt;{{ product.id }}&lt;/id&gt;<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&lt;title&gt;{{ product.title }}&lt;/title&gt;<br>
-              &nbsp;&nbsp;&nbsp;&nbsp;&lt;sku&gt;{{ product.variants.first.sku }}&lt;/sku&gt;<br>
-              &nbsp;&nbsp;&lt;/product&gt;<br>
-              {% endfor %}<br>
-              &lt;/products&gt;
-            </code>
-          </div>
+    <!-- Template Section (XML only) -->
+    <div id="template-section" data-export-form-target="templateSection" style="display: none;">
+      <div class="border-1 border-gray-200 rounded-xl overflow-hidden">
+        <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800">
+          <span class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+            </svg>
+          </span>
         </div>
-        <p class="text-xs font-semibold text-blue-700"><%=link_to 'Пример Avito', xml_avito_example_exports_path, target: '_blank', data: { turbo: false } %></p>
-      </div>
-  </div>
 
-  <%= form.label :template, t("exports.form.custom_xml_template"), class: "block text-sm font-semibold text-gray-800 mb-3" %>
-        <%= form.text_area :template, 
-            rows: 30,
-            placeholder: t("exports.form.template_placeholder"),
-        class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
-        data: { controller: "codemirror", codemirror_mode_value: "html" }
-          %>
-        
-        <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-          <p class="text-sm font-semibold text-gray-700 mb-2">🔧 <%= t("exports.form.available_objects") %>:</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-600">
-            <div>
-              <p><code class="bg-gray-100 px-2 py-1 rounded">export.data</code> - <%= t("exports.form.obj_all_records") %></p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product</code> - <%= t("exports.form.obj_product") %></p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.variants</code> - массив вариантов товара</p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.features</code> - массив свойств [{property, characteristic}]</p>
-            </div>
-            <div>
-              <p><code class="bg-gray-100 px-2 py-1 rounded">export</code> - <%= t("exports.form.obj_export") %></p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">current_time</code> - <%= t("exports.form.obj_current_time") %></p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.images</code> - массив URL изображений</p>
-              <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.images_zap</code> - массив URL изображений с водяным знаком</p>
+        <div class="p-4 bg-gray-50 border-t border-gray-200">
+          <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+            <p class="text-sm text-blue-800 mb-3">
+              <span class="font-semibold">💡 <%= t("exports.form.xml_required") %>:</span> <%= t("exports.form.xml_hint") %>
+            </p>
+            
+            <div class="bg-white p-3 rounded-lg border border-blue-200 mb-4">
+              <p class="text-xs font-semibold text-blue-700 mb-2"><%= t("exports.form.example_xml_template") %></p>
+              <code class="block text-xs text-blue-900 font-mono leading-relaxed">
+                &lt;products&gt;<br>
+                {% for product in export.data %}<br>
+                &nbsp;&nbsp;&lt;product&gt;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;id&gt;{{ product.id }}&lt;/id&gt;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;title&gt;{{ product.title }}&lt;/title&gt;<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&lt;sku&gt;{{ product.variants.first.sku }}&lt;/sku&gt;<br>
+                &nbsp;&nbsp;&lt;/product&gt;<br>
+                {% endfor %}<br>
+                &lt;/products&gt;
+              </code>
             </div>
           </div>
-
-          <%# List all fields available on `product` from Product model %>
-          <% template_fields = Export.available_product_fields_for_template %>
-          <div class="mt-4">
-            <p class="text-sm font-semibold text-gray-700 mb-2">📋 <%= t("exports.form.product_fields") %> (<%= t("exports.form.use_as_html") %>):</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-gray-700 max-h-64 overflow-auto p-2 bg-gray-50 border border-gray-200 rounded">
-              <%# Product fields %>
-              <% template_fields[:product_fields].each do |field| %>
-                <div class="flex items-center">
-                  <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ product.<%= field %> }}</code>
-                </div>
-              <% end %>
-              
-              <%# Variant fields %>
-              <% template_fields[:variant_fields].each do |field| %>
-                <div class="flex items-center">
-                  <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ <%= field %> }}</code>
-                </div>
-              <% end %>
-              
-              <%# Features - итерация по всем свойствам %>
-              <div class="flex items-center">
-                <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for feature in product.features %}{{ feature.property }}: {{ feature.characteristic }}{% endfor %}</code>
-              </div>
-              
-              <%# Features - фильтрация по конкретному свойству %>
-              <div class="flex items-center">
-                <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for feature in product.features %}{% if feature.property == 'Название' %}{{ feature.characteristic }}{% endif %}{% endfor %}</code>
-              </div>
-              
-              <%# Image fields %>
-              <% template_fields[:image_fields].each do |field| %>
-                <div class="flex items-center">
-                  <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ product.<%= field %> }}</code>
-                </div>
-              <% end %>
-              
-              <%# Image iteration %>
-              <div class="flex items-center">
-                <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for image in product.images_zap %}{{ image }}{% endfor %}</code>
-              </div>
-            </div>
-          </div>
+          <p class="text-xs font-semibold text-blue-700"><%=link_to 'Пример Avito', xml_avito_example_exports_path, target: '_blank', data: { turbo: false } %></p>
         </div>
-      </div>
     </div>
+
+    <%= form.label :template, t("exports.form.custom_xml_template"), class: "block text-sm font-semibold text-gray-800 mb-3" %>
+    <%= form.text_area :template, rows: 30,placeholder: t("exports.form.template_placeholder"),
+    class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
+    data: { controller: "codemirror" } %>
+        
+    <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+      <p class="text-sm font-semibold text-gray-700 mb-2">🔧 <%= t("exports.form.available_objects") %>:</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-600">
+        <div>
+          <p><code class="bg-gray-100 px-2 py-1 rounded">export.data</code> - <%= t("exports.form.obj_all_records") %></p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product</code> - <%= t("exports.form.obj_product") %></p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.variants</code> - массив вариантов товара</p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.features</code> - массив свойств [{property, characteristic}]</p>
+        </div>
+        <div>
+          <p><code class="bg-gray-100 px-2 py-1 rounded">export</code> - <%= t("exports.form.obj_export") %></p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">current_time</code> - <%= t("exports.form.obj_current_time") %></p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.images</code> - массив URL изображений</p>
+          <p class="mt-1"><code class="bg-gray-100 px-2 py-1 rounded">product.images_zap</code> - массив URL изображений с водяным знаком</p>
+        </div>
+      </div>
+
+      <%# List all fields available on `product` from Product model %>
+      <% template_fields = Export.available_product_fields_for_template %>
+      <div class="mt-4">
+        <p class="text-sm font-semibold text-gray-700 mb-2">📋 <%= t("exports.form.product_fields") %> (<%= t("exports.form.use_as_html") %>):</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-gray-700 max-h-64 overflow-auto p-2 bg-gray-50 border border-gray-200 rounded">
+          <%# Product fields %>
+          <% template_fields[:product_fields].each do |field| %>
+            <div class="flex items-center">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ product.<%= field %> }}</code>
+            </div>
+          <% end %>
+          
+          <%# Variant fields %>
+          <% template_fields[:variant_fields].each do |field| %>
+            <div class="flex items-center">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ <%= field %> }}</code>
+            </div>
+          <% end %>
+          
+          <%# Features - итерация по всем свойствам %>
+          <div class="flex items-center">
+            <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for feature in product.features %}{{ feature.property }}: {{ feature.characteristic }}{% endfor %}</code>
+          </div>
+          
+          <%# Features - фильтрация по конкретному свойству %>
+          <div class="flex items-center">
+            <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for feature in product.features %}{% if feature.property == 'Название' %}{{ feature.characteristic }}{% endif %}{% endfor %}</code>
+          </div>
+          
+          <%# Image fields %>
+          <% template_fields[:image_fields].each do |field| %>
+            <div class="flex items-center">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{{ product.<%= field %> }}</code>
+            </div>
+          <% end %>
+          
+          <%# Image iteration %>
+          <div class="flex items-center">
+            <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">{% for image in product.images_zap %}{{ image }}{% endfor %}</code>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- Action Buttons -->
   <div class="flex items-center justify-between pt-6 border-t border-gray-200">
     <div class="text-sm text-gray-500">
-  <p><%= t("exports.form.footer_hint") %></p>
+      <p><%= t("exports.form.footer_hint") %></p>
     </div>
     <div class="flex items-center space-x-4">
-    <%= link_to t("actions.cancel"), exports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: {turbo: false}%>
-    <%= form.submit t("actions.save"),
-          class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer"
-      %>
+      <%= link_to t("actions.cancel"), exports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: {turbo: false}%>
+      <%= form.submit t("actions.save"),
+            class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer"
+        %>
     </div>
   </div>
+
 <% end %>
