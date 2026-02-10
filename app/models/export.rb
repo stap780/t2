@@ -192,17 +192,45 @@ class Export < ApplicationRecord
     update_columns(active_job_id: job.job_id)
   end
 
-  # Remove pending scheduled job if present.
-  # Order: ScheduledExecution first (so it disappears from Scheduled jobs UI), then Job.
+  # Remove ALL pending scheduled jobs for this export, if present.
+  # 1) По active_job_id (старый механизм, для совместимости)
+  # 2) По GlobalID экспорта, чтобы удалить все задачи ExportJob для данного Export,
+  #    независимо от того, какой active_job_id сейчас записан.
+  # Порядок: сначала ScheduledExecution (чтобы исчезли из Scheduled jobs UI), потом Job.
   def cancel_pending_job
-    return if active_job_id.blank?
+    # Ничего не делаем, если SolidQueue не подключён
+    return unless defined?(SolidQueue::ScheduledExecution) && defined?(SolidQueue::Job)
 
-    if defined?(SolidQueue::ScheduledExecution)
-      SolidQueue::ScheduledExecution.joins(:job).where(solid_queue_jobs: { active_job_id: active_job_id }).delete_all
-    end
-    if defined?(SolidQueue::Job)
+    # 1. Удаляем по active_job_id (если он есть)
+    if active_job_id.present?
+      SolidQueue::ScheduledExecution.joins(:job)
+        .where(solid_queue_jobs: { active_job_id: active_job_id })
+        .delete_all
+
       SolidQueue::Job.where(active_job_id: active_job_id, finished_at: nil).delete_all
     end
+
+    # 2. Дополнительно удаляем все задачи ExportJob для этого Export по GlobalID,
+    #    чтобы в расписании всегда была максимум одна задача на экспорт.
+    begin
+      gid = to_global_id.to_s
+    rescue StandardError
+      gid = nil
+    end
+
+    if gid.present?
+      scheduled_scope = SolidQueue::ScheduledExecution.joins(:job)
+        .where(solid_queue_jobs: { queue_name: "export", class_name: "ExportJob" })
+        .where("solid_queue_jobs.arguments LIKE ?", "%#{gid}%")
+
+      job_scope = SolidQueue::Job.where(queue_name: "export", class_name: "ExportJob", finished_at: nil)
+        .where("arguments LIKE ?", "%#{gid}%")
+
+      scheduled_scope.delete_all
+      job_scope.delete_all
+    end
+
+    # После очистки сбрасываем active_job_id — новую задачу назначит schedule!/schedule_next_day!
     update_columns(active_job_id: nil)
   rescue => e
     Rails.logger.warn("Export##{id}: failed to cancel pending job #{active_job_id}: #{e.message}")
