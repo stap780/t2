@@ -1,7 +1,7 @@
 <div class="flex items-center justify-between mb-4">
   <h1 class="text-xl font-semibold"><%= t('.heading') %></h1>
   <div class="flex space-x-2">
-    <%# link_to t('.new'), new_incase_tip_path, 
+    <%= link_to t('.new'), new_incase_tip_path, 
         class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
         data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
   </div>
@@ -18,4 +18,3 @@
     <%= render @incase_tips %>
   <% end %>
 </div>
-
