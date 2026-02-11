@@ -40,13 +40,6 @@ details summary::marker {
   display: none;
 }
 
-.CodeMirror-gutter {
-  width: 40px!important;
-}
-.CodeMirror-line {
-  padding-left: 41px!important;
-}
-
 .sort_link:not(.asc):not(.desc)::after {
   margin-left: 5px;
   opacity: 0.5;
