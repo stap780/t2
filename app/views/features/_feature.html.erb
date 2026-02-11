@@ -19,7 +19,7 @@
       
       <%= turbo_frame_tag "characteristic_#{turbo_id_for(feature)}" do %>
         <%= ff.collection_select :characteristic_id, 
-            (feature.property&.characteristics&.order(title: :asc) || []), :id, :title, 
+            (feature.property&.characteristics || []), :id, :title, 
             { prompt: t("features.select_characteristic"), selected: feature.characteristic_id }, 
             { 
               class: "flex-1 px-2 py-1 border rounded-md",
