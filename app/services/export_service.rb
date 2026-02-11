@@ -12,6 +12,7 @@ class ExportService
   end
 
   def call
+    started_at = Time.current
     Rails.logger.info "📤 ExportService: Starting export for Export ##{@export.id} (#{@export.test_mode? ? 'TEST' : 'PRODUCTION'} mode)"
     @export.update!(status: "processing")
 
@@ -45,7 +46,7 @@ class ExportService
 
       if result
         @export.update!(status: "completed", exported_at: Time.current)
-        Rails.logger.info "📤 ExportService: Export completed successfully"
+        Rails.logger.info "📤 ExportService: Export completed successfully in #{(Time.current - started_at).round(2)}s"
         [true, @export]
       else
         @export.update!(status: "failed", error_message: "Failed to create export file")
@@ -179,12 +180,30 @@ class ExportService
   end
 
   def create_xml
-    return false, "XML template is required" unless @export.template.present?
-    
-    # Use Liquid template (like Dizauto)
-    template = Liquid::Template.parse(@export.template)
+    unless @export.layout_template.present? && @export.item_template.present?
+      return false, "XML templates are required"
+    end
+
+    # Prepare data for items
+    products = @export.data
+
+    # Parse templates
+    item_template   = Liquid::Template.parse(@export.item_template)
+    layout_template = Liquid::Template.parse(@export.layout_template)
+
+    # Build items XML in Ruby loop (one render per product)
+    items_xml = +""
+    products.each do |product_hash|
+      items_xml << item_template.render("product" => product_hash)
+      items_xml << "\n"
+    end
+
+    # Render final XML using layout (receives export drop and prebuilt items_xml)
     export_drop = Drop::Export.new(@export)
-    xml_content = template.render("export" => export_drop)
+    xml_content = layout_template.render(
+      "export"    => export_drop,
+      "items_xml" => items_xml
+    )
 
     attach_file(xml_content, "xml", "application/xml")
   end

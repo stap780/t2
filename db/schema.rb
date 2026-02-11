@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_09_113438) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_10_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -237,6 +237,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_09_113438) do
     t.string "time"
     t.datetime "scheduled_for"
     t.string "active_job_id"
+    t.text "layout_template"
+    t.text "item_template"
     t.index ["active_job_id"], name: "index_exports_on_active_job_id"
     t.index ["exported_at"], name: "index_exports_on_exported_at"
     t.index ["format"], name: "index_exports_on_format"

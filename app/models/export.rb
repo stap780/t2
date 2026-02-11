@@ -25,6 +25,11 @@ class Export < ApplicationRecord
   validates :status, presence: true, inclusion: { in: %w[pending processing completed failed] }
   validates :user, presence: true
 
+  with_options if: -> { format == "xml" } do
+    validates :layout_template, presence: true
+    validates :item_template, presence: true
+  end
+
   # Serialize file_headers as array to store selected field headers
   serialize :file_headers, coder: JSON
 
@@ -38,7 +43,7 @@ class Export < ApplicationRecord
   STATUS = %w[pending processing completed failed].freeze
 
   # Test mode limit
-  TEST_LIMIT = 1000
+  TEST_LIMIT = 5000
 
   # Callbacks
   before_validation :set_default_name, on: :create
@@ -246,6 +251,11 @@ class Export < ApplicationRecord
     # Default to test mode for new exports to prevent accidental large exports
     self.test = true if test.nil?
   end
+
+  # NOTE: legacy XML template support
+  # Поле `template` использовалось для полного Liquid-шаблона XML.
+  # Новая схема: layout_template (каркас с {{ items_xml }}) + item_template (один товар).
+  # Существующие экспорты с заполненным template нужно вручную перенести на новую схему.
 
   # Extract data from Product model with optimized queries
   def extract_data_from_products

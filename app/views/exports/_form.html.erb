@@ -112,38 +112,49 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
             </svg>
+            <span><%= t("exports.form.xml_required") %></span>
           </span>
         </div>
 
-        <div class="p-4 bg-gray-50 border-t border-gray-200">
-          <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
-            <p class="text-sm text-blue-800 mb-3">
-              <span class="font-semibold">💡 <%= t("exports.form.xml_required") %>:</span> <%= t("exports.form.xml_hint") %>
+        <div class="p-4 bg-gray-50 border-t border-gray-200 space-y-4">
+          <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+            <p class="text-sm text-blue-800">
+              <%= t("exports.form.xml_hint") %>
             </p>
-            
-            <div class="bg-white p-3 rounded-lg border border-blue-200 mb-4">
-              <p class="text-xs font-semibold text-blue-700 mb-2"><%= t("exports.form.example_xml_template") %></p>
-              <code class="block text-xs text-blue-900 font-mono leading-relaxed">
-                &lt;products&gt;<br>
-                {% for product in export.data %}<br>
-                &nbsp;&nbsp;&lt;product&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;id&gt;{{ product.id }}&lt;/id&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;title&gt;{{ product.title }}&lt;/title&gt;<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&lt;sku&gt;{{ product.variants.first.sku }}&lt;/sku&gt;<br>
-                &nbsp;&nbsp;&lt;/product&gt;<br>
-                {% endfor %}<br>
-                &lt;/products&gt;
-              </code>
+            <p class="mt-2 text-xs font-semibold text-blue-700">
+              <%= link_to 'Пример Avito', xml_avito_example_exports_path, target: '_blank', data: { turbo: false } %>
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-1 gap-2">
+            <!-- Layout template -->
+            <div>
+              <%= form.label :layout_template, "Layout-шаблон (каркас файла)", class: "block text-sm font-semibold text-gray-800 mb-2" %>
+              <p class="text-xs text-gray-600 mb-2">
+                Здесь задаётся общий XML, например Avito или YML: заголовок, корневые теги, &lt;shop&gt;, &lt;offers&gt; и т.п.
+                Внутрь нужного места вставьте <code class="bg-gray-100 px-1 py-0.5 rounded">{"{{ items_xml }}"}</code>.
+              </p>
+              <div data-controller="codemirror" data-codemirror-doc-value="<%= form.object.layout_template %>">
+                <div data-codemirror-target="editor">
+                <%= form.hidden_field :layout_template, data: { codemirror_target: "input" } %>
+              </div>
+            </div>
+
+            <!-- Item template -->
+            <div>
+              <%= form.label :item_template, "XML item (один товар)", class: "block text-sm font-semibold text-gray-800 mb-2" %>
+              <p class="text-xs text-gray-600 mb-2">
+                Item-шаблон одного товара. Внутри доступен объект <code class="bg-gray-100 px-1 py-0.5 rounded">product</code>
+                и его поля (id, title, variants, features, images и т.д.).
+              </p>
+              <div data-controller="codemirror" data-codemirror-doc-value="<%= form.object.item_template %>">
+                <div data-codemirror-target="editor">
+                <%= form.hidden_field :item_template, data: { codemirror_target: "input" } %>
+              </div>
             </div>
           </div>
-          <p class="text-xs font-semibold text-blue-700"><%=link_to 'Пример Avito', xml_avito_example_exports_path, target: '_blank', data: { turbo: false } %></p>
         </div>
-    </div>
-
-    <%= form.label :template, t("exports.form.custom_xml_template"), class: "block text-sm font-semibold text-gray-800 mb-3" %>
-    <%= form.text_area :template, rows: 30,placeholder: t("exports.form.template_placeholder"),
-    class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 font-mono text-sm leading-relaxed",
-    data: { controller: "codemirror" } %>
+      </div>
         
     <div class="mt-4 p-4 bg-white rounded-lg border border-gray-200">
       <p class="text-sm font-semibold text-gray-700 mb-2">🔧 <%= t("exports.form.available_objects") %>:</p>
