@@ -27,7 +27,7 @@ class IncaseEmailService
       # Определяем получателей
       client_emails = company.clients.pluck(:email).reject(&:blank?)
       emails = client_emails.join(',')
-      recipient_email = emails.present? ? emails : "panaet80@gmail.com"
+      recipient_email = emails.present? ? emails : "toweleie23@gmail.com"
       subject = emails.present? ? "#{company.short_title}. Заявка на вывоз запчастей" : "НЕТ адреса у контрагента #{company.short_title}. Заявка на вывоз запчастей"
       
       # Создаем EmailDelivery запись

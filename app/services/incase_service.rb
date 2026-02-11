@@ -144,11 +144,11 @@ class IncaseService
           @success_count += 1
         else
           # Дата не совпадает
-          if avilon_ag?(company)
-            apply_avilon_ag_logic(existing_incase, row, strah_company, company)
-          else
+          # if avilon_ag?(company)
+          #   apply_avilon_ag_logic(existing_incase, row, strah_company, company)
+          # else
             create_incase_dubl(row, strah_company, company)
-          end
+          # end
           @success_count += 1
         end
       else

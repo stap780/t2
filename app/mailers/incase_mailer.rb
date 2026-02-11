@@ -18,15 +18,9 @@ class IncaseMailer < ApplicationMailer
     # Для одиночной отправки используем первый убыток для обратной совместимости
     @incase = @incases.first if incase_ids.size == 1
     
-    # Определяем получателей (заглушка для тестирования)
-    emails = "toweleie23@gmail.com,panaet80@gmail.com" # @company.clients.pluck(:email).reject(&:blank?).join(',')
-    
-    if emails.blank?
-      emails = "toweleie23@gmail.com"
-      subject = "НЕТ адреса у контрагента #{@company.short_title}. Заявка на вывоз запчастей"
-    else
-      subject = "#{@company.short_title}. Заявка на вывоз запчастей"
-    end
+    # ВАЖНО: адрес и тема берутся из EmailDelivery, а не считаются здесь.
+    emails  = @email_delivery.recipient_email
+    subject = @email_delivery.subject
     
     # Читаем Excel из Active Storage attachment
     if @email_delivery.attachment.attached?
