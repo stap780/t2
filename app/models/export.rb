@@ -339,9 +339,10 @@ class Export < ApplicationRecord
   end
 
   def handle_enqueue_on_update
-    if saved_change_to_time?
-      schedule! if time.present?
-    end
+    schedule! if time.present?
+    # if saved_change_to_time?
+    #   schedule! if time.present?
+    # end
   end
 
 end

@@ -37,7 +37,7 @@
 </div>
 
 <%= search_form_for @search, url: incases_path, method: :get, html: { class: "flex items-center space-x-2 flex-wrap  mb-4" } do |f| %>
-  <%= f.search_field :unumber_or_items_barcode_or_carnumber_or_stoanumber_cont, value: params.dig(:q, :unumber_or_items_barcode_or_carnumber_or_stoanumber_cont), placeholder: t('.incases_search'), class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "min-width: 400px;" %>
+  <%= f.search_field :unumber_or_items_barcode_or_items_katnumber_or_carnumber_or_stoanumber_cont, value: params.dig(:q, :unumber_or_items_barcode_or_items_katnumber_or_carnumber_or_stoanumber_cont), placeholder: t('.incases_search'), class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3 ", style: "min-width: 400px;" %>
   <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.incase.company_id'), 
   class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md"%>
   <% selected_status_ids = Array(params.dig(:q, :incase_status_id_in)).reject(&:blank?).map(&:to_s) %>
