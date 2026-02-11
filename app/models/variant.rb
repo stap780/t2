@@ -124,15 +124,12 @@ class Variant < ApplicationRecord
 
   def create_barcode
     return if barcode.present?
-
-    code_value = id.to_s.rjust(12, '0')
-    barcode = Barby::EAN13.new(code_value)
-    # barcode.checksum
-    # чтобы не падала ошибка при импорте убытков заменил update! на update_column
-    # update!(barcode: barcode.data_with_checksum)
-    update_column(:barcode, barcode.data_with_checksum)
+  
+    next_number = BarcodeCounter.next_value!
+    code_value = next_number.to_s.rjust(12, '0')
+    barcode_obj = Barby::EAN13.new(code_value)
+    update_column(:barcode, barcode_obj.data_with_checksum)
     
-    # Создаем этикетку сразу после создания баркода
     generate_etiketka
   end
 

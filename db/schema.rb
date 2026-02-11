@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_10_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_11_185455) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_10_180000) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "barcode_counters", force: :cascade do |t|
+    t.integer "last_value", default: 900000, null: false
   end
 
   create_table "characteristics", force: :cascade do |t|
