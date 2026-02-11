@@ -202,6 +202,7 @@ class IncasesController < ApplicationController
       end
     end
   end
+
   def calc
     success, message = @incase.item_prices
     notice = message.presence || (success ? 'Проставили цены позициям' : 'Ошибка при проставлении цен позициям')
@@ -313,7 +314,7 @@ class IncasesController < ApplicationController
     # В params[:q] ключи приходят строками, не символами.
     # Поле поиска по номеру убытка и др. сейчас называется:
     #   unumber_or_items_barcode_or_carnumber_cont
-    search_key = 'unumber_or_items_barcode_or_carnumber_cont'
+    search_key = 'unumber_or_items_barcode_or_items_katnumber_or_carnumber_or_stoanumber_cont'
 
     return search_params_hash unless search_params_hash[search_key].present?
 
@@ -346,5 +347,6 @@ class IncasesController < ApplicationController
       comments_attributes: [:id, :body, :user_id, :commentable_type, :commentable_id, :_destroy]
     )
   end
+
 end
 
