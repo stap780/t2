@@ -135,7 +135,7 @@ namespace :insales do
     end
 
     stats = { total: 0, updated: 0, errors: 0 }
-    batch_size = 50
+    batch_size = 100
 
     varbinds = Varbind.where(
       bindable_type: "Insale",
@@ -169,7 +169,7 @@ namespace :insales do
       InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
 
       InsalesApi.wait_retry do
-        InsalesApi::Product.put(:variants_group_update, variants: batch)
+        InsalesApi::Product.variants_group_update(batch)
       end
 
       stats[:updated] += batch.size

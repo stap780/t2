@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/stap780/insales_api.git
   revision: ffd221742607949c1f8fccd015b1429a183d065e
+  branch: stap780-patch-1
   specs:
     insales_api (0.2.1)
       activeresource (>= 3.0.0)
