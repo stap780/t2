@@ -65,4 +65,5 @@ class Insale < ApplicationRecord
       [false, ["Error creating webhook: #{e.message}"]]
     end
   end
+  
 end
