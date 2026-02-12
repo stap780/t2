@@ -190,6 +190,8 @@ class Export < ApplicationRecord
 
   # Call from job after finishing to create a daily schedule
   def schedule_next_day!
+    cancel_pending_job
+    
     ts = next_run_at(from_time: Time.zone.now + 1.minute)
     return unless ts
     update_columns(scheduled_for: ts)
