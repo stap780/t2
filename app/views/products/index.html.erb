@@ -1,5 +1,8 @@
 <div class="flex items-center justify-between mb-4">
-  <h1 class="text-xl font-semibold"><%= t("products.index.heading") %> <small class="text-sm text-gray-500"><%= @products.count %></small></h1>
+  <div class="flex flex-col space-x-2">
+    <h1 class="text-xl font-semibold"><%= t("products.index.heading") %></h1>
+    <span class="text-xs text-gray-500"><%= @products.count %></span>
+  </div>
   <div class="flex space-x-2">
     <%= search_form_for @search, url: products_path, method: :get, html: { class: "flex items-center space-x-2" } do |f| %>
       <%= f.label :title_or_variants_sku_cont, t("products.index.search_by_title_sku"), class: "sr-only" %>

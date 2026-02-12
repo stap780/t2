@@ -224,11 +224,11 @@ ru:
       created_at: "Дата создания"
       updated_at: "Дата обновления"
       # Variant fields
-      variant_1_barcode: "Штрихкод (вариант 1)"
-      variant_1_sku: "Артикул (вариант 1)"
-      variant_1_price: "Цена (вариант 1)"
-      variant_1_quantity: "Количество (вариант 1)"
-      variant_1_cost_price: "Себестоимость (вариант 1)"
+      variant_1_barcode: "Штрихкод"
+      variant_1_sku: "Артикул"
+      variant_1_price: "Цена"
+      variant_1_quantity: "Количество"
+      variant_1_cost_price: "Себестоимость"
       # Image fields
       images: "Изображения"
       images_zap: "Изображения (с водяным знаком)"

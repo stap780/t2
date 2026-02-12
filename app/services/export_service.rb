@@ -122,7 +122,7 @@ class ExportService
     end
 
     csv_content = CSV.generate do |csv|
-      csv << headers
+      csv << headers.map { |h| Export.field_label(h) }
 
       # Add data rows
       flattened_data.each do |record|
@@ -164,7 +164,7 @@ class ExportService
 
     wb.add_worksheet(name: "Sheet 1") do |sheet|
       # Add headers
-      sheet.add_row headers
+      sheet.add_row headers.map { |h| Export.field_label(h) }
 
       # Add data rows
       flattened_data.each do |record|
@@ -233,11 +233,28 @@ class ExportService
       end
       
       # Разворачиваем features
-      # features_to_h возвращает хеш с ключами из property.title (могут быть на русском)
-      features_data = product_hash['features'] || product_hash[:features]
+      # Предпочитаем заранее подготовленный хеш features_hash (product.features_to_h),
+      # но поддерживаем и старый формат — массив { 'property', 'characteristic' }
+      features_data = product_hash['features_hash'] || product_hash[:features_hash] ||
+                      product_hash['features']      || product_hash[:features]
       if features_data.present?
-        # Преобразуем в обычный хеш, если это ActiveSupport::HashWithIndifferentAccess
-        features_hash = features_data.is_a?(Hash) ? features_data : {}
+        features_hash =
+          if features_data.is_a?(Hash)
+            # Современный формат: {"Марка"=>"Audi", "Цвет"=>"Серый"}
+            features_data
+          elsif features_data.is_a?(Array)
+            # Старый формат: [{ 'property' => 'Марка', 'characteristic' => 'Audi' }, ...]
+            features_data.each_with_object({}) do |f, acc|
+              next unless f.respond_to?(:[]) # защитимся от неожиданных объектов
+              property       = (f['property'] || f[:property]).to_s
+              characteristic = (f['characteristic'] || f[:characteristic]).to_s
+              next if property.blank?
+              acc[property] = characteristic
+            end
+          else
+            {}
+          end
+
         if features_hash.any?
           Rails.logger.debug "📤 ExportService: Product #{product_hash['id']} has features: #{features_hash.keys.join(', ')}"
           features_hash.each do |property, characteristic|

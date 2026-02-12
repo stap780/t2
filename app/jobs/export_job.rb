@@ -4,6 +4,14 @@ class ExportJob < ApplicationJob
   # If Export record is missing when job runs, drop it silently
   discard_on ActiveJob::DeserializationError
 
+  # Workaround: Solid Queue worker on macOS (Puma plugin) sometimes doesn't persist finished_at.
+  # Explicitly mark job as finished so Mission Control shows it.
+  after_perform do |job|
+    sq = SolidQueue::Job.find_by(active_job_id: job.job_id)
+    sq&.update_column(:finished_at, Time.current)
+    Rails.logger.info "🎯 ExportJob: marked finished_at for job #{job.job_id}" if sq
+  end
+
   def perform(export, expected_at = nil)
     # Skip if time changed after enqueue (stale job)
     if expected_at.present? && export.respond_to?(:scheduled_for) && export.scheduled_for.present?

@@ -299,13 +299,16 @@ class Export < ApplicationRecord
       variant.attributes.with_indifferent_access
     end
     
-    # Добавляем features как массив для итерации: for feature in product.features
+    # Добавляем features:
+    # 1) как массив для итерации в шаблонах (XML, Liquid)
     hash['features'] = product.features.map do |feature|
       {
         'property' => feature.property.title.to_s,
         'characteristic' => feature.characteristic.title.to_s
       }
     end
+    # 2) как хеш "Название свойства" => "Значение" для плоских экспортов (CSV/XLSX)
+    hash['features_hash'] = product.features_to_h
     
     # Добавляем изображения как массив URL
     # Используем выбранный вариант изображений или оригинал по умолчанию
