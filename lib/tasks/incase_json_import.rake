@@ -289,7 +289,7 @@ module IncaseJsonImporter
         update_attrs = {
           incase_status_id: incase_status&.id || existing_incase.incase_status_id,
           incase_tip_id: incase_tip&.id || existing_incase.incase_tip_id,
-          modelauto: [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip.presence || existing_incase.modelauto
+          modelauto: (case_data['modelauto']&.strip).presence || [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip.presence || existing_incase.modelauto
         }
         
         # Update totalsum if provided in JSON
@@ -348,7 +348,7 @@ module IncaseJsonImporter
   
   def self.has_differences?(existing_incase, case_data, strah_company, company)
     parsed_date = parse_date(case_data['actdate'] || case_data['date'] || case_data['created_at'] || case_data['date_vukladki'])
-    modelauto = [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
+    modelauto = (case_data['modelauto']&.strip).presence || [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
     
     # Find status and tip from JSON
     incase_status = find_or_create_incase_status(case_data['status'] || case_data[:status])
@@ -369,7 +369,7 @@ module IncaseJsonImporter
   
   def self.create_incase_dubl(case_data, strah_company, company, import = nil)
     parsed_date = parse_date(case_data['actdate'] || case_data['date'] || case_data['created_at'] || case_data['date_vukladki'])
-    modelauto = [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
+    modelauto = (case_data['modelauto']&.strip).presence || [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
     
     # Use provided import or create one for tracking
     unless import
@@ -494,7 +494,7 @@ module IncaseJsonImporter
   def self.create_new_incase(case_data, strah_company, company)
     # Try actdate first, then date, created_at, date_vukladki
     parsed_date = parse_date(case_data['actdate'] || case_data['date'] || case_data['created_at'] || case_data['date_vukladki'])
-    modelauto = [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
+    modelauto = (case_data['modelauto']&.strip).presence || [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
     
     # Find or create status and tip
     incase_status = find_or_create_incase_status(case_data['status'] || case_data[:status])
@@ -609,6 +609,73 @@ module IncaseJsonImporter
     
     value.to_s.to_i
   end
+
+  # Обновляет только modelauto для существующих убытков по данным из JSON.
+  # Не создаёт новые записи и дубли. Используется для повторного импорта после исправления.
+  def self.run_update_modelauto_only(url = nil, email = nil, password = nil, page = 1)
+    puts "=" * 60
+    puts "Updating modelauto only from JSON"
+    puts "URL: #{url}"
+    puts "=" * 60
+
+    cookies = nil
+    begin
+      puts "\n[1/3] Downloading JSON..."
+      if email && password
+        json_data, cookies = authenticate_and_download(url, email, password)
+      else
+        json_data = download_json(url)
+      end
+      puts "✓ Downloaded #{json_data.length} bytes"
+
+      puts "\n[2/3] Parsing JSON..."
+      cases = parse_json(json_data)
+      puts "✓ Found #{cases.length} cases"
+
+      puts "\n[3/3] Updating modelauto..."
+      updated = update_modelauto_only(cases)
+      puts "=" * 60
+      puts "✓ Updated #{updated} incases"
+      puts "=" * 60
+      { updated: updated }
+    rescue => e
+      puts "\n❌ ERROR: #{e.class} - #{e.message}"
+      puts e.backtrace.first(10).join("\n")
+      raise
+    end
+  end
+
+  def self.update_modelauto_only(cases)
+    updated = 0
+    cases.each_with_index do |case_data, index|
+      unumber = case_data['unumber']&.strip
+      if unumber.blank?
+        puts "  Skip #{index + 1}: no unumber"
+        next
+      end
+
+      modelauto = (case_data['modelauto']&.strip).presence ||
+        [case_data['marka'] || case_data['marka_ts'], case_data['model'] || case_data['model_ts']].compact.join(' ').strip
+      if modelauto.blank?
+        puts "  Skip #{index + 1} (#{unumber}): no modelauto in JSON"
+        next
+      end
+
+      stoanumber = (case_data['stoanumber'] || case_data['number_z_n_stoa'])&.strip
+      incase = Incase.find_by_unumber_and_stoanumber(unumber, stoanumber)
+      unless incase
+        puts "  Skip #{index + 1} (#{unumber}): incase not found"
+        next
+      end
+
+      if incase.modelauto != modelauto
+        incase.update_column(:modelauto, modelauto)
+        updated += 1
+        puts "  ✓ #{index + 1} ##{incase.id} #{unumber}: #{modelauto}"
+      end
+    end
+    updated
+  end
 end
 
 namespace :incase do
@@ -648,9 +715,53 @@ namespace :incase do
       puts "=== Page #{page} ==="
       IncaseJsonImporter.run(url, email, password, page)
     end
-  end  
+  end
 
+  desc "Update only modelauto for existing incases from JSON (no new records, no dubls)"
+  task :update_modelauto_from_json, [:email, :password, :page] => :environment do |t, args|
+    require 'net/http'
+    require 'uri'
+    require 'json'
+
+    base_url = 'http://138.197.52.153/inbound_cases.json'
+    page = args[:page] || '1'
+    url = "#{base_url}?page=#{page}"
+    email = args[:email]
+    password = args[:password]
+
+    puts "Using URL: #{url}"
+    puts "Using email: #{email}" if email
+    puts "Using page: #{page}"
+
+    IncaseJsonImporter.run_update_modelauto_only(url, email, password, page.to_i)
+  end
+
+  desc "Update modelauto only for a range of pages"
+  task :update_modelauto_from_json_range, [:email, :password, :start_page, :end_page] => :environment do |t, args|
+    require 'net/http'
+    require 'uri'
+    require 'json'
+
+    base_url = 'http://138.197.52.153/inbound_cases.json'
+    email = args[:email]
+    password = args[:password]
+    start_page = (args[:start_page] || 1).to_i
+    end_page = (args[:end_page] || 1).to_i
+
+    total = 0
+    (start_page..end_page).each do |page|
+      url = "#{base_url}?page=#{page}"
+      puts "=== Page #{page} ==="
+      result = IncaseJsonImporter.run_update_modelauto_only(url, email, password, page)
+      total += result[:updated]
+    end
+    puts "\n" + "=" * 60
+    puts "Total updated: #{total}"
+    puts "=" * 60
+  end
 end
 
 # rails 'incase:json_import[email,password,page]'
+# rails 'incase:update_modelauto_from_json[email,password,page]'
+# rails 'incase:update_modelauto_from_json_range[email,password,1,50]'
 
