@@ -62,7 +62,7 @@ namespace :insales do
         end
       end
       
-      sleep 1
+      sleep 0.8
 
       puts "   Страница #{page}, ключ #{key_idx + 1}/4, товаров #{products.size}"
       page += 1
@@ -122,7 +122,70 @@ namespace :insales do
     stats[:errors] += 1
     Rails.logger.warn "InsalesVarbindSync: не удалось создать varbind: #{e.message}"
   end
+
+  desc "Обновить цену и количество в InSales по varbind через variants_group_update"
+  task prices_update: :environment do
+    puts "🔄 Обновление цен и остатков в InSales (variants_group_update)"
+    puts "⏰ Время начала: #{Time.zone.now}"
+
+    insale = Insale.first
+    unless insale
+      puts "❌ Нет записи Insale в базе. Создайте и настройте Insale."
+      next
+    end
+
+    stats = { total: 0, updated: 0, errors: 0 }
+    batch_size = 50
+
+    varbinds = Varbind.where(
+      bindable_type: "Insale",
+      bindable_id: insale.id,
+      record_type: "Variant"
+    ).includes(:record)
+
+    variants_data = varbinds.filter_map do |vb|
+      next unless vb.record.is_a?(Variant)
+
+      variant = vb.record
+      {
+        id: vb.value.to_i,
+        price: variant.price.to_f,
+        quantity: variant.quantity.to_i
+      }
+    end
+
+    stats[:total] = variants_data.size
+
+    if variants_data.empty?
+      puts "   Нет вариантов с varbind для InSales."
+      next
+    end
+
+    variants_data.each_slice(batch_size).with_index do |batch, idx|
+      key_idx = idx % INSALES_CREDENTIALS.size
+      creds = INSALES_CREDENTIALS[key_idx]
+
+      InsalesApi::App.api_key = creds[:api_key]
+      InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
+
+      InsalesApi.wait_retry do
+        InsalesApi::Product.put(:variants_group_update, variants: batch)
+      end
+
+      stats[:updated] += batch.size
+      puts "   Батч #{idx + 1}, ключ #{key_idx + 1}/4, обновлено #{batch.size} вариантов"
+      sleep 0.8
+    end
+
+    puts "\n📊 Итого: обновлено #{stats[:updated]} из #{stats[:total]} вариантов"
+    puts "⏰ Время завершения: #{Time.zone.now}"
+  rescue StandardError => e
+    puts "   ❌ Ошибка: #{e.class} #{e.message}"
+    Rails.logger.error "InsalesPricesUpdate: #{e.message}\n#{e.backtrace.first(10).join("\n")}"
+    raise
+  end
 end
 
 
-# rails  'insales:varbind_sync'
+# rails insales:varbind_sync
+# rails insales:prices_update
