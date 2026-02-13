@@ -61,7 +61,6 @@ class ActPdfService
 
       pdf.move_down 10
 
-
       # Заголовок акта
       pdf.text "АКТ ПРИЕМА-ПЕРЕДАЧИ № #{@act.id}", size: 12, style: :bold, align: :center
       pdf.move_down 20
@@ -141,6 +140,9 @@ class ActPdfService
       # Группируем позиции по заявкам (Incase)
       incases = @act.items.includes(:incase).map(&:incase).uniq.compact
 
+      # Высота шапки для страниц 2+ (резерв под повторяющийся заголовок)
+      header_height = 25
+
       # Минимальная высота для футера с подписями
       footer_min_height = 20 + 15  # 35 точек от bounds.bottom
       # Оценка высоты: заголовок заявки ~25pt, одна строка позиции ~25pt, отступ после блока 10pt
@@ -156,6 +158,7 @@ class ActPdfService
         # Если вся заявка не помещается на текущей странице — переносим её целиком на новую
         if block_height > available_height
           pdf.start_new_page
+          pdf.move_down(header_height) if pdf.page_number >= 2
         end
 
         # Заголовок заявки
@@ -178,6 +181,7 @@ class ActPdfService
           # На случай очень длинной заявки: не рисовать поверх футера
           if pdf.cursor < footer_min_height + row_height
             pdf.start_new_page
+            pdf.move_down(header_height) if pdf.page_number >= 2
           end
 
           item_data = [
@@ -201,6 +205,18 @@ class ActPdfService
         end
 
         pdf.move_down 10
+      end
+
+      # Шапка со 2-й страницы: идентификация акта
+      header_text = "Акт сдачи-приёмки № #{@act.id} от #{@act.date&.strftime('%d/%m/%Y')} . СТОА: #{company&.title || 'Не указано'}"
+      pdf.repeat(->(pg) { pg >= 2 }, dynamic: true) do
+        pdf.font(font_name) do
+          pdf.bounding_box([pdf.bounds.left, pdf.bounds.top], width: pdf.bounds.width, height: header_height) do
+            pdf.text header_text, size: 8, align: :center
+            pdf.move_down 2
+            pdf.stroke_horizontal_line pdf.bounds.left, pdf.bounds.right, at: pdf.cursor
+          end
+        end
       end
 
       # Подписи в футере страницы
@@ -233,30 +249,12 @@ class ActPdfService
     end
 
     # Добавляем нумерацию страниц внизу справа в формате "CTP X/Y"
-    # Используем repeat для контроля размера шрифта разных частей
-    pdf.repeat(:all) do
-      pdf.bounding_box([pdf.bounds.right - 100, 20], width: 100, height: 20) do
-        page_num = pdf.page_number
-        total_pages = pdf.page_count rescue nil
-        
-        if total_pages && total_pages > 0
-          # Используем inline_format для разных размеров шрифта
-          pdf.text_box "<font size='7'>CTP</font> <font size='9'>#{page_num}/#{total_pages}</font>", 
-                       at: [0, 20], 
-                       width: 100, 
-                       align: :right,
-                       inline_format: true,
-                       size: 9
-        else
-          pdf.text_box "<font size='7'>CTP</font> <font size='9'>#{page_num}</font>", 
-                       at: [0, 20], 
-                       width: 100, 
-                       align: :right,
-                       inline_format: true,
-                       size: 9
-        end
-      end
-    end
+    pdf.number_pages "CTP <page>/<total>",
+      at: [pdf.bounds.right - 100, 20],
+      width: 100,
+      align: :right,
+      page_filter: :all,
+      size: 9
 
     pdf.render
   end

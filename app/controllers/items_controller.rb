@@ -146,7 +146,8 @@ class ItemsController < ApplicationController
             dom_id(@incase, dom_id(@item, 'act_show')),
             partial: "items/act_show",
             locals: { item: @item, incase: @incase }
-          )
+          ),
+          turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
         ]
       end
     end
@@ -164,7 +165,8 @@ class ItemsController < ApplicationController
             dom_id(@incase, dom_id(@item, 'act_show')),
             partial: "items/act_show",
             locals: { item: @item, incase: @incase }
-          )
+          ),
+          turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
         ]
       end
     end

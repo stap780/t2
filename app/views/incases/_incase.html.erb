@@ -23,6 +23,7 @@
   </div>
   <div class="flex flex-col">
     <span class="text-sm text-black-900"><%= link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800", data: { turbo: false } %></span>
+    <span class="text-sm text-gray-600"><%= incase.stoanumber %></span>
     <span class="text-sm text-gray-600"><%= incase.strah&.short_title %></span>
   </div>
   <div class="text-sm text-gray-600"><%= incase.company&.short_title %></div>

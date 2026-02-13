@@ -31,6 +31,16 @@ document.addEventListener("turbo:load", function() {
         element.checked = false
       })
     }
+    Turbo.StreamActions.scroll_to = function () {
+      const targetId = this.target || this.getAttribute("target");
+      const scroll = () => {
+        const element = document.getElementById(targetId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      };
+      requestAnimationFrame(scroll);
+    };
   }
 }, { once: true })
 
