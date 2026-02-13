@@ -107,9 +107,17 @@ export default class extends Controller {
                 urlObj.searchParams.append("property_id", newVal[0].value)
                 urlObj.searchParams.append("turbo_frame_id", turboFrameId)
                 
+                const featureableType = this.element.dataset.featureableType
+                if (featureableType) {
+                  urlObj.searchParams.append("featureable_type", featureableType)
+                }
                 const productId = this.element.dataset.productId
                 if (productId) {
                   urlObj.searchParams.append("product_id", productId)
+                }
+                const detalId = this.element.dataset.detalId
+                if (detalId) {
+                  urlObj.searchParams.append("detal_id", detalId)
                 }
               } else if (fieldName && fieldName.includes('variant_id')) {
                 urlObj.searchParams.append("variant_id", newVal[0].value)
@@ -124,9 +132,17 @@ export default class extends Controller {
                 urlObj.searchParams.append("property_id", newVal[0].value)
                 urlObj.searchParams.append("turbo_frame_id", turboFrameId)
                 
+                const featureableType = this.element.dataset.featureableType
+                if (featureableType) {
+                  urlObj.searchParams.append("featureable_type", featureableType)
+                }
                 const productId = this.element.dataset.productId
                 if (productId) {
                   urlObj.searchParams.append("product_id", productId)
+                }
+                const detalId = this.element.dataset.detalId
+                if (detalId) {
+                  urlObj.searchParams.append("detal_id", detalId)
                 }
               }
               

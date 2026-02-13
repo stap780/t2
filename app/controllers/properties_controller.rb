@@ -94,21 +94,31 @@ class PropertiesController < ApplicationController
     @turbo_frame_id = params[:turbo_frame_id]
     property_id = params[:property_id]
     product_id = params[:product_id]
+    detal_id = params[:detal_id]
+    featureable_type = params[:featureable_type]
     
     # Проверяем наличие обязательных параметров
     return head :bad_request unless @turbo_frame_id.present? && property_id.present?
     
     @feature_id_str = @turbo_frame_id.sub('feature_', '')
     
-    # Находим product из параметров
-    @product = product_id ? Product.find(product_id.to_i) : Product.new
+    # Определяем featureable (Product или Detal)
+    @featureable = if product_id.present?
+      Product.find(product_id.to_i)
+    elsif detal_id.present?
+      Detal.find(detal_id.to_i)
+    elsif featureable_type.present?
+      featureable_type.constantize.new
+    else
+      Product.new
+    end
     
     # Пытаемся найти feature (для сохраненных features с числовым ID)
     feature_id = @feature_id_str.to_i if @feature_id_str.match?(/^\d+$/) && @feature_id_str.to_i < 2147483647
-    @feature = feature_id ? @product.features.find_by(id: feature_id) : nil
+    @feature = feature_id ? @featureable.features.find_by(id: feature_id) : nil
     
     # Если feature не найден, создаем новый (для новых features с hash ID)
-    @feature ||= @product.features.build
+    @feature ||= @featureable.features.build
     
     # Обновляем property_id
     if property_id.present?
@@ -120,7 +130,7 @@ class PropertiesController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
-          turbo_stream.replace(@turbo_frame_id, partial: "features/feature", locals: { feature: @feature, product: @product })
+          turbo_stream.replace(@turbo_frame_id, partial: "features/feature", locals: { feature: @feature, featureable: @featureable })
         ]
       end
     end

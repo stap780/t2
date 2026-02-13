@@ -9,7 +9,7 @@ class Product < ApplicationRecord
   include Bindable
   audited except: [:images_urls, :file_description]
 
-  has_many :features, as: :featureable, dependent: :destroy
+  has_many :features, -> { order(:property_id) }, as: :featureable, dependent: :destroy
   has_many :properties, through: :features
   accepts_nested_attributes_for :features, allow_destroy: true
 

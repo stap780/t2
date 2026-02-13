@@ -114,16 +114,14 @@ class FeaturesController < ApplicationController
         @featureable = Product.find(params[:product_id])
       elsif params[:detal_id].present?
         @featureable = Detal.find(params[:detal_id])
+      elsif params[:featureable_type].present?
+        @featureable = params[:featureable_type].constantize.new
+      elsif params.key?(:detal_id)
+        @featureable = Detal.new
+      elsif params.key?(:product_id)
+        @featureable = Product.new
       else
-        # Для новых записей определяем по параметрам
-        if params[:product_id] == nil && params[:detal_id] == nil
-          # Пытаемся определить из feature_params или создаем новый объект
-          if params[:feature] && params[:feature][:featureable_type]
-            @featureable = params[:feature][:featureable_type].constantize.new
-          else
-            @featureable = Product.new
-          end
-        end
+        @featureable = params[:feature]&.dig(:featureable_type)&.constantize&.new || Product.new
       end
     end
 
