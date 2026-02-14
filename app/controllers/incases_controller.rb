@@ -15,8 +15,10 @@ class IncasesController < ApplicationController
     base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
     search_params_hash = (search_params || {}).dup
 
-    # Process multiple unumber search
+    # Process multiple unumber, carnumber, stoanumber search (несколько значений через пробел → точный поиск по массиву)
     processed_params = process_multiple_unumber_search(search_params_hash)
+    processed_params = process_multiple_carnumber_search(processed_params)
+    processed_params = process_multiple_stoanumber_search(processed_params)
     
     searching_by_barcode = processed_params.keys.any? { |key| key.to_s.include?('items_barcode') }
     
@@ -311,23 +313,27 @@ class IncasesController < ApplicationController
   end
 
   def process_multiple_unumber_search(search_params_hash)
-    # В params[:q] ключи приходят строками, не символами.
-    # Поле поиска по номеру убытка и др. сейчас называется:
-    #   unumber_or_items_barcode_or_carnumber_cont
-    search_key = 'unumber_or_items_barcode_or_items_katnumber_or_carnumber_or_stoanumber_cont'
+    process_multiple_field_search(search_params_hash, 'unumber_cont', 'unumber_in', 50)
+  end
 
-    return search_params_hash unless search_params_hash[search_key].present?
+  def process_multiple_carnumber_search(search_params_hash)
+    process_multiple_field_search(search_params_hash, 'carnumber_cont', 'carnumber_in', 50)
+  end
 
-    search_value = search_params_hash[search_key].to_s.strip
+  def process_multiple_stoanumber_search(search_params_hash)
+    process_multiple_field_search(search_params_hash, 'stoanumber_cont', 'stoanumber_in', 50)
+  end
 
-    # Если введено несколько значений через пробел — пытаемся поискать по массиву номеров убытков
+  def process_multiple_field_search(search_params_hash, cont_key, in_key, max_length = 50)
+    return search_params_hash unless search_params_hash[cont_key].present?
+
+    search_value = search_params_hash[cont_key].to_s.strip
+
     if search_value.include?(' ')
       parts = search_value.split(/\s+/).map(&:strip).reject(&:blank?)
-
-      if parts.length > 1 && parts.all? { |part| part.length <= 50 }
-        # Переключаемся с общего поля поиска на точный поиск по массиву unumber
-        search_params_hash.delete(search_key)
-        search_params_hash['unumber_in'] = parts
+      if parts.length > 1 && parts.all? { |part| part.length <= max_length }
+        search_params_hash.delete(cont_key)
+        search_params_hash[in_key] = parts
       end
     end
 

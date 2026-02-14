@@ -243,7 +243,7 @@ class ProductsController < ApplicationController
         end
       end
     else
-      flash.now[:notice] = 'Продукт не может быть заполнен'
+      flash.now[:notice] = 'Продукт не может быть заполнен. Нет мастер карточки.'
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: [

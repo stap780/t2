@@ -709,6 +709,7 @@ ru:
       act_date: "Дата акта"
       status: "Статус"
       driver: "Водитель"
+      send_to_driver: "Отправить водителю"
       items: "Позиции акта"
       print_etiketkas_all: "Все"
       print_etiketkas_selected: "Выбранные"
@@ -717,6 +718,7 @@ ru:
       yes: "Да"
       no: "Нет"
       note: "Примечание"
+      print_etiketkas_yes: "Да"
     form:
       okrug: "Округ"
       item_statuses: "Статусы позиций"
@@ -727,6 +729,9 @@ ru:
       success: "Акты успешно созданы"
     destroy:
       success: "Акт успешно удален"
+    send_to_driver:
+      no_driver: "У акта не назначен водитель"
+      success: "Акт отправлен водителю на email"
   incase_imports:
     index:
       heading: "Импорты"

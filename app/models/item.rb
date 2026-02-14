@@ -97,17 +97,39 @@ class Item < ApplicationRecord
   def create_product_variant
     return if variant_id.present?
     
-    product = Product.create!(
-      title: title.presence || 'Incase product',
+    product = Product.create!(product_attributes_for_creation)
+    self.variant_id = product.variants.first.id
+  end
+
+  def product_attributes_for_creation
+    sku = katnumber.presence || ''
+    detal = sku.present? ? Detal.find_by(sku: sku) : nil
+  
+    attrs = {
+      title: (detal&.title.presence || title.presence || 'Incase product'),
       status: 'draft',
-      tip: 'product'
-    )
-    variant = product.variants.create!(
-      quantity: quantity || 0,
-      price: price || 0,
-      sku: katnumber.presence || ''
-    )
-    self.variant_id = variant.id
+      tip: 'product',
+      variants_attributes: [{
+        quantity: quantity || 0,
+        price: price || 0,
+        sku: sku
+      }]
+    }
+  
+    if detal.present?
+      attrs[:description] = detal.desc
+      attrs[:features_attributes] = detal.features.map do |f|
+        { property_id: f.property_id, characteristic_id: f.characteristic_id }
+      end
+    elsif incase&.modelauto.present?
+      property = Property.find_or_create_by!(title: 'Старый Modelauto')
+      characteristic = property.characteristics.find_or_create_by!(title: incase.modelauto)
+      attrs[:features_attributes] = [
+        { property_id: property.id, characteristic_id: characteristic.id }
+      ]
+    end
+  
+    attrs
   end
 
   def recalculate_incase_status

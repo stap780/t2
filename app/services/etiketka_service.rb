@@ -110,14 +110,32 @@ class EtiketkaService
                    overflow: :shrink_to_fit
     end
 
+    # Название машины (Марка + Модель или Старый Modelauto)
+    modelauto_text = car_model_name
+    if modelauto_text.present?
+      modelauto_y = pdf.bounds.top - 12
+      pdf.font(font_name) do
+        pdf.text_box modelauto_text.to_s[0..35], 
+                     at: [pdf.bounds.left, modelauto_y], 
+                     width: pdf.bounds.width,
+                     height: 9,
+                     size: 11, 
+                     align: :center, 
+                     valign: :top,
+                     overflow: :shrink_to_fit
+      end
+      barcode_y = modelauto_y - 10
+    else
+      barcode_y = pdf.bounds.top - 12
+    end
+
     # Штрих-код (PNG изображение) - максимально уменьшаем отступы
-    barcode_y = pdf.bounds.top - 12
     barcode_text_y = nil
     
     if @variant.barcode.present? && @variant.barcode.size == 13
       insert_barcode_image(pdf, barcode_y)
       # Поднимаем числовой код выше (уменьшаем расстояние)
-      barcode_text_y = barcode_y - 55  # Уменьшили с 55 до 50
+      barcode_text_y = barcode_y - 52
     end
 
     # Числовой код штрих-кода (крупным шрифтом)
@@ -141,8 +159,8 @@ class EtiketkaService
       # Вычисляем позицию SKU: между числовым кодом и footer
       # Поднимаем SKU выше (уменьшаем отступ от числового кода)
       if barcode_text_y
-        # SKU ниже числового кода штрих-кода с меньшим отступом (поднимаем выше)
-        sku_y = barcode_text_y - 15
+        # SKU ниже числового кода штрих-кода, поднимаем выше для большего отступа от footer
+        sku_y = barcode_text_y - 12
       else
         # Размещаем выше footer с достаточным отступом
         sku_y = footer_height + 20
@@ -189,6 +207,21 @@ class EtiketkaService
     nil
   end
 
+  def car_model_name
+    h = @variant.product.features_to_h
+    marka = (h['Марка'] || h['Brand'])&.strip
+    model = (h['Модель'] || h['Model'])&.strip
+    old_modelauto = (h['Старый Modelauto'])&.strip
+
+    if marka.present? || model.present?
+      [marka, model].compact.join(' ').strip
+    elsif old_modelauto.present?
+      old_modelauto
+    else
+      ''
+    end
+  end
+
   def insert_barcode_image(pdf, y_position)
     return unless @variant.barcode.present? && @variant.barcode.size == 13
 
@@ -206,8 +239,8 @@ class EtiketkaService
     # Вставить в PDF (максимально увеличиваем размер штрих-кода, минимальные отступы)
     # Вычисляем максимальную ширину с минимальными отступами (почти без отступов)
     max_width = pdf.bounds.width - 0.5
-    barcode_width = [max_width, 170].min # Увеличено с 150 до 170
-    barcode_height = 55 # Увеличено с 50 до 55 для лучшей читаемости
+    barcode_width = [max_width, 150].min
+    barcode_height = 52
     
     # Позиционируем изображение по центру по горизонтали
     x_position = pdf.bounds.left + (pdf.bounds.width - barcode_width) / 2

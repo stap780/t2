@@ -5,8 +5,8 @@
       
       <% if @incases_group_by_company_id.present? %>
         <!-- Таблица с компаниями и позициями -->
-        <% @incases_group_by_company_id.each do |company_id, incases| %>
-          
+        <% @sorted_company_ids.each do |company_id| %>
+          <% incases = @incases_group_by_company_id[company_id] %>
           <% company = incases.first.company %>
           <% metadata = @companies_metadata[company_id] %>
           

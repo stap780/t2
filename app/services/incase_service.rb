@@ -195,7 +195,6 @@ class IncaseService
     end
   end
   
-  
   def create_incase_dubl(row_data, strah_company, company)
     parsed_date = parse_date(row_data['Дата выкладки Акта п-п в папку СК'])
     modelauto = "#{row_data['Марка ТС']&.to_s} #{row_data['Модель ТС']&.to_s}".strip

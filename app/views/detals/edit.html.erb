@@ -1,4 +1,7 @@
 <div class="max-w-1xl mx-auto">
-  <h1 class="text-2xl font-semibold mb-4"><%= t('detals.edit.title') %></h1>
+  <div class="flex items-center mb-4 space-x-4">
+    <%= link_to_back detals_path %>
+    <h1 class="text-2xl font-semibold"><%= t('detals.edit.title') %></h1>
+  </div>
   <%= render "form", detal: @detal %>
 </div>

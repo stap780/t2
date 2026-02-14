@@ -118,6 +118,27 @@
                 </div>
             </div>
         </div>
+        <div data-controller="checkbox">
+            <div class="block text-sm font-medium text-gray-700 mb-1">Связи</div>
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center space-x-2">
+                <%= f.check_box :with_insale, {
+                        checked: params.dig('q', 'with_insale') == '1',
+                        class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                        data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                    } %>
+                <%= f.label :with_insale, 'InSales', class: 'text-sm text-gray-700' %>
+                </div>
+                <div class="flex items-center space-x-2">
+                <%= f.check_box :with_moysklad, {
+                        checked: params.dig('q', 'with_moysklad') == '1',
+                        class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                        data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                    } %>
+                <%= f.label :with_moysklad, 'МойСклад', class: 'text-sm text-gray-700' %>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="flex gap-2 mt-4">

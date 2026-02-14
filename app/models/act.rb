@@ -61,6 +61,14 @@ class Act < ApplicationRecord
     # Создание/обновление актов
     created_act_ids = create_or_update_from_grouped_data(grouped_data)
 
+    # Отправка актов водителям после создания
+    if created_act_ids.any?
+      acts_by_driver = where(id: created_act_ids).where.not(driver_id: nil).group_by(&:driver_id)
+      acts_by_driver.each do |driver_id, acts|
+        GenerateActsPdfJob.perform_later(acts.map(&:id), driver_id)
+      end
+    end
+
     { success: true, act_ids: created_act_ids.uniq }
   rescue => e
     Rails.logger.error("Act.create_from_selected_items error: #{e.class} #{e.message}")

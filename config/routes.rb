@@ -183,6 +183,7 @@ Rails.application.routes.draw do
       get :print, format: :pdf
       get :print_etiketkas, format: :pdf
       post :print_selected_etiketkas, format: :pdf
+      post :send_to_driver
     end
     collection do
       post :create_multi

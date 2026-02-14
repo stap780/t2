@@ -14,9 +14,9 @@ production:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12
   
-  product_import:
-    class: ProductImportJob
-    schedule: at 20:20 every day
+  # product_import:
+  #   class: ProductImportJob
+  #   schedule: at 20:20 every day
   
   detal_oszz_price_update:
     class: DetalOszzPriceUpdateJob
@@ -24,9 +24,9 @@ production:
   
   moysklad_update_quantities:
     class: MoyskladUpdateQuantitiesJob
-    schedule: at 19:30 every day  # Обновление остатков в 19:30
-  
+    schedule: every 3 hours
+    # schedule: at 19:30 every day  # Обновление остатков в 19:30
+
   moysklad_create_products_batch:
     class: MoyskladCreateProductsBatchJob
     schedule: at 20:00 every day  # Массовое создание товаров в МойСклад вечером после 20:00
-    queue: default

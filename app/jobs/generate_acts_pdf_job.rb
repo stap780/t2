@@ -2,7 +2,7 @@
 class GenerateActsPdfJob < ApplicationJob
   queue_as :default
   
-  def perform(act_ids, user_id)
+  def perform(act_ids, user_id, resend: false)
     require 'prawn'
     require 'combine_pdf'
     require 'stringio'
@@ -10,8 +10,8 @@ class GenerateActsPdfJob < ApplicationJob
     # Находим получателя (водителя)
     user = User.find(user_id)
     
-    # Находим акты со статусом "Новый"
-    acts = Act.where(id: act_ids, status: :pending)
+    # Находим акты: при resend — любые, иначе только со статусом "Новый"
+    acts = resend ? Act.where(id: act_ids) : Act.where(id: act_ids, status: :pending)
     return if acts.empty?
     
     # Создаем EmailDelivery записи для каждого акта (если еще не созданы)

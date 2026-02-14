@@ -34,9 +34,8 @@ export default class extends Controller {
       })
     } else {
       // Глобальный селект - меняем все items в пределах этого контроллера
-      this.itemResultsTargets.forEach((element, index) => {
+      this.element.querySelectorAll('[data-choose-target="itemResults"]').forEach((element) => {
         element.value = selectedValue
-        // Находим форму и отправляем её только если элемент имеет data-submit-element='true'
         if (element.dataset.submitElement === 'true') {
           const form = element.closest('form')
           if (form) {

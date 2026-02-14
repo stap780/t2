@@ -27,7 +27,7 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
-
+  after_update :sync_description_to_detals
   before_destroy :check_variants_have_items, prepend: true
 
   validates :title, presence: true
@@ -56,6 +56,13 @@ class Product < ApplicationRecord
 
   scope :with_images, -> { joins(:images).where.not(images: {product_id: nil}).distinct }
   scope :without_images, -> { left_joins(:images).where(images: {product_id: nil}) }
+
+  scope :with_insale, -> {
+    joins(variants: :bindings).where(varbinds: { bindable_type: 'Insale' }).distinct
+  }
+  scope :with_moysklad, -> {
+    joins(variants: :bindings).where(varbinds: { bindable_type: 'Moysklad' }).distinct
+  }
 
   # Scopes для фильтрации по опасным/предупреждающим ценам
   scope :danger_true, -> { 
@@ -91,7 +98,7 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images danger_true warning_true]
+    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad danger_true warning_true]
   end
 
   # Ransackers для фильтрации по истории изменений (изменения Variant через associated_audits)
@@ -252,7 +259,6 @@ class Product < ApplicationRecord
 
   private
 
-
   def check_variants_have_items
     # Проверяем, есть ли Items, которые ссылаются на Variant этого Product
     variant_ids = variants.pluck(:id)
@@ -344,5 +350,16 @@ class Product < ApplicationRecord
     [true, { product: self, variant: variant }]
   end
 
+  def sync_description_to_detals
+    return if description.blank?
   
+    new_desc = description.to_plain_text
+    skus = variants.where.not(sku: [nil, '']).pluck(:sku).uniq
+    return if skus.empty?
+  
+    Detal.where(sku: skus).find_each do |detal|
+      detal.update_column(:desc, new_desc) if detal.desc != new_desc
+    end
+  end
+
 end

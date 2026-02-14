@@ -1,5 +1,5 @@
 class ActsController < ApplicationController
-  before_action :set_act, only: [:show, :edit, :update, :destroy, :print, :print_etiketkas]
+  before_action :set_act, only: [:show, :edit, :update, :destroy, :print, :print_etiketkas, :send_to_driver]
   include ActionView::RecordIdentifier
   include PrintEtiketkas
 
@@ -193,6 +193,11 @@ class ActsController < ApplicationController
         }
       end
       
+      # Сортировка компаний по цвету: Красный → Жёлтый → Зелёный → Белый → Серый (color_id 1→2→3→4→5)
+      @sorted_company_ids = @incases_group_by_company_id.keys.sort_by do |company_id|
+        @companies_metadata[company_id][:color_id] || 999
+      end
+      
       # Сохраняем параметры для использования в шаблоне
       @okrug_ids = params[:okrug_ids]
       @item_status_ids = params[:item_status_ids]
@@ -220,9 +225,19 @@ class ActsController < ApplicationController
           ]
         end
       else
-        format.turbo_stream { redirect_to acts_path(format: :html), notice: "Создано актов: #{result[:act_ids]&.count || 0}" }
+        act_ids = result[:act_ids] || []
+        format.turbo_stream { redirect_to acts_path(format: :html), notice: "Создано актов: #{act_ids.count}" }
       end
     end
+  end
+
+  def send_to_driver
+    if @act.driver.blank?
+      redirect_to act_path(@act), alert: t('.no_driver')
+      return
+    end
+    GenerateActsPdfJob.perform_later([@act.id], @act.driver_id, resend: true)
+    redirect_to act_path(@act), notice: t('.success')
   end
 
   def print
@@ -235,13 +250,24 @@ class ActsController < ApplicationController
   end
 
   # Печать этикеток только для выбранных позиций акта
+  # При params[:status]=="da" — печатает только позиции со статусом "Да"
   def print_selected_etiketkas
     @act = Act.find(params[:id])
 
-    item_ids = params[:item_ids]
+    item_ids = if params[:status] == 'da'
+      da_status = ItemStatus.find_by(title: 'Да')
+      if da_status.blank?
+        flash[:alert] = 'Статус "Да" не найден'
+        redirect_back(fallback_location: act_path(@act))
+        return
+      end
+      @act.items.where(item_status_id: da_status.id).pluck(:id)
+    else
+      params[:item_ids]
+    end
 
     if item_ids.blank?
-      flash[:alert] = 'Выберите позиции для печати этикеток'
+      flash[:alert] = params[:status] == 'da' ? 'В акте нет позиций со статусом "Да"' : 'Выберите позиции для печати этикеток'
       redirect_back(fallback_location: act_path(@act))
       return
     end
@@ -262,7 +288,6 @@ class ActsController < ApplicationController
       record_name: 'акте'
     )
   end
-
 
   private
 

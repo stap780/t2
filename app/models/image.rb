@@ -106,6 +106,6 @@ class Image < ApplicationRecord
     end
     
     # Генерируем zap вариант в фоне (с водяным знаком)
-    ImageZapVariantJob.perform_later(self)
+    # ImageZapVariantJob.perform_later(self)
   end
 end
