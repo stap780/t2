@@ -71,6 +71,11 @@ class VariantsController < ApplicationController
             turbo_stream.replace(dom_id(@product, dom_id(@variant, :price)), partial: "products/inline/price", locals: { product: @product, variant: @variant })
           ]
         end
+      else
+        format.turbo_stream do
+          flash.now[:alert] = @variant.errors.full_messages.join(", ")
+          render turbo_stream: [render_turbo_flash], status: :unprocessable_entity
+        end
       end
     end
   end
