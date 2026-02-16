@@ -1,5 +1,5 @@
 <%= turbo_frame_tag dom_id(@product, :status) do %>
-    <%= form_with model: @product, url: update_status_inline_product_path(@product), method: :patch, local: false, class: "inline-flex items-center gap-1 z-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[145px] bg-white p-2 shadow-lg" do |f| %>
+    <%= form_with model: @product, url: update_status_inline_product_path(@product), method: :patch, local: false, class: "inline-flex items-center gap-1 z-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[155px] bg-white p-2 shadow-lg" do |f| %>
         <%= f.select :status, options_for_select(Product::STATUS.map { |s| [t("products.form.status.#{s}"), s] }, @product.status),
             { include_blank: t("products.form.select_status") },
             { class: "w-full px-2 py-1 border border-gray-300 rounded-md" } %>

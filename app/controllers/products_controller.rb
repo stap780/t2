@@ -283,8 +283,15 @@ class ProductsController < ApplicationController
 
   def update_status_inline
     @product.update(status: params[:product][:status])
+    flash.now[:success] = t(".success")
     respond_to do |format|
-      format.turbo_stream { redirect_to products_path(format: :html), notice: t(".success") }
+      format.turbo_stream { 
+        render turbo_stream: [
+          turbo_stream.replace(dom_id(@product), partial: "products/product", locals: { product: @product }),
+          render_turbo_flash
+        ] 
+      # redirect_to products_path(format: :html), notice: t(".success") 
+      }
     end
   end
 

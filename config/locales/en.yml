@@ -414,6 +414,8 @@ en:
       success: "Product was successfully created."
     update:
       success: "Product was successfully updated."
+    update_status_inline:
+      success: "Status updated"
     destroy:
       success: "Product was successfully destroyed."
   variants:

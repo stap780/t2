@@ -526,6 +526,8 @@ ru:
       success: "Товар создан"
     update:
       success: "Товар обновлен"
+    update_status_inline:
+      success: "Статус обновлён"
     destroy:
       success: "Товар удален"
     insales_info:
