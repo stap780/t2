@@ -136,7 +136,5 @@ class VariantsController < ApplicationController
     params.require(:variant).permit(:product_id, :sku, :barcode, :quantity, :cost_price, :price)
   end
 
-  def render_turbo_flash
-    turbo_stream.replace("flash", partial: "shared/flash")
-  end
+
 end

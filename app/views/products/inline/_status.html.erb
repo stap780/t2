@@ -1,0 +1,10 @@
+<%= turbo_frame_tag dom_id(product, :status) do %>
+    <div class="px-2 py-1 rounded">
+        <div class="flex flex-col gap-2">
+            <%= link_to edit_status_inline_product_path(product), 
+                class: "text-sm text-blue-600 hover:text-blue-800", data: {turbo_prefetch: false} do %>
+                <span class="font-medium"><%= t("products.form.status.#{product.status}") %></span>
+            <% end %>
+        </div>
+    </div>
+<% end %>

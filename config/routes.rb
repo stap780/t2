@@ -52,6 +52,8 @@ Rails.application.routes.draw do
       post :copy
       patch :sort_image
       post :sync_with_moysklad
+      get :edit_status_inline
+      patch :update_status_inline
     end
     resources :variants do
       member do

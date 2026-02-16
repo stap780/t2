@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline ]
   after_action :clear_preloaded_detals, only: [:index, :edit, :update]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
@@ -276,6 +276,15 @@ class ProductsController < ApplicationController
         render turbo_stream: [render_turbo_flash]
       end
       format.html { redirect_to products_path, flash_type => flash_message }
+    end
+  end
+
+  def edit_status_inline; end
+
+  def update_status_inline
+    @product.update(status: params[:product][:status])
+    respond_to do |format|
+      format.turbo_stream { redirect_to products_path(format: :html), notice: t(".success") }
     end
   end
 
