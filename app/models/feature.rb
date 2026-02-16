@@ -5,6 +5,8 @@ class Feature < ApplicationRecord
 
   validates :property_id, uniqueness: { scope: [:featureable_type, :featureable_id] }
   
+  scope :ordered, -> { order(title: :asc) }
+
   # Отслеживание изменений для Product через associated_audits
   audited associated_with: :featureable
   

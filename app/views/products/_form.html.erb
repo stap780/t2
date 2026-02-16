@@ -72,7 +72,7 @@
             class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" %>
         </div>      
           <%= turbo_frame_tag dom_id(product, 'features') do %>
-            <div class="grid grid-cols-[1fr_1fr_50px] gap-4 p-2 hover:bg-gray-50">
+            <div class="grid gap-4 p-2 hover:bg-gray-50" style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
               <div>Название</div>
               <div>Значение</div>
               <div></div>
@@ -132,7 +132,7 @@
           </div>
 
           <!-- Список изображений -->
-          <%= turbo_frame_tag "images", class: "flex flex-wrap gap-1", data: { controller: "sortable" } do %>
+          <%= turbo_frame_tag "images", class: "flex flex-wrap gap-1", data: { controller: "sortable lightbox" } do %>
             <%= f.fields_for :images do |form| %>
               <%= render partial: "images/image", 
                   locals: { 

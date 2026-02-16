@@ -5,20 +5,20 @@ import "controllers"
 import "trix"
 import "@rails/actiontext"
 
-// Fancybox initialization
-import { Fancybox } from "@fancyapps/ui"
+// // Fancybox initialization
+// import { Fancybox } from "@fancyapps/ui"
 
-function initFancybox() {
-  Fancybox.bind("[data-fancybox]", {
-    Toolbar: {
-      display: {
-        left: ["infobar"],
-        middle: [],
-        right: ["slideshow", "download", "thumbs", "close"],
-      },
-    },
-  })
-}
+// function initFancybox() {
+//   Fancybox.bind("[data-fancybox]", {
+//     Toolbar: {
+//       display: {
+//         left: ["infobar"],
+//         middle: [],
+//         right: ["slideshow", "download", "thumbs", "close"],
+//       },
+//     },
+//   })
+// }
 
 // Custom Turbo Stream Actions
 // set_unchecked: снимает выделение со всех чекбоксов, найденных по селектору из атрибута targets
@@ -44,5 +44,5 @@ document.addEventListener("turbo:load", function() {
   }
 }, { once: true })
 
-document.addEventListener("DOMContentLoaded", initFancybox)
-document.addEventListener("turbo:load", initFancybox)
+// document.addEventListener("DOMContentLoaded", initFancybox)
+// document.addEventListener("turbo:load", initFancybox)

@@ -8,6 +8,8 @@ class Property < ApplicationRecord
   has_many :characteristics, -> { order(title: :asc) }, dependent: :destroy
   accepts_nested_attributes_for :characteristics, allow_destroy: true, reject_if: :all_blank
 
+  scope :ordered, -> { order(title: :asc) }
+
   validates :title, presence: true, uniqueness: true
   validates :handle, uniqueness: true, allow_nil: true
 

@@ -8,11 +8,11 @@ export default class extends Controller {
   static values = { productId: Number };
 
   connect() {
-    console.log('[Image] Controller connected', {
-      hasFilesInputTarget: this.hasFilesInputTarget,
-      filesInputTarget: this.hasFilesInputTarget ? this.filesInputTarget : null,
-      productId: this.productIdValue
-    });
+    // console.log('[Image] Controller connected', {
+    //   hasFilesInputTarget: this.hasFilesInputTarget,
+    //   filesInputTarget: this.hasFilesInputTarget ? this.filesInputTarget : null,
+    //   productId: this.productIdValue
+    // });
   }
 
   triggerFileInput(event) {

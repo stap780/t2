@@ -5,7 +5,7 @@ export default class extends Controller {
   static targets = ["input", "counter"]
 
   connect() {
-    console.log('connected character-counter');
+    // console.log('connected character-counter');
     this.updateCounter()
     this.inputTarget.addEventListener("input", () => this.updateCounter())
   }

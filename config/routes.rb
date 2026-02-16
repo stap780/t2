@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   resources :detals do
     member do
       get :get_oszz

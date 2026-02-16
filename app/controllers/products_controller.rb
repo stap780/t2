@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad ]
-  after_action :clear_preloaded_detals, only: [:index]
+  after_action :clear_preloaded_detals, only: [:index, :edit, :update]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -73,6 +73,11 @@ class ProductsController < ApplicationController
     @product.images.includes([:file_attachment, :file_blob])
     @features = @product.features
     @variants = @product.variants.order(id: :asc)
+    
+    # Preload Detal для oszz_price (избегаем N+1)
+    skus = @variants.map(&:sku).compact.uniq
+    detals_by_sku = Detal.where(sku: skus).pluck(:sku, :oszz_price).to_h if skus.any?
+    Variant.preload_detals(detals_by_sku || {})
   end
 
   def filter
@@ -277,7 +282,11 @@ class ProductsController < ApplicationController
   private
 
   def set_product
-    @product = Product.find(params[:id])
+    @product = Product.includes(
+      images: [:file_attachment, :file_blob],
+      variants: [],
+      features: { property: :characteristics }
+    ).find(params[:id])
   end
 
   def clear_preloaded_detals

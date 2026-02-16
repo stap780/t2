@@ -43,11 +43,7 @@
   <!-- Изображение -->
   <div class="w-full flex items-center justify-center bg-gray-50 rounded aspect-square mb-2 overflow-hidden" data-original-image-url="<%= img_def_url %>">
     <% if blob_exists %>
-      <% 
-        # Используем оригинальное изображение для быстрой загрузки
-        # Вариант thumb_webp будет создан асинхронно при необходимости
-        img = url_for(blob)
-      %>
+      <% img = url_for(blob) %>
       <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
         <div class="img-ratio__inner w-full h-full">
           <%= picture_tag(class: "block w-full h-full") do %>
@@ -71,7 +67,7 @@
   
   <!-- Действия -->
   <div class="flex items-center justify-between mt-1">
-    <a href="<%= img_def_url %>" data-fancybox="gallery" class="text-blue-400 hover:text-blue-600 mr-2">
+    <a href="<%= img_def_url %>" data-src="<%= img_def_url %>" class="lg-image-link text-blue-400 hover:text-blue-600 mr-2" data-turbo="false" >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.92 3.053-3.858 6.002-9.542 7-5.685-.999-8.623-3.947-9.542-7z" />
