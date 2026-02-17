@@ -344,6 +344,13 @@ en:
         record_id: "Record ID"
         created_at: "Created At"
         updated_at: "Updated At"
+      user:
+        name: "First name"
+        surname: "Surname"
+        email_address: "Email"
+        password: "Password"
+        password_confirmation: "Password confirmation"
+        role: "Role"
     errors:
       models:
         product:

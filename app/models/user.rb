@@ -26,6 +26,11 @@ class User < ApplicationRecord
     ["created_at", "email_address", "id", "id_value", "password_digest", "role", "updated_at"]
   end
 
+  def full_name
+    return email_address if name.blank? && surname.blank?
+    "#{name} #{surname}".strip
+  end
+
   private
 
   def password_required?

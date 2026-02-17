@@ -1130,6 +1130,8 @@ ru:
         comments:
           body: "Текст комментария"
       user:
+        name: "Имя"
+        surname: "Фамилия"
         email_address: "Email"
         password: "Пароль"
         password_confirmation: "Подтверждение пароля"

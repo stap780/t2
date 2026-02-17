@@ -2,7 +2,7 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     <div>
       <%= f.label t("activerecord.attributes.audit.user"), class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.collection_select :user_id_eq, User.all, :id, :email_address, {include_blank: true}, {class: "block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm"} %>
+      <%= f.collection_select :user_id_eq, User.all, :id, :full_name, {include_blank: true}, {class: "block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-violet-500 focus:ring-violet-500 sm:text-sm"} %>
     </div>
 
     <div>
