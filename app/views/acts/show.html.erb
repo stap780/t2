@@ -42,10 +42,16 @@
           </div>
         </div>
       </div>
-      <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf, status: 'da'), method: :post, target: '_blank', data: { turbo: false } do |f| %>
-        <button type="submit" class="px-3 py-1 rounded-md border border-green-300 hover:bg-green-100 inline-flex items-center gap-1 cursor-pointer">
+      <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf, status: 'Да'), method: :post, target: '_blank', data: { turbo: false } do |f| %>
+        <button type="submit" class="px-2 py-1 rounded-md border border-green-300 hover:bg-green-100 inline-flex items-center gap-1 cursor-pointer">
           <%= barcode_icon %>
           <span><%= t('acts.show.print_etiketkas_yes') %></span>
+        </button>
+      <% end %>
+      <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf, status: 'В работе'), method: :post, target: '_blank', data: { turbo: false } do |f| %>
+        <button type="submit" class="px-2 py-1 rounded-md border border-green-300 hover:bg-green-100 inline-flex items-center gap-1 cursor-pointer">
+          <%= barcode_icon %>
+          <span><%= t('acts.show.print_etiketkas_in_work') %></span>
         </button>
       <% end %>
     </div>
@@ -129,7 +135,7 @@
     <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('.items') %></h2>
 
     <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
-    <% incases.sort_by(&:created_at).reverse_each do |incase| %>
+    <% incases.sort_by(&:date) do |incase| %>
       <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" data-controller="choose">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">

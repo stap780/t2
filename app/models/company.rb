@@ -4,7 +4,7 @@ class Company < ApplicationRecord
   
   belongs_to :okrug, optional: true
   
-  has_many :incases
+  # has_many :incases
   has_many :client_companies, dependent: :destroy
   has_many :clients, through: :client_companies
   accepts_nested_attributes_for :client_companies, allow_destroy: true

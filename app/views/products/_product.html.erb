@@ -1,5 +1,5 @@
 <%= turbo_frame_tag dom_id(product), class: "grid grid-cols-[90px_70px_80px_1fr_100px_85px_120px] gap-1 px-1 py-1 border-b hover:bg-gray-50 items-center" do %>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-1">
     <%= check_box_tag "product_ids[]", product.id, false, {
       class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500', 
       data: { 'selectall_target': 'checkbox', action: "change->selectall#toggleParent"}, 
@@ -7,6 +7,7 @@
     } %>
     <div class="text-xs text-gray-500"><%= product.id %></div>
     <div class="text-xs text-gray-500"><%= product.created_at.strftime('%d.%m.%Y') %></div>
+    <div class="text-xs text-gray-500"><%= product.updated_at.strftime('%d.%m.%Y') %></div>
   </div>
   <div>
     <% first_image = product.images.first %>

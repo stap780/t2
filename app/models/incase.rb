@@ -31,6 +31,7 @@ class Incase < ApplicationRecord
 
   attribute :strah_title
   attribute :company_title
+  attribute :okrug_title
   attribute :company_contacts_data
   attribute :incase_status_title
   attribute :incase_tip_title
@@ -42,6 +43,7 @@ class Incase < ApplicationRecord
       stoanumber       # Номер з/н
       strah_title      # СК
       company_title    # СТО
+      okrug_title      # Округ
       modelauto        # модель а/м
       carnumber        # номер а/м
       date             # дата
@@ -94,6 +96,11 @@ class Incase < ApplicationRecord
   def company_title
     return '' unless company.present?
     company.title
+  end
+
+  def okrug_title
+    return '' unless company.present? && company.okrug.present?
+    company.okrug.title
   end
 
   def company_contacts_data

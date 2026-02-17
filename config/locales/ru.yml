@@ -721,6 +721,7 @@ ru:
       no: "Нет"
       note: "Примечание"
       print_etiketkas_yes: "Да"
+      print_etiketkas_in_work: "В работе"
     form:
       okrug: "Округ"
       item_statuses: "Статусы позиций"
@@ -1040,6 +1041,7 @@ ru:
         sendstatus: "Отправлено"
         strah_title: "Название страховой компании"
         company_title: "Название контрагента"
+        okrug_title: "Округ"
         company_contacts_data: "Контакты контрагента"
         incase_status_title: "Статус убытка"
         incase_tip_title: "Тип убытка"

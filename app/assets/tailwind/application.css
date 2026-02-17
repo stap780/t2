@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source("../../");
 
 @layer components {
   /* Аккуратный тонкий скроллбар для левого меню */

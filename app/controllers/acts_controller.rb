@@ -254,20 +254,20 @@ class ActsController < ApplicationController
   def print_selected_etiketkas
     @act = Act.find(params[:id])
 
-    item_ids = if params[:status] == 'da'
-      da_status = ItemStatus.find_by(title: 'Да')
-      if da_status.blank?
-        flash[:alert] = 'Статус "Да" не найден'
+    item_ids = if params[:status]
+      item_status = ItemStatus.find_by(title: params[:status])
+      if item_status.blank?
+        flash[:alert] = "Статус #{params[:status]} не найден"
         redirect_back(fallback_location: act_path(@act))
         return
       end
-      @act.items.where(item_status_id: da_status.id).pluck(:id)
+      @act.items.where(item_status_id: item_status.id).pluck(:id)
     else
       params[:item_ids]
     end
 
     if item_ids.blank?
-      flash[:alert] = params[:status] == 'da' ? 'В акте нет позиций со статусом "Да"' : 'Выберите позиции для печати этикеток'
+      flash[:alert] = params[:status] ? "В акте нет позиций со статусом #{params[:status]}" : 'Выберите позиции для печати этикеток'
       redirect_back(fallback_location: act_path(@act))
       return
     end

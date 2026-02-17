@@ -12,7 +12,7 @@ class IncasesController < ApplicationController
       puts "search_params: #{search_params}"
     end
     # Join items and variants if searching by items_barcode
-    base_relation = Incase.includes(:company, :strah, :incase_status, :incase_tip, items: :variant)
+    base_relation = Incase.includes([company: :okrug], :strah, :incase_status, :incase_tip, items: :variant)
     search_params_hash = (search_params || {}).dup
 
     # Process multiple unumber, carnumber, stoanumber search (несколько значений через пробел → точный поиск по массиву)

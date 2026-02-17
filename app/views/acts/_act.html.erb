@@ -16,9 +16,14 @@
   <div class="text-sm text-gray-600"><%= act.items.count %></div>
   <div class="flex justify-end space-x-2">
     <%= link_to_edit act_path(act), data: { turbo: false } %>
-    <%= link_to "PDF", print_act_path(act, format: :pdf), class: "px-2 py-1 rounded-md border border-blue-300 hover:bg-violet-200", target: '_blank' %>
+    <%= link_to "PDF", print_act_path(act, format: :pdf), class: "px-2 py-1 rounded-md border border-blue-300 hover:bg-violet-200 h-8 text-sm", target: '_blank' %>
     <%# link_to_print_barcode print_etiketkas_act_path(act, format: :pdf) %>
-    <%= link_to_print_barcode print_selected_etiketkas_act_path(act, format: :pdf, status: 'da'), title: t('acts.show.print_etiketkas_yes') %>
+    <%# link_to_print_barcode print_selected_etiketkas_act_path(act, format: :pdf, status: 'da'), title: t('acts.show.print_etiketkas_yes') %>
+    <%= form_with url: print_selected_etiketkas_act_path(act, format: :pdf, status: 'В работе'), method: :post, target: '_blank', data: { turbo: false } do |f| %>
+      <button type="submit" class="px-2 py-1 rounded-md border border-green-300 hover:bg-green-100 inline-flex items-center gap-1 cursor-pointer h-8" title="В работе">
+        <%= barcode_icon %>
+      </button>
+    <% end %>
     <%= link_to_delete act_path(act), data: { turbo_method: :delete, turbo_confirm: t('actions.delete') } %>
   </div>
 <% end %>
