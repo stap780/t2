@@ -27,7 +27,8 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
-  after_update :sync_description_to_detals
+  after_create :sync_product_data_to_detals
+  after_update :sync_product_data_to_detals
   before_destroy :check_variants_have_items, prepend: true
 
   validates :title, presence: true
@@ -260,13 +261,13 @@ class Product < ApplicationRecord
   private
 
   def check_variants_have_items
-    # Проверяем, есть ли Items, которые ссылаются на Variant этого Product
+    # Проверяем, есть ли позиции убытка (Item), которые ссылаются на Variant этого Product
     variant_ids = variants.pluck(:id)
     return if variant_ids.empty?
     
     items_count = Item.where(variant_id: variant_ids).count
     if items_count > 0
-      errors.add(:base, "Cannot delete product. There are #{items_count} item(s) that reference this product's variants.")
+      errors.add(:base, I18n.t('activerecord.errors.models.product.variants_have_items', count: items_count))
       throw(:abort)
     end
   end
@@ -350,15 +351,31 @@ class Product < ApplicationRecord
     [true, { product: self, variant: variant }]
   end
 
-  def sync_description_to_detals
-    return if description.blank?
-  
-    new_desc = description.to_plain_text
+  def sync_product_data_to_detals
     skus = variants.where.not(sku: [nil, '']).pluck(:sku).uniq
     return if skus.empty?
-  
+
+    # Создаём Detal для SKU, если ещё нет
+    skus.each do |sku|
+      Detal.find_or_create_by!(sku: sku) { |detal| detal.title = title.presence || sku }
+    end
+
+    new_title = title
+    new_desc = description.present? ? description.to_plain_text : nil
+    product_features = features.reload.to_a
+
     Detal.where(sku: skus).find_each do |detal|
-      detal.update_column(:desc, new_desc) if detal.desc != new_desc
+      attrs = {}
+      attrs[:title] = new_title if detal.title != new_title
+      attrs[:desc] = new_desc if new_desc.present? && detal.desc != new_desc
+
+      detal.update_columns(attrs) if attrs.any?
+
+      # Синхронизация параметров (features): заменяем параметры детали на параметры товара
+      detal.features.destroy_all
+      product_features.each do |pf|
+        detal.features.create!(property_id: pf.property_id, characteristic_id: pf.characteristic_id)
+      end
     end
   end
 

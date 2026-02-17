@@ -344,6 +344,12 @@ en:
         record_id: "Record ID"
         created_at: "Created At"
         updated_at: "Updated At"
+    errors:
+      models:
+        product:
+          variants_have_items:
+            one: "Cannot delete product. 1 loss position references this product's variants."
+            other: "Cannot delete product. %{count} loss positions reference this product's variants."
   acts:
     index:
       acts_search: "Search by number, item title, barcode or car number"
