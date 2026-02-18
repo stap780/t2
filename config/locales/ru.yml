@@ -2,6 +2,7 @@ ru:
   edit: "Редактировать"
   delete: "Удалить"
   print_barcode: "Печать штрихкода"
+  generate_barcode: "Генерация штрихкода"
   nav:
     brand: "App"
     dashboard: "Панель"
@@ -315,6 +316,8 @@ ru:
     create: "Создать"
     delete: "Удалить"
     delete_confirm: "Вы уверены?"
+    generate_barcode: "Будет создан новый штрихкод. Старый удалится. Вы уверены!?"
+    binds: "Связи"
     upload: "Загрузить"
     view: "Просмотр"
   access_denied: "Доступ запрещён. Требуются права администратора."
@@ -535,6 +538,7 @@ ru:
     sync_with_moysklad: "Синхронизировать с МС"
     sync_with_moysklad_started: "Синхронизация с МойСклад запущена"
     sync_with_moysklad_no_binding: "Настройте связь с МойСклад в разделе привязок товара"
+    sync_with_moysklad_success: "создали товар в МС"
   properties:
     index:
       title: "Параметры"

@@ -61,6 +61,7 @@ Rails.application.routes.draw do
         get :print_etiketka
         get :edit_price_inline
         patch :update_price_inline
+        get :generate_barcode
       end
     end
     resources :varbinds, only: [:new, :create, :edit, :update, :destroy]

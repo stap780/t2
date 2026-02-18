@@ -280,8 +280,18 @@ class ProductsController < ApplicationController
       flash_message = t("products.sync_with_moysklad_started")
       flash_type = :notice
     else
-      flash_message = t("products.sync_with_moysklad_no_binding")
-      flash_type = :alert
+      # flash_message = t("products.sync_with_moysklad_no_binding")
+      # flash_type = :alert
+      service = Moysklad::SyncProductService.new(@product, Moysklad.first)
+      result = service.call
+      
+      if result[:success]
+        flash_message = t("products.sync_with_moysklad_success")
+        flash_type = :notice
+      else
+        flash_message = t("products.sync_with_moysklad_error")
+        flash_type = :alert
+      end
     end
 
     respond_to do |format|

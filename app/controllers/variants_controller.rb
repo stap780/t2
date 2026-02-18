@@ -1,6 +1,6 @@
 class VariantsController < ApplicationController
   before_action :set_product
-  before_action :set_variant, only: %i[show edit update destroy print_etiketka edit_price_inline update_price_inline]
+  before_action :set_variant, only: %i[show edit update destroy print_etiketka edit_price_inline update_price_inline generate_barcode]
   include ActionView::RecordIdentifier
 
   def index
@@ -102,6 +102,22 @@ class VariantsController < ApplicationController
     redirect_back(fallback_location: product_variants_path(@product))
   end
 
+  def generate_barcode
+    @variant.create_barcode
+    respond_to do |format|
+      flash.now[:success] = t('.success')
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(
+            dom_id(@product, dom_id(@variant)),
+            partial: "variants/variant",
+            locals: { variant: @variant, product: @product }
+          )
+        ]
+      end
+    end
+  end
+
   def destroy
     check_destroy = @variant.destroy ? true : false
     if check_destroy == true
@@ -140,6 +156,5 @@ class VariantsController < ApplicationController
   def variant_params
     params.require(:variant).permit(:product_id, :sku, :barcode, :quantity, :cost_price, :price)
   end
-
 
 end

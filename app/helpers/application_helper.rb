@@ -32,6 +32,36 @@ module ApplicationHelper
           </svg>'.html_safe
   end
 
+  def generate_barcode_icon
+    '<svg class="w-4 h-4 mr-1 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
+      <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
+      <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
+      <rect x="13" y="6" width="1" height="12" fill="currentColor"/>
+      <rect x="16" y="6" width="2" height="12" fill="currentColor"/>
+      <rect x="20" y="6" width="1" height="12" fill="currentColor"/>
+      <g>
+        <path d="M7 4v-1a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1" fill="none"/>
+        <rect x="10" y="1.5" width="4" height="3" rx="1" fill="currentColor" opacity="0.15"/>
+      </g>
+      <g>
+        <path d="M12 9v3m0 0l2-2m-2 2l-2-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g>
+    </svg>'.html_safe
+  end
+
+  def link_to_generate_barcode(path, **options)
+    if options[:class]
+      options[:class]
+    elsif !options[:class]
+      options[:class] = "p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center h-8"
+    end
+    options[:title] ||= t('generate_barcode')
+    link_to path, options do
+      generate_barcode_icon
+    end
+  end
+
   def link_to_print_barcode(path, **options)
     if options[:class]
       options[:class]

@@ -29,6 +29,7 @@
 
 en:
   hello: "Hello world"
+  generate_barcode: "Generate barcode"
   nav:
     brand: "Exports"
     dashboard: "Dashboard"
@@ -184,6 +185,8 @@ en:
   actions:
     edit: "Edit"
     run: "Run"
+    generate_barcode: "A new barcode will be created. The old one will be removed."
+    binds: "Bindings"
     cancel: "Cancel"
     save: "Save"
     update: "Update"
@@ -431,6 +434,7 @@ en:
       success: "Status updated"
     destroy:
       success: "Product was successfully destroyed."
+    sync_with_moysklad_success: "Product created in Moysklad"
   variants:
     index:
       title: "Variants"

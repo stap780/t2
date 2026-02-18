@@ -124,8 +124,6 @@ class Variant < ApplicationRecord
   end
 
   def create_barcode
-    return if barcode.present?
-  
     next_number = BarcodeCounter.next_value!
     code_value = next_number.to_s.rjust(12, '0')
     barcode_obj = Barby::EAN13.new(code_value)
