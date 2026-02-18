@@ -435,6 +435,7 @@ en:
     destroy:
       success: "Product was successfully destroyed."
     sync_with_moysklad_success: "Product created in Moysklad"
+    sync_with_moysklad_error: "Moysklad sync error"
   variants:
     index:
       title: "Variants"

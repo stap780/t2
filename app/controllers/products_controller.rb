@@ -289,7 +289,7 @@ class ProductsController < ApplicationController
         flash_message = t("products.sync_with_moysklad_success")
         flash_type = :notice
       else
-        flash_message = t("products.sync_with_moysklad_error")
+        flash_message = result.to_s
         flash_type = :alert
       end
     end

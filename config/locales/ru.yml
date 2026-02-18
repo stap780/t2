@@ -539,6 +539,7 @@ ru:
     sync_with_moysklad_started: "Синхронизация с МойСклад запущена"
     sync_with_moysklad_no_binding: "Настройте связь с МойСклад в разделе привязок товара"
     sync_with_moysklad_success: "создали товар в МС"
+    sync_with_moysklad_error: "Ошибка синхронизации с МойСклад"
   properties:
     index:
       title: "Параметры"
