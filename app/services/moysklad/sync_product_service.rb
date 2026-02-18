@@ -20,25 +20,22 @@ class Moysklad::SyncProductService
     existing_binding = @variant.bindings.find_by(bindable: @moysklad)
     
     if existing_binding&.value.present?
-      # Товар уже существует - обновляем через PUT (без code)
-      payload = build_payload(include_code: false)
+      payload = build_payload
       update_in_moysklad(payload, existing_binding.value)
     else
-      # Товара нет - создаем через POST (с code)
-      payload = build_payload(include_code: true)
+      payload = build_payload
       send_to_moysklad(payload)
     end
   end
 
   private
 
-  def build_payload(include_code: true)
-    features_hash = @product.features_to_h
-    
+  # Один и тот же payload для создания и обновления. code = barcode.
+  def build_payload
     payload = {
       "name" => @product.title.to_s,
       "externalCode" => @product.id.to_s,
-      "description" => @product.file_description.to_s,
+      "description" => (@product.file_description.presence || "").to_s,
       "vat" => 18,
       "effectiveVat" => 18,
       "barcodes" => [barcode_for_payload],
@@ -65,45 +62,36 @@ class Moysklad::SyncProductService
           "mediaType" => "application/json",
           "uuidHref" => "https://online.moysklad.ru/app/#good/edit?id=770c8263-4dd9-11e7-7a34-5acf0005f710"
         }
-      }
+      },
+      "buyPrice" => build_buy_price
     }
-    
-    # Добавляем buyPrice из cost_price, если он есть
-    if @variant.cost_price.present?
-      buy_price_in_cents = (@variant.cost_price * 100).to_f.round(0)
-      payload["buyPrice"] = {
-        "value" => buy_price_in_cents,
-        "currency" => {
-          "meta" => {
-            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/309cadeb-35fc-11e6-7a69-9711001fa0ae",
-            "metadataHref" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata",
-            "type" => "currency",
-            "mediaType" => "application/json",
-            "uuidHref" => "https://online.moysklad.ru/app/#currency/edit?id=309cadeb-35fc-11e6-7a69-9711001fa0ae"
-          }
-        }
-      }
-    end
-    
-    # Добавляем code только при создании нового товара
-    payload["code"] = code_for_payload if include_code
-    
+
+    payload["code"] = barcode_for_payload
+
     payload
   end
 
-  def code_for_payload
-    # Используем sku, если есть, иначе barcode
-    @variant.sku.present? ? @variant.sku : barcode_for_payload
+  def build_buy_price
+    cost_cents = (@variant.cost_price || 0) * 100
+    {
+      "value" => cost_cents.to_f.round(0),
+      "currency" => {
+        "meta" => {
+          "href" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/309cadeb-35fc-11e6-7a69-9711001fa0ae",
+          "metadataHref" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata",
+          "type" => "currency",
+          "mediaType" => "application/json",
+          "uuidHref" => "https://online.moysklad.ru/app/#currency/edit?id=309cadeb-35fc-11e6-7a69-9711001fa0ae"
+        }
+      }
+    }
   end
 
   def barcode_for_payload
     return @variant.barcode if @variant.barcode.present? && @variant.barcode.size == 13
-    
-    # Генерируем EAN13 из ID, если баркода нет
-    code_value = @variant.id.to_s.rjust(12, '0')
-    barcode = Barby::EAN13.new(code_value)
-    barcode.checksum
-    barcode.data_with_checksum
+
+    @variant.create_barcode
+    @variant.barcode
   end
 
   def price_in_cents

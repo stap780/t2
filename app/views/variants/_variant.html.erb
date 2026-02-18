@@ -7,15 +7,19 @@
   <div><%= variant.quantity %></div>
   <div><%= variant.cost_price %></div>
   <div><%# variant.price %><%= render 'products/inline/price', product: product, variant: variant %></div>
-  <div class="flex justify-end space-x-1">
-    <%= link_to_generate_barcode generate_barcode_product_variant_path(product, variant), title: t('generate_barcode'), 
-    data: { turbo_stream: true, turbo_method: :get, turbo_confirm: t('actions.generate_barcode'), turbo_prefetch: false } %>
-    <%= link_to_print_barcode print_etiketka_product_variant_path(product, variant) %>
-    <%= link_to_varbind product_variant_path(product, variant), title: t('actions.binds'),
-        data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
-    <%= link_to_edit edit_product_variant_path(product, variant), 
-        data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
-    <%= link_to_delete product_variant_path(product, variant), 
-        data: { turbo_method: :delete, turbo_confirm: t('actions.delete_confirm') } %>
+  <div class="flex flex-col gap-1">
+    <div class="flex justify-end space-x-1">
+      <%= link_to_generate_barcode generate_barcode_product_variant_path(product, variant), title: t('generate_barcode'), 
+      data: { turbo_stream: true, turbo_method: :get, turbo_confirm: t('actions.generate_barcode'), turbo_prefetch: false } %>
+      <%= link_to_print_barcode print_etiketka_product_variant_path(product, variant) %>
+      <%= link_to_varbind product_variant_path(product, variant), title: t('actions.binds'),
+          data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    </div>
+    <div class="flex justify-end space-x-1">
+      <%= link_to_edit edit_product_variant_path(product, variant), 
+          data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+      <%= link_to_delete product_variant_path(product, variant), 
+          data: { turbo_method: :delete, turbo_confirm: t('actions.delete_confirm') } %>
+    </div>
   </div>
 <% end %>
