@@ -17,6 +17,7 @@ class Variant < ApplicationRecord
   
   after_initialize :set_default_new, if: :new_record?
   after_commit :create_barcode, on: :create
+  after_save :sync_to_moysklad_if_price_changed, if: :saved_change_to_price?
   before_destroy :prevent_destroy_if_last
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -172,6 +173,12 @@ class Variant < ApplicationRecord
   def set_default_new
     self.quantity = 0 if quantity.nil?
     self.price = 0 if price.nil?
+  end
+
+  def sync_to_moysklad_if_price_changed
+    return unless product.has_moysklad_binding?
+
+    MoyskladSyncProductJob.perform_later(product.id)
   end
 
   def prevent_destroy_if_last

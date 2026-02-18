@@ -102,55 +102,6 @@ class Product < ApplicationRecord
     %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad danger_true warning_true]
   end
 
-  # Ransackers для фильтрации по истории изменений (изменения Variant через associated_audits)
-  # Ransacker для фильтрации по наличию атрибута в audited_changes
-  # Ищет только в associated_audits (изменения Variant: price, quantity)
-  ransacker :audits_model_attribute do |parent|
-    products_table = parent.table
-    Arel.sql("EXISTS (
-      SELECT 1 FROM audits 
-      WHERE audits.associated_type = 'Product' 
-      AND audits.associated_id = #{products_table[:id].to_sql}
-      AND audits.audited_changes ? #{Arel::Nodes::BindParam.new}
-    )")
-  end
-
-  # Ransacker для проверки наличия старого значения (первый элемент массива)
-  # Ищет только в associated_audits (изменения Variant)
-  # Возвращает булево значение для работы с предикатом present
-  ransacker :audits_old_value_present do |parent|
-    products_table = parent.table
-    Arel.sql("CASE WHEN EXISTS (
-      SELECT 1 FROM audits 
-      WHERE audits.associated_type = 'Product' 
-      AND audits.associated_id = #{products_table[:id].to_sql}
-      AND jsonb_typeof(audits.audited_changes) = 'object'
-      AND EXISTS (
-        SELECT 1 FROM jsonb_object_keys(audits.audited_changes) AS key
-        WHERE jsonb_typeof(audits.audited_changes->key) = 'array'
-        AND (audits.audited_changes->key)->0 IS NOT NULL
-      )
-    ) THEN true ELSE false END")
-  end
-
-  # Ransacker для проверки наличия нового значения (второй элемент массива)
-  # Ищет только в associated_audits (изменения Variant)
-  # Возвращает булево значение для работы с предикатом present
-  ransacker :audits_new_value_present do |parent|
-    products_table = parent.table
-    Arel.sql("CASE WHEN EXISTS (
-      SELECT 1 FROM audits 
-      WHERE audits.associated_type = 'Product' 
-      AND audits.associated_id = #{products_table[:id].to_sql}
-      AND jsonb_typeof(audits.audited_changes) = 'object'
-      AND EXISTS (
-        SELECT 1 FROM jsonb_object_keys(audits.audited_changes) AS key
-        WHERE jsonb_typeof(audits.audited_changes->key) = 'array'
-        AND (audits.audited_changes->key)->1 IS NOT NULL
-      )
-    ) THEN true ELSE false END")
-  end
-
   # Ransacker для фильтрации по номеру акта через variants -> items -> acts
   ransacker :acts_number do |parent|
     Arel.sql("(
@@ -162,11 +113,6 @@ class Product < ApplicationRecord
       WHERE variants.product_id = products.id
     )")
   end
-
-  # Алиасы для совместимости с carpats
-  ransack_alias :h_m_a, :audits_model_attribute
-  ransack_alias :h_o_v, :audits_old_value_present
-  ransack_alias :h_n_v, :audits_new_value_present
 
   # Bindable methods
   def broadcast_target_for_bindings
@@ -195,6 +141,16 @@ class Product < ApplicationRecord
   def var_price
     return '' unless variants.present?
     variants.first.price
+  end
+
+  def has_moysklad_binding?
+    moysklad = Moysklad.first
+    return false unless moysklad
+
+    first_variant = variants.first
+    return false unless first_variant
+
+    first_variant.bindings.exists?(bindable: moysklad)
   end
 
   # Данные свойств для экспорта

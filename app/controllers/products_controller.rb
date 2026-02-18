@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline ]
-  after_action :clear_preloaded_detals, only: [:index, :edit, :update]
+  after_action :clear_preloaded_detals, only: [:index, :edit, :update, :open_filter, :filter_price]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -8,8 +8,30 @@ class ProductsController < ApplicationController
   include PrintEtiketkas
 
   def index
-    # COUNT запрос БЕЗ includes (быстрый) - Ransack сам добавит нужные JOIN для условий поиска
-    @search = Product.ransack(search_params)
+    build_products_index(Product.all, search_params)
+  end
+
+  def open_filter
+    @search = Product.ransack(search_params || {})
+    @search.sorts = "id desc" if @search.sorts.empty?
+    render params[:price].present? ? :filter_price : :filter
+  end
+
+  def filter_price
+    audit_q = params[:audit_q]&.to_unsafe_h&.compact_blank&.symbolize_keys
+    base_scope = if audit_q.present?
+      ids = Audited::Audit.where(associated_type: "Product").ransack(audit_q).result.distinct.pluck(:associated_id).compact.uniq
+      Product.where(id: ids)
+    else
+      Product.all
+    end
+    build_products_index(base_scope, params[:q] || {})
+    render :index
+  end
+
+  def build_products_index(base_scope, product_params)
+    hash = product_params.respond_to?(:to_unsafe_h) ? product_params.to_unsafe_h : product_params.to_h
+    @search = base_scope.ransack(hash)
     @search.sorts = "id desc" if @search.sorts.empty?
     
     # Проверяем, используется ли сортировка по полям вариантов
@@ -30,8 +52,7 @@ class ProductsController < ApplicationController
       select_columns << "variants.price" if sorting_by_variants_price
       select_columns << "variants.quantity" if sorting_by_variants_quantity
       
-      @search.result(distinct: true)
-             .select(select_columns.join(", "))
+      @search.result(distinct: true).select(select_columns.join(", "))
     else
       @search.result(distinct: true)
     end
@@ -43,8 +64,8 @@ class ProductsController < ApplicationController
     @products.total_entries = total_count
     
     # Preload Detal records to avoid N+1 queries
-    # Use pluck to get all SKUs in one query instead of iterating through loaded objects
     product_ids = @products.map(&:id)
+    # Use pluck to get all SKUs in one query instead of iterating through loaded objects
     skus = Variant.where(product_id: product_ids).pluck(:sku).compact.uniq if product_ids.any?
     # Use pluck to load only sku and oszz_price (faster than loading full objects)
     detals_by_sku = Detal.where(sku: skus).pluck(:sku, :oszz_price).to_h if skus&.any?
@@ -78,13 +99,6 @@ class ProductsController < ApplicationController
     skus = @variants.map(&:sku).compact.uniq
     detals_by_sku = Detal.where(sku: skus).pluck(:sku, :oszz_price).to_h if skus.any?
     Variant.preload_detals(detals_by_sku || {})
-  end
-
-  def filter
-    @price_filter = params[:price].present? ? true : false
-    @search = Product.ransack(search_params)
-    @search.sorts = "id desc" if @search.sorts.empty?
-    @products = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
   end
 
   def create
@@ -261,7 +275,7 @@ class ProductsController < ApplicationController
   end
 
   def sync_with_moysklad
-    if has_moysklad_binding?
+    if @product.has_moysklad_binding?
       MoyskladSyncProductJob.perform_later(@product.id)
       flash_message = t("products.sync_with_moysklad_started")
       flash_type = :notice
@@ -318,16 +332,6 @@ class ProductsController < ApplicationController
         end
       end
     end
-  end
-
-  def has_moysklad_binding?
-    moysklad = Moysklad.first
-    return false unless moysklad
-    
-    first_variant = @product.variants.first
-    return false unless first_variant
-    
-    first_variant.bindings.exists?(bindable: moysklad)
   end
 
   def product_params

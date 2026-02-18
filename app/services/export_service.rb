@@ -275,20 +275,20 @@ class ExportService
       
       # Объединяем images через разделитель (запятая)
       if product_hash['images'].present?
-        flattened['images'] = Array(product_hash['images']).compact.join(',')
+        flattened['images'] = Array(product_hash['images']).compact.join(' ')
       end
       
       # Также добавляем другие варианты изображений если они есть
       if product_hash['images_zap'].present?
-        flattened['images_zap'] = Array(product_hash['images_zap']).compact.join(',')
+        flattened['images_zap'] = Array(product_hash['images_zap']).compact.join(' ')
       end
       
       if product_hash['images_second'].present?
-        flattened['images_second'] = Array(product_hash['images_second']).compact.join(',')
+        flattened['images_second'] = Array(product_hash['images_second']).compact.join(' ')
       end
       
       if product_hash['images_thumb'].present?
-        flattened['images_thumb'] = Array(product_hash['images_thumb']).compact.join(',')
+        flattened['images_thumb'] = Array(product_hash['images_thumb']).compact.join(' ')
       end
       
       Rails.logger.debug "📤 ExportService: Flattened product #{product_hash['id']}: #{flattened.keys.join(', ')}"

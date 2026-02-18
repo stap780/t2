@@ -64,8 +64,8 @@
         </div>
       </div>
     <% end %>
-    <%= link_to t('.filter'), filter_products_path, class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
-    <%= link_to t('.filter')+' Ц', filter_products_path(price: true), class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter'), open_filter_products_path, class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter')+' Ц', open_filter_products_path(price: true, audit_q: params[:audit_q]&.to_unsafe_h), class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
     <%= link_to t("products.index.new"), new_product_path, class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 </div>
