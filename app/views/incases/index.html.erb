@@ -110,7 +110,7 @@
 <%= turbo_stream_from "incases" %>
 
 <div class="bg-white rounded-lg shadow divide-y" data-controller="selectall">
-  <div class="grid grid-cols-[40px_85px_85px_220px_160px_100px_120px_110px_110px_30px_70px] gap-1 px-2 py-4 font-medium text-gray-700">
+  <div class="grid grid-cols-[40px_170px_220px_160px_100px_120px_110px_110px_30px_70px] gap-1 px-2 py-4 font-medium text-gray-700">
     <div>
       <%= check_box_tag "select_all", "1", false, {
         class: 'checkboxes w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500',
@@ -122,8 +122,7 @@
         form: :bulk_action_form
       } %>
     </div>
-    <div><%= t('activerecord.attributes.incase.incase_status_id') %></div>
-    <div><%= t('activerecord.attributes.incase.incase_tip_id') %></div>
+    <div></div>
     <div><%= t('incases.index.ubitok') %></div>
     <div><%= t('activerecord.attributes.incase.company_id') %></div>
     <div><%= t('activerecord.attributes.incase.okrug') %></div>
