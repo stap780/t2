@@ -759,10 +759,76 @@ namespace :incase do
     puts "Total updated: #{total}"
     puts "=" * 60
   end
+
+  desc "Update variant barcode and etiketka for incase by inbound_case id (e.g. 155654)"
+  task :update_barcode_by_inbound_id, [:inbound_case_id, :email, :password] => :environment do |t, args|
+    require 'net/http'
+    require 'uri'
+    require 'json'
+
+    inbound_id = args[:inbound_case_id]
+    raise "inbound_case_id is required" if inbound_id.blank?
+
+    base_url = "http://138.197.52.153/inbound_cases/#{inbound_id}.json"
+    email = args[:email]
+    password = args[:password]
+
+    puts "Fetching: #{base_url}"
+
+    json_data = if email.present? && password.present?
+      json_data, _cookies = IncaseJsonImporter.authenticate_and_download(base_url, email, password)
+      json_data
+    else
+      IncaseJsonImporter.download_json(base_url)
+    end
+
+    case_data = JSON.parse(json_data)
+    case_data = case_data.first if case_data.is_a?(Array)
+
+    unumber = case_data['unumber']&.strip
+    stoanumber = (case_data['stoanumber'] || case_data['number_z_n_stoa'])&.strip
+
+    incase = Incase.find_by_unumber_and_stoanumber(unumber, stoanumber)
+    raise "Incase not found for unumber=#{unumber}, stoanumber=#{stoanumber}" unless incase
+
+    items_data = case_data['inbound_case_items'] || case_data['items'] || []
+    updated = 0
+
+    items_data.each do |item_hash|
+      item_hash = item_hash.is_a?(Hash) ? item_hash : {}
+      detalname = (item_hash['detalname'] || item_hash[:detalname])&.strip
+      katnumber = (item_hash['katnumber'] || item_hash[:katnumber] || item_hash['sku'] || item_hash[:sku])&.strip
+      barcode = (item_hash['barcode'] || item_hash[:barcode])&.strip
+
+      next if barcode.blank?
+      next unless barcode.size == 13
+
+      item = if katnumber.present?
+        incase.items.find_by(katnumber: katnumber)
+      elsif detalname.present?
+        incase.items.find_by(title: detalname)
+      end
+
+      next unless item&.variant
+
+      variant = item.variant
+
+      variant.etiketka.purge if variant.etiketka.attached?
+      variant.update!(barcode: barcode)
+      variant.generate_etiketka
+
+      updated += 1
+      puts "  ✓ #{detalname || katnumber}: barcode=#{barcode}"
+    end
+
+    puts "\nUpdated #{updated} variant(s)"
+  end
+
 end
 
 # rails 'incase:json_import[email,password,page]'
 # rails 'incase:update_modelauto_from_json[email,password,page]'
 # rails 'incase:update_modelauto_from_json_range[email,password,1,50]'
+# rails 'incase:update_barcode_by_inbound_id[155654,email,password]'
 
 
