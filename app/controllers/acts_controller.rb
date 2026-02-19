@@ -1,5 +1,5 @@
 class ActsController < ApplicationController
-  before_action :set_act, only: [:show, :edit, :update, :destroy, :print, :print_etiketkas, :send_to_driver]
+  before_action :set_act, only: [:show, :edit, :update, :destroy, :print, :print_etiketkas, :send_to_driver, :bulk_update_item_status]
   include ActionView::RecordIdentifier
   include PrintEtiketkas
 
@@ -56,6 +56,21 @@ class ActsController < ApplicationController
       end
       format.html { redirect_to acts_path, notice: t('.success') }
       format.json { head :no_content }
+    end
+  end
+
+  def bulk_update_item_status
+    item_ids = Array(params[:item_ids]).reject(&:blank?).map(&:to_i)
+    item_status_id = params[:item_status_id].presence&.to_i
+
+    if item_ids.empty? || item_status_id.blank?
+      flash.now[:notice] = 'Выберите позиции и статус'
+      return render turbo_stream: [render_turbo_flash], status: :unprocessable_entity
+    end
+
+    items = @act.items.where(id: item_ids)
+    items.each do |item|
+      item.update(item_status_id: item_status_id)
     end
   end
 

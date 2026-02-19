@@ -15,14 +15,13 @@
 
     <%= link_to_print_barcode print_etiketka_product_variant_path(item.variant.product, item.variant) %>
 
-    <%= form_with url: update_status_incase_item_path(incase, item), method: :post do |f| %>
+    <%= form_with url: update_status_incase_item_path(incase, item), method: :post, data: { turbo_stream: true, turbo_preserve_scroll: "true" }  do |f| %>
       <%= f.select :item_status_id,
                    options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }, item.item_status_id),
                    { include_blank: false },
                    onchange: 'this.form.requestSubmit();',
                    class: "w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 h-8",
-                   style: "max-width: 250px;",
-                   data: { choose_target: 'itemResults', submit_element: 'true' } %>
+                   style: "max-width: 250px;" %>
     <% end %>
 
     <%= tag.div class: "flex items-center space-x-4" do %>

@@ -137,18 +137,41 @@ class ItemsController < ApplicationController
 
   def update_status
     @item.update(item_status_id: params[:item_status_id])
-    respond_to do |format|
-      format.turbo_stream do
-        flash.now[:success] = t('.success')
-        render turbo_stream: [
-          render_turbo_flash,
-          turbo_stream.replace(
-            dom_id(@incase, dom_id(@item, 'act_show')),
-            partial: "items/act_show",
-            locals: { item: @item, incase: @incase }
-          ),
-          turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
-        ]
+    # in model we have broadcast that makes turbo_stream response
+
+    # respond_to do |format|
+    #   format.turbo_stream do
+    #     flash.now[:success] = t('.success')
+    #     render turbo_stream: [
+    #       render_turbo_flash,
+    #       turbo_stream.replace(
+    #         dom_id(@incase, dom_id(@item, 'act_show')),
+    #         partial: "items/act_show",
+    #         locals: { item: @item, incase: @incase }
+    #       ),
+    #       turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
+    #     ]
+    #   end
+    # end
+  end
+
+  def bulk_update_status
+    item_ids = Array(params[:item_ids]).reject(&:blank?).map(&:to_i)
+    item_status_id = params[:item_status_id].presence&.to_i
+
+    if item_ids.empty? || item_status_id.blank?
+      flash.now[:notice] = 'Выберите позиции и статус'
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
+      end
+    else
+      items = @incase.items.where(id: item_ids)
+      items.each do |item|
+        item.update(item_status_id: item_status_id)
       end
     end
   end
@@ -156,20 +179,20 @@ class ItemsController < ApplicationController
   def update_condition
     @item.update(condition: params[:condition])
     @item.variant.product.update(status: 'pending') if @item.variant.product.status == 'draft'
-    respond_to do |format|
-      format.turbo_stream do
-        flash.now[:success] = t('.success')
-        render turbo_stream: [
-          render_turbo_flash,
-          turbo_stream.replace(
-            dom_id(@incase, dom_id(@item, 'act_show')),
-            partial: "items/act_show",
-            locals: { item: @item, incase: @incase }
-          ),
-          turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
-        ]
-      end
-    end
+    # respond_to do |format|
+    #   format.turbo_stream do
+    #     flash.now[:success] = t('.success')
+    #     render turbo_stream: [
+    #       render_turbo_flash,
+    #       turbo_stream.replace(
+    #         dom_id(@incase, dom_id(@item, 'act_show')),
+    #         partial: "items/act_show",
+    #         locals: { item: @item, incase: @incase }
+    #       ),
+    #       turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
+    #     ]
+    #   end
+    # end
   end
 
   private

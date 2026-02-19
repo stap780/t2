@@ -18,10 +18,7 @@
             options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
             { prompt: t('activerecord.attributes.item.item_status_id'),
               class: "px-2 ps-1 py-1 border rounded-md text-sm w-full", 
-              data: {
-                action: "change->choose#changeBulkItemStatus", 
-                choose_target: "itemSelected" 
-              } } %>
+              data: { action: "change->choose#changeBulkItemStatus" } } %>
       </div>
       <div>Дата</div>
       <div><%= t('activerecord.attributes.item.quantity') %></div>

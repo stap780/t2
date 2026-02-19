@@ -1,6 +1,7 @@
 class Item < ApplicationRecord
   include NormalizeDataWhiteSpace
-  
+  include ActionView::RecordIdentifier
+
   belongs_to :incase
   belongs_to :item_status, optional: true
   belongs_to :variant, optional: true
@@ -24,11 +25,17 @@ class Item < ApplicationRecord
   after_initialize :set_default_new
   before_create :set_default_status
   before_create :create_product_variant, if: -> { variant_id.blank? }
-  after_save :recalculate_incase_status, if: :saved_change_to_item_status_id?
+  after_commit :recalculate_incase_status, if: :saved_change_to_item_status_id?
   after_destroy :recalculate_incase_status_after_destroy
+
+  after_commit :broadcast_update_incase_items, on: :update, if: :saved_change_to_item_status_id?
+
+  def broadcast_update_incase_items
+    broadcast_update_to dom_id(incase, 'items'), target: dom_id(incase, dom_id(self, 'act_show')), partial: 'items/act_show', locals: { item: self, incase: incase }
+  end
   
   attribute :item_status_title
-	
+  
   def self.file_export_attributes
     # Базовый порядок: сначала название и статус, затем остальные поля
     attrs = attribute_names - %w[id incase_id item_status_id variant_id created_at updated_at]

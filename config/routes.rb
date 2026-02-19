@@ -189,6 +189,7 @@ Rails.application.routes.draw do
       get :print_etiketkas, format: :pdf
       post :print_selected_etiketkas, format: :pdf
       post :send_to_driver
+      post :bulk_update_item_status
     end
     collection do
       post :create_multi
@@ -212,6 +213,9 @@ Rails.application.routes.draw do
       get :filter
     end
     resources :items do
+      collection do
+        post :bulk_update_status
+      end
       member do
         get :update_variant_fields
         post :update_status

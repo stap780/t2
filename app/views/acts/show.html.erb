@@ -1,4 +1,7 @@
-<div class="max-w-7xl mx-auto" data-controller="choose">
+<% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
+<% sort_incases = incases.sort_by(&:date) %>
+
+<div class="max-w-7xl mx-auto">
   <div class="flex items-center justify-between mb-6">
     <%= link_to t('.back_to_list'), acts_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" %>
     <h1 class="text-2xl font-semibold text-gray-900"><%= t('.heading') %> №<%= @act.number %></h1>
@@ -106,15 +109,14 @@
         </div>
         <div>
           <span class="text-sm text-gray-500">Позиции</span>
-          <%= select_tag "act_all_items_status", 
-              options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
-              { prompt: t('activerecord.attributes.item.item_status_id'),
-                class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 text-sm", 
-                style: "max-width: 250px;",
-                data: {
-                  action: "change->choose#changeBulkItemStatus", 
-                  choose_target: "itemSelected" 
-              } } %>
+          <%= form_with url: bulk_update_item_status_act_path(@act), method: :post, data: { turbo_stream: true, turbo_preserve_scroll: "true" } do |f| %>
+            <% sort_incases.each do |incase| %>
+              <% @act.items.where(incase: incase).order(:title).each do |item| %>
+                <%= hidden_field_tag 'item_ids[]', item.id %>
+              <% end %>
+            <% end %>
+            <%= f.select :item_status_id, options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }), { include_blank: false, prompt: t('activerecord.attributes.item.item_status_id') }, onchange: 'this.form.requestSubmit();', class: "w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 text-sm", style: "max-width: 250px;" %>
+          <% end %>
         </div>
       </div>
     </div>
@@ -123,11 +125,10 @@
   <!-- Позиции акта, сгруппированные по заявкам -->
   <div class="bg-white rounded-lg shadow-md p-6">
     <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('.items') %></h2>
-
-    <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
-    <% incases.sort_by(&:date).each do |incase| %>
+    <% sort_incases.each do |incase| %>
+      <%= turbo_stream_from dom_id(incase, 'items') %>
       <% act_items_from_incase = @act.items.where(incase: incase).order(:title) %>
-      <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" data-controller="choose">
+      <div class="incase-wrapper mb-6 border border-gray-200 rounded-lg overflow-hidden">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
           <div class="grid grid-cols-1 md:grid-cols-[1fr_50px_200px_200px] gap-4">
@@ -144,7 +145,7 @@
                 <%=link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800 cursor-pointer", target: '_blank', data: { turbo: false } %> от <%= incase.date&.strftime('%d.%m.%Y') %>
               </span>
             </div>
-            <div><%# link_to_print_barcode print_etiketkas_incase_path(incase, format: :pdf) %>
+            <div>
               <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf), method: :post, target: '_blank', data: { turbo: false } do |f| %>
                 <% act_items_from_incase.each do |item| %>
                   <%= hidden_field_tag 'item_ids[]', item.id %>
@@ -155,14 +156,12 @@
               <% end %>
             </div>
             <div>
-              <%= select_tag "incase_item_status_label", 
-              options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
-              { prompt: t('activerecord.attributes.item.item_status_id'),
-                class: "px-2 py-1 border rounded-md text-sm w-full", 
-                data: {
-                  action: "change->choose#changeBulkItemStatus", 
-                  choose_target: "itemSelected" 
-              } } %>
+              <%= form_with url: bulk_update_status_incase_items_path(incase), method: :post, data: { turbo_stream: true, turbo_preserve_scroll: "true" } do |f| %>
+                <% act_items_from_incase.each do |item| %>
+                  <%= hidden_field_tag 'item_ids[]', item.id %>
+                <% end %>
+                <%= f.select :item_status_id, options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }), { include_blank: false, prompt: t('activerecord.attributes.item.item_status_id') }, onchange: 'this.form.requestSubmit();', class: "w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 text-sm", style: "max-width: 250px;" %>
+              <% end %>
             </div>
             <div>Состояние</div>
           </div>
