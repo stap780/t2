@@ -3,14 +3,27 @@ class ProductPriceUpdateJob < ApplicationJob
 
   def perform(product_ids, field_type, move, shift, points, round, current_user_id = nil)
     products = Product.where(id: product_ids)
+    user = current_user_id.present? ? User.find_by(id: current_user_id) : nil
 
-    success, message = Product::PriceUpdate.new(products, {
-      field_type: field_type,
-      move: move,
-      shift: shift,
-      points: points,
-      round: round
-    }).call
+    success, message = if user
+      Audited.audit_class.as_user(user) do
+        Product::PriceUpdate.new(products, {
+          field_type: field_type,
+          move: move,
+          shift: shift,
+          points: points,
+          round: round
+        }).call
+      end
+    else
+      Product::PriceUpdate.new(products, {
+        field_type: field_type,
+        move: move,
+        shift: shift,
+        points: points,
+        round: round
+      }).call
+    end
 
     flash = ActionDispatch::Flash::FlashHash.new
     flash[:notice] = message
