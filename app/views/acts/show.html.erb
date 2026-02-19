@@ -10,14 +10,7 @@
         <button type="button" data-action="click->dropdown#toggle"
          class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
           <!-- Simple barcode icon -->
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
-            <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
-            <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
-            <rect x="13" y="6" width="1" height="12" fill="currentColor"/>
-            <rect x="16" y="6" width="2" height="12" fill="currentColor"/>
-            <rect x="20" y="6" width="1" height="12" fill="currentColor"/>
-          </svg>
+          <%= barcode_icon %>
           <!-- Dropdown arrow -->
           <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -58,10 +51,7 @@
   </div>
 
   <!-- Hidden form for printing selected items' etiketas -->
-  <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf),
-                method: :post,
-                id: :act_items_print_form,
-                local: true do |f| %>
+  <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf),method: :post, id: :act_items_print_form,local: true do |f| %>
   <% end %>
 
   <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -136,6 +126,7 @@
 
     <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
     <% incases.sort_by(&:date).each do |incase| %>
+      <% act_items_from_incase = @act.items.where(incase: incase).order(:title) %>
       <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" data-controller="choose">
         <!-- Заголовок заявки -->
         <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
@@ -153,7 +144,16 @@
                 <%=link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800 cursor-pointer", target: '_blank', data: { turbo: false } %> от <%= incase.date&.strftime('%d.%m.%Y') %>
               </span>
             </div>
-            <div><%= link_to_print_barcode print_etiketkas_incase_path(incase, format: :pdf) %></div>
+            <div><%# link_to_print_barcode print_etiketkas_incase_path(incase, format: :pdf) %>
+              <%= form_with url: print_selected_etiketkas_act_path(@act, format: :pdf), method: :post, target: '_blank', data: { turbo: false } do |f| %>
+                <% act_items_from_incase.each do |item| %>
+                  <%= hidden_field_tag 'item_ids[]', item.id %>
+                <% end %>
+                <button type="submit" target="_blank" class="p-2 rounded-md bg-gray-50 hover:bg-gray-100 flex items-center justify-center h-8 cursor-pointer" title="<%= t('print_barcode') %>">
+                  <%= barcode_icon %>
+                </button>
+              <% end %>
+            </div>
             <div>
               <%= select_tag "incase_item_status_label", 
               options_from_collection_for_select(ItemStatus.order(:id), "id", "title"), 
@@ -170,7 +170,6 @@
 
         <!-- Позиции этой заявки -->
         <div class="divide-y divide-gray-200">
-          <% act_items_from_incase = @act.items.where(incase: incase).order(:title) %>
           <% act_items_from_incase.each do |item| %>
             <%= render "items/act_show", item: item, incase: incase %>
           <% end %>

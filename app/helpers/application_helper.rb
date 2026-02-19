@@ -22,7 +22,7 @@ module ApplicationHelper
   end
 
   def barcode_icon
-    '<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
             <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
             <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
@@ -33,7 +33,7 @@ module ApplicationHelper
   end
 
   def generate_barcode_icon
-    '<svg class="w-4 h-4 mr-1 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    '<svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
       <rect x="6" y="6" width="1" height="12" fill="currentColor"/>
       <rect x="9" y="6" width="2" height="12" fill="currentColor"/>
@@ -284,12 +284,18 @@ module ApplicationHelper
     end
   end
 
+  def history_icon
+    '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>'.html_safe
+  end
+
   def link_to_history(auditable_type:, auditable_id:, **options)
     return '' if auditable_id.blank?
     
     default_options = {
       class: "inline-flex items-center px-3 py-1 border border-violet-300 shadow-sm text-sm font-medium rounded-md text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
-      data: { turbo_frame: :offcanvas },
+      data: { turbo_frame: :offcanvas, turbo_prefetch: false },
       title: 'История изменений'
     }
     
@@ -299,10 +305,8 @@ module ApplicationHelper
       audited_auditable_audits_path(auditable_type: auditable_type, auditable_id: auditable_id),
       options
     ) do
-      '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      </svg>
-      <span class="ml-2">История</span>'.html_safe
+      history_icon
+      # '<span class="ml-2">История</span>'.html_safe
     end
   end
 

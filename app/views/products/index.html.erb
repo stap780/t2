@@ -20,7 +20,7 @@
     <%= form_with url: products_path, method: :post, id: :bulk_action_form, local: false do |f| %>
       <!-- Price Update Button -->
       <%= f.button type: :submit, 
-          class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
+          class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer",
           id: 'price-update', 
           formaction: price_edit_products_path,
           data: { turbo_frame: 'offcanvas', turbo_prefetch: false } do %>
@@ -38,7 +38,7 @@
       
       <!-- Print Etiketkas Buttons -->
       <div class="relative inline-block" data-controller="dropdown">
-        <button type="button" class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+        <button type="button" class="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
                 data-action="click->dropdown#toggle">
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
@@ -55,17 +55,17 @@
         <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-1" data-dropdown-target="menu">
           <div class="py-1">
             <%= f.button 'Выбранное', type: :submit, 
-                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer", 
                 formaction: bulk_print_etiketkas_products_path(print_type: :selected) %>
             <%= f.button 'Отфильтрованное', type: :submit, 
-                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100", 
+                class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer", 
                 formaction: bulk_print_etiketkas_products_path(print_type: :filtered) %>
           </div>
         </div>
       </div>
     <% end %>
-    <%= link_to t('.filter'), open_filter_products_path, class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
-    <%= link_to t('.filter')+' Ц', open_filter_products_path(price: true, audit_q: params[:audit_q]&.to_unsafe_h), class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas' } %>
+    <%= link_to t('.filter'), open_filter_products_path, class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
+    <%= link_to t('.filter')+' Ц', open_filter_products_path(price: true, audit_q: params[:audit_q]&.to_unsafe_h), class: "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700", data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>
     <%= link_to t("products.index.new"), new_product_path, class: "inline-flex items-center px-2 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 </div>

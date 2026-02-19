@@ -27,7 +27,7 @@ Rails.application.config.to_prepare do
     }
 
     def self.ransackable_attributes(auth_object = nil)
-      %w[id user_id created_at associated_type associated_id auditable_type auditable_id action]
+      %w[id user_id created_at associated_type associated_id auditable_type auditable_id action raw_audited_changes]
     end
 
     def self.ransackable_scopes(auth_object = nil)
