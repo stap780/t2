@@ -717,6 +717,25 @@ namespace :incase do
     end
   end
 
+  desc "Import single incase by inbound_case id (e.g. 155942) from http://138.197.52.153/inbound_cases/ID.json"
+  task :json_import_one, [:inbound_case_id, :email, :password] => :environment do |t, args|
+    require 'net/http'
+    require 'uri'
+    require 'json'
+
+    inbound_id = args[:inbound_case_id]
+    raise "inbound_case_id is required" if inbound_id.blank?
+
+    url = "http://138.197.52.153/inbound_cases/#{inbound_id}.json"
+    email = args[:email]
+    password = args[:password]
+
+    puts "Importing single incase from: #{url}"
+    puts "Using email: #{email}" if email.present?
+
+    IncaseJsonImporter.run(url, email, password, 1)
+  end
+
   desc "Update only modelauto for existing incases from JSON (no new records, no dubls)"
   task :update_modelauto_from_json, [:email, :password, :page] => :environment do |t, args|
     require 'net/http'
@@ -832,6 +851,7 @@ namespace :incase do
 end
 
 # rails 'incase:json_import[email,password,page]'
+# rails 'incase:json_import_one[155942,email,password]'
 # rails 'incase:update_modelauto_from_json[email,password,page]'
 # rails 'incase:update_modelauto_from_json_range[email,password,1,50]'
 # rails 'incase:update_barcode_by_inbound_id[155654,email,password]'
