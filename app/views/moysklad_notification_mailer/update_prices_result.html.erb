@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Обновление цен успешно завершено' : '⚠️ Обновление цен - завершено с ошибками' %></h2>
+
+    <% if @details['updated_count'].present? %>
+      <p><strong>Обновлено вариантов:</strong> <%= @details['updated_count'] %></p>
+    <% end %>
+    <% if @details['error_count'].present? && @details['error_count'] > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details['error_count'] %></p>
+    <% end %>
+    <% if @details['total'].present? %>
+      <p><strong>Всего товаров:</strong> <%= @details['total'] %></p>
+    <% end %>
+    <% if @details['completed_at'].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+    <% end %>
+
+    <% if @details['errors'].present? && @details['errors'].any? %>
+      <h3>Детали ошибок:</h3>
+      <ul>
+        <% @details['errors'].each do |err| %>
+          <li>
+            Вариант #<%= err['variant_id'] %> (товар #<%= err['product_id'] %>)
+            <% if err['sku'].present? %> — артикул: <%= err['sku'] %><% end %>
+            <% if err['barcode'].present? %> — штрихкод: <%= err['barcode'] %><% end %>
+            — <%= err['messages']&.join(', ') %>
+          </li>
+        <% end %>
+      </ul>
+      <% if @details['error_count'].to_i > 20 %>
+        <p><em>Показаны первые 20 ошибок из <%= @details['error_count'] %>.</em></p>
+      <% end %>
+    <% end %>
+  </body>
+</html>

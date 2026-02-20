@@ -6,16 +6,19 @@ class Product::PriceUpdate
     @shift = options[:shift]
     @points = options[:points]
     @round = options[:round]
-    @error_message = []
+    @updated_count = 0
+    @errors = []
   end
 
   def call
     update
-    if @error_message.size.positive?
-      [false, @error_message]
-    else
-      [true, I18n.t('we_update_price', default: 'Prices updated successfully')]
-    end
+    {
+      success: @errors.empty?,
+      updated_count: @updated_count,
+      error_count: @errors.size,
+      errors: @errors,
+      total: @products.count
+    }
   end
 
   private
@@ -28,9 +31,18 @@ class Product::PriceUpdate
 
         new_price = calculate_new_price(sale_price, @move, @shift, @points, @round)
 
-        if new_price.present?
-          variant.update!(price: new_price)
-          @error_message << variant.errors.full_messages if variant.errors.present?
+        next if new_price.blank?
+
+        if variant.update(price: new_price)
+          @updated_count += 1
+        else
+          @errors << {
+            variant_id: variant.id,
+            product_id: product.id,
+            sku: variant.sku,
+            barcode: variant.barcode,
+            messages: variant.errors.full_messages
+          }
         end
       end
       product.update(title: product.title)

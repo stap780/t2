@@ -48,6 +48,8 @@ class EmailDelivery < ApplicationRecord
       'Массовое создание товаров'
     when 'update_quantities_result'
       'Обновление остатков'
+    when 'update_prices_result'
+      'Обновление цен'
     else
       mailer_method
     end

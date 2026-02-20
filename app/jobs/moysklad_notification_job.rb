@@ -12,6 +12,8 @@ class MoyskladNotificationJob < ApplicationJob
         mailer = MoyskladNotificationMailer.create_products_batch_result(email_delivery_id)
       when 'update_quantities_result'
         mailer = MoyskladNotificationMailer.update_quantities_result(email_delivery_id)
+      when 'update_prices_result'
+        mailer = MoyskladNotificationMailer.update_prices_result(email_delivery_id)
       else
         Rails.logger.error "MoyskladNotificationJob: Unknown mailer method: #{email_delivery.mailer_method}"
         return

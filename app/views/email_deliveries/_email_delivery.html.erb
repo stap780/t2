@@ -4,6 +4,14 @@
     <% if email_delivery.moysklad_notification? %>
       <% if email_delivery.record.is_a?(Product) %>
         Товар #<%= email_delivery.record.id %>
+      <% elsif email_delivery.mailer_method == 'update_prices_result' %>
+        <% if email_delivery.recipient.respond_to?(:email_address) %>
+          <%= email_delivery.recipient.email_address %>
+        <% elsif email_delivery.recipient.respond_to?(:short_title) %>
+          <%= email_delivery.recipient.short_title %>
+        <% else %>
+          <%= email_delivery.recipient.class.name %>
+        <% end %>
       <% else %>
         МойСклад
       <% end %>

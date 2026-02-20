@@ -3,6 +3,8 @@ ru:
   delete: "Удалить"
   print_barcode: "Печать штрихкода"
   generate_barcode: "Генерация штрихкода"
+  we_update_price: "Цены успешно обновлены"
+  we_update_price_errors: "Обновлено с ошибками: %{updated} успешно, %{errors} с ошибками"
   nav:
     brand: "App"
     dashboard: "Панель"

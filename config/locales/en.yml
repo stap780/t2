@@ -30,6 +30,8 @@
 en:
   hello: "Hello world"
   generate_barcode: "Generate barcode"
+  we_update_price: "Prices updated successfully"
+  we_update_price_errors: "Updated with errors: %{updated} success, %{errors} failed"
   nav:
     brand: "Exports"
     dashboard: "Dashboard"

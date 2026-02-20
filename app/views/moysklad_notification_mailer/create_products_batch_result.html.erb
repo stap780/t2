@@ -4,32 +4,60 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
   </head>
   <body>
-    <h2><%= @success ? '✅ Массовое создание товаров в МойСклад успешно завершено' : '❌ Ошибка массового создания товаров в МойСклад' %></h2>
-    
-    <% if @success %>
-      <% if @details['created_count'].present? %>
-        <p><strong>Создано товаров:</strong> <%= @details['created_count'] %></p>
-      <% end %>
-      <% if @details['error_count'].present? %>
-        <p><strong>Ошибок:</strong> <%= @details['error_count'] %></p>
-      <% end %>
-      <% if @details['error_412_count'].present? %>
-        <p><strong>Ошибок 412 (дубликат code):</strong> <%= @details['error_412_count'] %></p>
-      <% end %>
-      <% if @details['total'].present? %>
-        <p><strong>Всего обработано:</strong> <%= @details['total'] %></p>
-      <% end %>
-      <% if @details['completed_at'].present? %>
-        <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
-      <% end %>
-    <% else %>
-      <p><strong>Ошибка:</strong> <%= @email_delivery.error_message %></p>
-      <% if @details['error_class'].present? %>
-        <p><strong>Тип ошибки:</strong> <%= @details['error_class'] %></p>
-      <% end %>
-      <% if @details['error_message'].present? %>
-        <p><strong>Детали ошибки:</strong> <%= @details['error_message'] %></p>
-      <% end %>
+    <h2><%= @success ? '✅ Массовое создание товаров в МойСклад успешно завершено' : '⚠️ Массовое создание товаров в МойСклад - завершено с ошибками' %></h2>
+
+    <% if @details['created_count'].present? %>
+      <p><strong>Создано товаров:</strong> <%= @details['created_count'] %></p>
+    <% end %>
+    <% if @details['error_count'].present? && @details['error_count'] > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details['error_count'] %></p>
+    <% end %>
+    <% if @details['error_412_count'].present? && @details['error_412_count'] > 0 %>
+      <p><strong>Ошибок 412 (дубликат code/barcode):</strong> <%= @details['error_412_count'] %></p>
+    <% end %>
+    <% if @details['total'].present? %>
+      <p><strong>Всего обработано:</strong> <%= @details['total'] %></p>
+    <% end %>
+    <% if @details['completed_at'].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+    <% end %>
+
+    <% if @created_products.present? %>
+      <h3>Созданные товары:</h3>
+      <ul>
+        <% @created_products.each do |product| %>
+          <li><%= link_to "#{product.title} (##{product.id})", product_url(product) %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @error_412_products.present? %>
+      <h3>Товары с ошибкой 412 (дубликат code/barcode):</h3>
+      <ul>
+        <% @error_412_products.each do |product| %>
+          <li><%= link_to "#{product.title} (##{product.id})", product_url(product) %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @error_products.present? %>
+      <h3>Товары с другими ошибками:</h3>
+      <ul>
+        <% @error_products.each do |item| %>
+          <li>
+            <% if item[:product] %>
+              <%= link_to "#{item[:product].title} (##{item[:product_id]})", product_url(item[:product]) %> —
+            <% else %>
+              Товар ##<%= item[:product_id] %> —
+            <% end %>
+            <%= item[:error] %>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if !@success && @email_delivery.error_message.present? %>
+      <p><strong>Критическая ошибка:</strong> <%= @email_delivery.error_message %></p>
     <% end %>
   </body>
 </html>
