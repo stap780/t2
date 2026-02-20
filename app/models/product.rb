@@ -64,6 +64,12 @@ class Product < ApplicationRecord
   scope :with_moysklad, -> {
     joins(variants: :bindings).where(varbinds: { bindable_type: 'Moysklad' }).distinct
   }
+  scope :without_insale, -> {
+    where.not(id: joins(variants: :bindings).where(varbinds: { bindable_type: 'Insale' }).select(:id))
+  }
+  scope :without_moysklad, -> {
+    where.not(id: joins(variants: :bindings).where(varbinds: { bindable_type: 'Moysklad' }).select(:id))
+  }
 
   # Scopes для фильтрации по опасным/предупреждающим ценам
   scope :danger_true, -> { 
@@ -99,7 +105,7 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad danger_true warning_true]
+    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad without_insale without_moysklad danger_true warning_true]
   end
 
   # Ransacker для фильтрации по номеру акта через variants -> items -> acts
