@@ -813,6 +813,11 @@ namespace :incase do
 
       variant = item.variant
 
+      if Variant.where(barcode: barcode).where.not(id: variant.id).exists?
+        puts "  ⏭ #{detalname || katnumber}: barcode #{barcode} уже существует, пропуск"
+        next
+      end
+
       variant.etiketka.purge if variant.etiketka.attached?
       variant.update!(barcode: barcode)
       variant.generate_etiketka
