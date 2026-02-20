@@ -8,7 +8,7 @@ class Company < ApplicationRecord
   has_many :client_companies, dependent: :destroy
   has_many :clients, through: :client_companies
   accepts_nested_attributes_for :client_companies, allow_destroy: true
-  has_many :company_plan_dates, dependent: :destroy
+  has_many :company_plan_dates, -> { order(date: :asc) }, dependent: :destroy
   accepts_nested_attributes_for :company_plan_dates, allow_destroy: true
   
   validates :short_title, presence: true

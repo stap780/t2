@@ -18,6 +18,7 @@ class Act < ApplicationRecord
   after_create :set_number_from_id
   after_create_commit { broadcast_prepend_to 'acts' }
   after_update_commit { broadcast_replace_to dom_id(self, :show), target: dom_id(self, :status), partial: "acts/status", locals: { act: self } }
+  after_update :clear_company_plan_date_on_close, if: :saved_change_to_status?
   
   enum :status, {
     pending: 'pending',
@@ -251,6 +252,12 @@ class Act < ApplicationRecord
     # Устанавливаем номер акта равным ID после создания
     # Используем update_column чтобы избежать валидаций и колбэков
     update_column(:number, id.to_s) if id.present?
+  end
+
+  def clear_company_plan_date_on_close
+    return unless closed?
+  
+    company.company_plan_dates.last&.destroy
   end
 end
 
