@@ -1,3 +1,4 @@
+<% content_for :title, "Акт ##{@act.id}" %>
 <% incases = @act.items.includes(:incase).map(&:incase).uniq.compact %>
 <% sort_incases = incases.sort_by(&:date) %>
 

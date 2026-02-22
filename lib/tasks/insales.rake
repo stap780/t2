@@ -54,7 +54,7 @@ namespace :insales do
   end
 
   def sync_varbinds_single_store(insale, stats)
-    batch_size = 100
+    batch_size = 250
     page = 1
     max_pages = 400 # для теста
 
