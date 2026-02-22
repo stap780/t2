@@ -848,6 +848,28 @@ namespace :incase do
     puts "\nUpdated #{updated} variant(s)"
   end
 
+  desc "Update barcodes for multiple inbound_case ids (comma-separated, e.g. 155942,155943,155944)"
+  task :update_barcode_by_inbound_ids, [:inbound_case_ids, :email, :password] => :environment do |t, args|
+    ids_str = args[:inbound_case_ids]
+    raise "inbound_case_ids is required (comma-separated)" if ids_str.blank?
+
+    ids = ids_str.to_s.split(',').map(&:strip).reject(&:blank?)
+    email = args[:email]
+    password = args[:password]
+
+    puts "Updating barcodes for #{ids.size} inbound_case(s): #{ids.join(', ')}"
+
+    ids.each_with_index do |inbound_id, i|
+      puts "\n--- [#{i + 1}/#{ids.size}] Inbound case ##{inbound_id} ---"
+      Rake::Task['incase:update_barcode_by_inbound_id'].reenable
+      Rake::Task['incase:update_barcode_by_inbound_id'].invoke(inbound_id, email, password)
+    rescue => e
+      puts "  ❌ Error: #{e.message}"
+    end
+
+    puts "\n✓ Done"
+  end
+
 end
 
 # rails 'incase:json_import[email,password,page]'
@@ -855,5 +877,6 @@ end
 # rails 'incase:update_modelauto_from_json[email,password,page]'
 # rails 'incase:update_modelauto_from_json_range[email,password,1,50]'
 # rails 'incase:update_barcode_by_inbound_id[155654,email,password]'
+# rails 'incase:update_barcode_by_inbound_ids[155942,155943,155944,email,password]'
 
 
