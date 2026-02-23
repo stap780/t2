@@ -161,7 +161,7 @@ class Export < ApplicationRecord
       product_fields: %w[id status tip title description created_at updated_at],
       variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.quantity variants.first.cost_price],
       feature_fields: ['features (for iteration)'],
-      image_fields: %w[images images_zap images_second images_thumb]
+      image_fields: %w[images] #images_zap images_second images_thumb
     }
   end
 
@@ -310,16 +310,18 @@ class Export < ApplicationRecord
     # 2) как хеш "Название свойства" => "Значение" для плоских экспортов (CSV/XLSX)
     hash['features_hash'] = product.features_to_h
     
-    # Добавляем изображения как массив URL
-    # Используем выбранный вариант изображений или оригинал по умолчанию
-    image_variant = image_variant_for_export || 'original'
-    hash['images'] = product_images_urls(product, image_variant)
-    
-    # Также добавляем все варианты изображений для гибкости
-    hash['images_zap'] = product_images_urls(product, 'zap')
-    # hash['images_second'] = product_images_urls(product, 'second')
-    
+    # Добавляем изображения только когда они нужны для экспорта
+    if needs_images_for_export?
+      hash['images'] = product_images_urls(product, 'original')
+    end
+
     hash
+  end
+
+  def needs_images_for_export?
+    return true if format == 'xml'
+    return true if file_headers.blank?
+    file_headers.include?('images')
   end
 
   # Get image variant for export (can be extended with image_variant field)
@@ -336,9 +338,9 @@ class Export < ApplicationRecord
     product.images.map do |image|
       case variant
       when 'zap'
-        image.zap_url
+        # image.zap_url
       when 'second'
-        image.second_url
+        # image.second_url
       else # 'original'
         image.s3_url
       end
