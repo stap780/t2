@@ -159,6 +159,14 @@ class Product < ApplicationRecord
     first_variant.bindings.exists?(bindable: moysklad)
   end
 
+  def has_insale_binding?
+    insale = Insale.first
+    return false unless insale
+
+    bindings.exists?(bindable: insale) ||
+      variants.joins(:bindings).where(varbinds: { bindable_type: 'Insale' }).exists?
+  end
+
   # Данные свойств для экспорта
   def properties_data 
     # this is for export csv/excel

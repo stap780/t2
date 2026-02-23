@@ -264,7 +264,7 @@ class Export < ApplicationRecord
     Rails.logger.info "🎯 Export ##{id}: Extracting data from Product model"
 
     # Оптимизированная загрузка с includes для избежания N+1 запросов
-    products_scope = Product.active
+    products_scope = Product.active.yes_quantity.yes_price
       .includes(:variants, features: [:property, :characteristic], images: [:file_attachment, :file_blob])
 
     # Применение тестового режима

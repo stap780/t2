@@ -58,7 +58,7 @@ class ProductsController < ApplicationController
     end
     
     # Данные С includes (для отображения, избегаем N+1)
-    @products = base_result.includes(:features, :variants, images: [:file_attachment, :file_blob])
+    @products = base_result.includes(:features, :bindings, :variants, variants: :bindings, images: [:file_attachment, :file_blob])
                            .paginate(page: params[:page], per_page: 100)
     
     @products.total_entries = total_count
