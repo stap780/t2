@@ -129,7 +129,7 @@ class Export < ApplicationRecord
     variant_fields_flat = variant_fields.map { |f| "variant_1_#{f}" }
     
     # Image fields
-    image_fields = %w[images images_zap images_second images_thumb]
+    image_fields = %w[images] #images_zap images_second images_thumb
     
     # Feature fields - используем реальные названия свойств из базы данных
     # Получаем все уникальные названия свойств, которые используются в продуктах

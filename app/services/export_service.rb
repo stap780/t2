@@ -17,19 +17,16 @@ class ExportService
     @export.update!(status: "processing")
 
     begin
-      # Get filtered data based on selected headers
-      data = collect_filtered_data
-
-      if data.empty?
+      source_data = @export.data
+      if source_data.empty?
         raise "No data available for export. Products may be missing or incomplete."
       end
 
-      # Log data information
       selected_headers_info = @export.file_headers&.any? ? " (#{@export.file_headers.length} selected fields)" : " (all fields)"
       if @export.test_mode?
-        Rails.logger.info "📤 ExportService: TEST MODE - Processing #{data.length} records#{selected_headers_info} (limited to #{Export::TEST_LIMIT})"
+        Rails.logger.info "📤 ExportService: TEST MODE - Processing #{source_data.length} records#{selected_headers_info} (limited to #{Export::TEST_LIMIT})"
       else
-        Rails.logger.info "📤 ExportService: PRODUCTION MODE - Processing #{data.length} records#{selected_headers_info}"
+        Rails.logger.info "📤 ExportService: PRODUCTION MODE - Processing #{source_data.length} records#{selected_headers_info}"
       end
 
       # Create export file based on format (like Dizauto)
@@ -68,64 +65,29 @@ class ExportService
 
   private
 
-  def collect_filtered_data
-    # Get source data from export (now from Product model)
-    source_data = @export.data
-    return [] if source_data.empty?
+  # Returns [filtered_data, headers] — filters flattened records by file_headers when selected
+  def filter_flattened_by_headers(flattened_data)
+    return flattened_data, (flattened_data.first&.keys || []) unless @export.file_headers&.any?
 
-    # If no specific headers are selected, return all data
-    return source_data unless @export.file_headers&.any?
-
-    Rails.logger.info "📤 ExportService: Filtering data to include only selected headers: #{@export.file_headers.join(', ')}"
-
-    # Filter data to include only selected headers
-    filtered_data = source_data.map do |record|
-      filtered_record = {}
-      @export.file_headers.each do |header|
-        if record.key?(header)
-          filtered_record[header] = record[header]
-        else
-          Rails.logger.warn "📤 ExportService: Header '#{header}' not found in source data"
-          filtered_record[header] = nil
-        end
-      end
-      filtered_record
+    Rails.logger.info "📤 ExportService: Filtering flattened data to include only selected headers: #{@export.file_headers.join(', ')}"
+    filtered = flattened_data.map do |record|
+      @export.file_headers.to_h { |h| [h, record[h]] }
     end
-
-    Rails.logger.info "📤 ExportService: Filtered #{filtered_data.length} records to #{@export.file_headers.length} selected fields"
-    filtered_data
+    Rails.logger.info "📤 ExportService: Filtered #{filtered.length} records to #{@export.file_headers.length} selected fields"
+    [filtered, @export.file_headers]
   end
 
   def create_csv
-    # Сначала получаем все данные и разворачиваем их
     source_data = @export.data
     return false if source_data.empty?
 
-    # Преобразуем данные в плоский формат для CSV
     flattened_data = flatten_data_for_csv(source_data)
-
-    # Теперь фильтруем по выбранным заголовкам (если они выбраны)
-    if @export.file_headers&.any?
-      Rails.logger.info "📤 ExportService: Filtering flattened data to include only selected headers: #{@export.file_headers.join(', ')}"
-      flattened_data = flattened_data.map do |record|
-        filtered_record = {}
-        @export.file_headers.each do |header|
-          filtered_record[header] = record[header] if record.key?(header)
-        end
-        filtered_record
-      end
-      # Используем выбранные заголовки для CSV
-      headers = @export.file_headers
-    else
-      # Используем все доступные заголовки из данных
-      headers = flattened_data.first.keys
-    end
+    filtered_data, headers = filter_flattened_by_headers(flattened_data)
 
     csv_content = CSV.generate do |csv|
       csv << headers.map { |h| Export.field_label(h) }
 
-      # Add data rows
-      flattened_data.each do |record|
+      filtered_data.each do |record|
         csv << headers.map { |header| record[header] }
       end
     end
@@ -134,40 +96,20 @@ class ExportService
   end
 
   def create_xlsx
-    # Сначала получаем все данные и разворачиваем их
     source_data = @export.data
     return false if source_data.empty?
 
-    # Преобразуем данные в плоский формат для XLSX
     flattened_data = flatten_data_for_csv(source_data)
-
-    # Теперь фильтруем по выбранным заголовкам (если они выбраны)
-    if @export.file_headers&.any?
-      Rails.logger.info "📤 ExportService: Filtering flattened data to include only selected headers: #{@export.file_headers.join(', ')}"
-      flattened_data = flattened_data.map do |record|
-        filtered_record = {}
-        @export.file_headers.each do |header|
-          filtered_record[header] = record[header] if record.key?(header)
-        end
-        filtered_record
-      end
-      # Используем выбранные заголовки для XLSX
-      headers = @export.file_headers
-    else
-      # Используем все доступные заголовки из данных
-      headers = flattened_data.first.keys
-    end
+    filtered_data, headers = filter_flattened_by_headers(flattened_data)
 
     # Create XLSX using Axlsx
     p = Axlsx::Package.new
     wb = p.workbook
 
     wb.add_worksheet(name: "Sheet 1") do |sheet|
-      # Add headers
       sheet.add_row headers.map { |h| Export.field_label(h) }
 
-      # Add data rows
-      flattened_data.each do |record|
+      filtered_data.each do |record|
         sheet.add_row headers.map { |header| record[header] }
       end
     end
@@ -217,7 +159,7 @@ class ExportService
       # Копируем базовые поля Product
       product_hash.each do |key, value|
         next if %w[variants features images images_zap images_second images_thumb].include?(key)
-        flattened[key] = value
+        flattened[key] = value.to_s
       end
       
       # Разворачиваем variants
@@ -310,4 +252,5 @@ class ExportService
 
     true
   end
+
 end

@@ -344,7 +344,8 @@ class Moysklad::SyncProductService
 
   def find_and_bind_existing_product(code)
     # Ищем существующий товар по code
-    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{CGI.escape(code)}"
+    # uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{CGI.escape(code)}"
+    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?search=#{CGI.escape(code)}"
     auth = authorization_header
     
     begin

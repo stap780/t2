@@ -35,6 +35,9 @@
           <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
             <%= number_to_human_size(export.export_file.byte_size) %>
           </span>
+          <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+            <%= export.export_file.blob.created_at.strftime("%d/%m/%Y %H:%M") %>
+          </span>
         <% end %>
         <% if export.test_mode? %>
           <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
