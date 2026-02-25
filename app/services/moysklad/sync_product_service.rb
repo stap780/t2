@@ -362,8 +362,8 @@ class Moysklad::SyncProductService
         { success: true, ms_id: ms_id, message: "Product already exists, varbind created" }
       else
         Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error 412 but product not found by code"
-        { success: false, error_code: 412, error: "Duplicate code but product not found" }
         @product.update_column(:status, 'archived')
+        { success: false, error_code: 412, error: "Duplicate code but product not found" }
       end
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "Moysklad::SyncProductService: Error finding existing product ##{@product.id}: #{e.message}"

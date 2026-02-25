@@ -11,7 +11,7 @@ class Varbind < ApplicationRecord
   validates :value, presence: true
   validates :value, uniqueness: {
     scope: [:bindable_id, :bindable_type],
-    message: "combination of Bindable Type, Bindable, and Value must be unique for this record"
+    message: "этот ID уже привязан к другому варианту в данной интеграции"
   }
   validates :record_id, uniqueness: {
     scope: [:record_type, :bindable_id, :bindable_type],
