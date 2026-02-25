@@ -9,9 +9,13 @@ class Varbind < ApplicationRecord
   validates :bindable_id, presence: true
   validates :bindable_type, presence: true
   validates :value, presence: true
-  validates :value, uniqueness: { 
-    scope: [:bindable_id, :bindable_type], 
-    message: "combination of Bindable Type, Bindable, and Value must be unique for this record" 
+  validates :value, uniqueness: {
+    scope: [:bindable_id, :bindable_type],
+    message: "combination of Bindable Type, Bindable, and Value must be unique for this record"
+  }
+  validates :record_id, uniqueness: {
+    scope: [:record_type, :bindable_id, :bindable_type],
+    message: "у варианта может быть только одна привязка к данной интеграции"
   }
 
   def self.int_types

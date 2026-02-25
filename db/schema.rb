@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_17_170154) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -485,6 +485,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_17_170154) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["bindable_type", "bindable_id", "record_type", "record_id", "value"], name: "index_bindings_on_bindable_record_and_value", unique: true
+    t.index ["record_type", "record_id", "bindable_type", "bindable_id"], name: "index_varbinds_on_record_and_bindable_unique", unique: true
     t.index ["record_type", "record_id"], name: "index_varbinds_on_record_type_and_record_id"
     t.index ["value"], name: "index_varbinds_on_value"
   end

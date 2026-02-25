@@ -345,9 +345,10 @@ class Moysklad::SyncProductService
   end
 
   def find_and_bind_existing_product(code)
+    search_code = CGI.escape(code)
     # Ищем существующий товар по code
-    # uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{CGI.escape(code)}"
-    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?search=#{CGI.escape(code)}"
+    # uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{search_code}"
+    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?search=#{search_code}"
     auth = authorization_header
     
     begin
@@ -362,6 +363,7 @@ class Moysklad::SyncProductService
       else
         Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error 412 but product not found by code"
         { success: false, error_code: 412, error: "Duplicate code but product not found" }
+        @product.update_column(:status, 'archived')
       end
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "Moysklad::SyncProductService: Error finding existing product ##{@product.id}: #{e.message}"
