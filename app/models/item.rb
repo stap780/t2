@@ -150,11 +150,12 @@ class Item < ApplicationRecord
     return unless incase_id.present?
     Incase.recalculate_status_from_items(incase_id)
   end
-  
+
   def promote_product_to_pending
     product = variant&.product
     return unless product && item_status&.title == 'Да' && product.status == 'draft'
-  
+    
+    self.update_column(:condition, 'priemka')
     product.update(status: 'pending')
   end
 

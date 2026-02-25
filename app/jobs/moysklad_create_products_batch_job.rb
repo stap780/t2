@@ -1,5 +1,5 @@
 class MoyskladCreateProductsBatchJob < ApplicationJob
-  queue_as :default
+  queue_as :moysklad_create_products_batch
 
   def perform
     moysklad = Moysklad.first

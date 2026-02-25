@@ -10,9 +10,10 @@ class Moysklad::CreateProductsBatchService
   def call
     # Товары без varbind Moysklad и со статусом pending
     products_without_binding = Product.where(status: 'pending').where.not(
-        id: Varbind.where(bindable_type: 'Moysklad', bindable_id: @moysklad.id)
-                   .where(record_type: 'Product').select(:record_id)
-      )
+      id: Varbind.where(bindable_type: 'Moysklad', bindable_id: @moysklad.id, record_type: 'Variant')
+                 .joins("INNER JOIN variants ON variants.id = varbinds.record_id")
+                 .select("variants.product_id")
+    )
 
     total = products_without_binding.count
     
