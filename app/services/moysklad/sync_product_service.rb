@@ -18,12 +18,16 @@ class Moysklad::SyncProductService
   def call
     # Проверяем, есть ли уже привязка к МойСклад
     existing_binding = @variant.bindings.find_by(bindable: @moysklad)
-    
+    payload = build_payload
+
+    unless payload["code"].present?
+      Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} - skipping sync (no valid barcode)"
+      return { success: false, skipped: true, reason: "no_valid_barcode" }
+    end
+  
     if existing_binding&.value.present?
-      payload = build_payload
       update_in_moysklad(payload, existing_binding.value)
     else
-      payload = build_payload
       send_to_moysklad(payload)
     end
   end
@@ -89,9 +93,7 @@ class Moysklad::SyncProductService
 
   def barcode_for_payload
     return @variant.barcode if @variant.barcode.present? && @variant.barcode.size == 13
-
-    @variant.create_barcode
-    @variant.barcode
+    nil
   end
 
   def price_in_cents
