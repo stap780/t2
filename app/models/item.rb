@@ -29,6 +29,7 @@ class Item < ApplicationRecord
   after_destroy :recalculate_incase_status_after_destroy
 
   after_commit :broadcast_update_incase_items, on: :update, if: :saved_change_to_item_status_id?
+  after_commit :promote_product_to_pending, on: :update, if: :saved_change_to_item_status_id?
 
   def broadcast_update_incase_items
     broadcast_update_to dom_id(incase, 'items'), target: dom_id(incase, dom_id(self, 'act_show')), partial: 'items/act_show', locals: { item: self, incase: incase }
@@ -149,7 +150,13 @@ class Item < ApplicationRecord
     return unless incase_id.present?
     Incase.recalculate_status_from_items(incase_id)
   end
-
+  
+  def promote_product_to_pending
+    product = variant&.product
+    return unless product && item_status&.title == 'Да' && product.status == 'draft'
+  
+    product.update(status: 'pending')
+  end
 
 end
 
