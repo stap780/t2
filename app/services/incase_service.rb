@@ -254,7 +254,8 @@ class IncaseService
     katnumber = row_data['Каталожный_номер']&.to_s&.strip
 
     # Проверяем позицию по title и katnumber (как в carpats - detalname и katnumber)
-    existing_item = incase.items.where(title: title, katnumber: katnumber).first
+    # existing_item = incase.items.where(title: title, katnumber: katnumber).first
+    existing_item = incase.items.where(katnumber: katnumber).first
     return if existing_item.present?
 
     # Создать новую позицию (автоматически создастся Product и Variant)
