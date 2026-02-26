@@ -30,3 +30,15 @@ production:
   moysklad_create_products_batch:
     class: MoyskladCreateProductsBatchJob
     schedule: at 20:00 every day  # Массовое создание товаров в МойСклад вечером после 20:00
+
+  insales_varbind_sync:
+    class: InsalesVarbindSyncJob
+    schedule: at 20:15 every day  # Синхронизация varbind InSales
+
+  insales_prices_update:
+    class: InsalesPricesUpdateJob
+    schedule: at 20:30 every day  # Обновление цен и остатков InSales
+
+  insales_images_sync:
+    class: InsalesImagesSyncJob
+    schedule: at 20:45 every day  # Синхронизация изображений InSales

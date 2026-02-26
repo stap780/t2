@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Обновление цен и остатков InSales успешно завершено' : '⚠️ Обновление цен и остатков InSales - завершено с ошибками' %></h2>
+
+    <% if @details['total'].present? %>
+      <p><strong>Всего вариантов:</strong> <%= @details['total'] %></p>
+    <% end %>
+    <% if @details['updated'].present? %>
+      <p><strong>Обновлено:</strong> <%= @details['updated'] %></p>
+    <% end %>
+    <% if @details['errors'].present? && @details['errors'].to_i > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details['errors'] %></p>
+    <% end %>
+    <% if @details['completed_at'].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+    <% end %>
+  </body>
+</html>

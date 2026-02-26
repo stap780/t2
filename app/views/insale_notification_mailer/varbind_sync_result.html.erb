@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Синхронизация varbind InSales успешно завершена' : '⚠️ Синхронизация varbind InSales - завершено с ошибками' %></h2>
+
+    <% if @details['processed'].present? %>
+      <p><strong>Обработано вариантов из API:</strong> <%= @details['processed'] %></p>
+    <% end %>
+    <% if @details['created'].present? %>
+      <p><strong>Создано varbind (Variant):</strong> <%= @details['created'] %></p>
+    <% end %>
+    <% if @details['product_created'].present? %>
+      <p><strong>Создано varbind (Product):</strong> <%= @details['product_created'] %></p>
+    <% end %>
+    <% if @details['skipped'].present? %>
+      <p><strong>Пропущено (уже есть varbind):</strong> <%= @details['skipped'] %></p>
+    <% end %>
+    <% if @details['product_skipped'].present? %>
+      <p><strong>Пропущено Product (уже есть varbind):</strong> <%= @details['product_skipped'] %></p>
+    <% end %>
+    <% if @details['not_found'].present? %>
+      <p><strong>Не найдено в БД по штрихкоду:</strong> <%= @details['not_found'] %></p>
+    <% end %>
+    <% if @details['errors'].present? && @details['errors'].to_i > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details['errors'] %></p>
+    <% end %>
+    <% if @details['completed_at'].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+    <% end %>
+  </body>
+</html>

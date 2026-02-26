@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Синхронизация изображений InSales успешно завершена' : '⚠️ Синхронизация изображений InSales - завершено с ошибками' %></h2>
+
+    <% if @details['processed'].present? %>
+      <p><strong>Обработано товаров:</strong> <%= @details['processed'] %></p>
+    <% end %>
+    <% if @details['images_added'].present? %>
+      <p><strong>Добавлено изображений:</strong> <%= @details['images_added'] %></p>
+    <% end %>
+    <% if @details['skipped'].present? %>
+      <p><strong>Пропущено (уже есть фото):</strong> <%= @details['skipped'] %></p>
+    <% end %>
+    <% if @details['not_found'].present? %>
+      <p><strong>Не найдено в БД (нет varbind):</strong> <%= @details['not_found'] %></p>
+    <% end %>
+    <% if @details['errors'].present? && @details['errors'].to_i > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details['errors'] %></p>
+    <% end %>
+    <% if @details['completed_at'].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+    <% end %>
+  </body>
+</html>

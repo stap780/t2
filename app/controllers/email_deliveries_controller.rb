@@ -42,6 +42,9 @@ class EmailDeliveriesController < ApplicationController
     when 'MoyskladNotificationMailer'
       # Повторная отправка уведомления Moysklad
       MoyskladNotificationJob.perform_later(@email_delivery.id)
+    when 'InsaleNotificationMailer'
+      # Повторная отправка уведомления InSales
+      InsaleNotificationJob.perform_later(@email_delivery.id)
     else
       redirect_to @email_delivery, alert: 'Повторная отправка недоступна для этого типа письма'
       return
