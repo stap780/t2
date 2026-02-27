@@ -368,6 +368,9 @@ class Moysklad::SyncProductService
     rescue RestClient::ExceptionWithResponse => e
       Rails.logger.error "Moysklad::SyncProductService: Error finding existing product ##{@product.id}: #{e.message}"
       { success: false, error_code: 412, error: "Duplicate code, failed to find existing product: #{e.message}" }
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "Moysklad::SyncProductService: Cannot create varbind for product ##{@product.id}: #{e.message}"
+      { success: false, error_code: 412, error: e.record.errors.full_messages.join(", ") }
     end
   end
 
