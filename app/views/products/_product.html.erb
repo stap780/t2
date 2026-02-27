@@ -21,7 +21,12 @@
   <div class="flex flex-col relative">
     <div class="absolute top-0 right-0 flex gap-1">
       <% if product.has_moysklad_binding? %>
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">МС</span>
+        <%# tag.a "https://api.moysklad.ru/api/remap/1.2/entity/product/<%= product.variants.first.bindings.where(bindable: Moysklad.first).take.value %>", target: "_blank", class: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800" do %>
+          <%# МС %>
+        <%# end %>
+        <%= link_to "https://online.moysklad.ru/app/#good?global_codeFilter=#{product.variants.first.barcode},equals", target: "_blank", class: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer" do %>
+          МС
+        <% end %>
       <% end %>
       <% if product.has_insale_binding? %>
         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">InS</span>

@@ -33,7 +33,7 @@ production:
 
   insales_varbind_sync:
     class: InsalesVarbindSyncJob
-    schedule: at 20:15 every day  # Синхронизация varbind InSales
+    schedule: at 20:10 every day  # Синхронизация varbind InSales
 
   insales_prices_update:
     class: InsalesPricesUpdateJob
