@@ -24,6 +24,7 @@ class Export < ApplicationRecord
   validates :format, presence: true, inclusion: { in: %w[csv xlsx xml] }
   validates :status, presence: true, inclusion: { in: %w[pending processing completed failed] }
   validates :user, presence: true
+  validates :interval_hours, inclusion: { in: [1, 2, 3, 4, 5, 6], allow_nil: true }
 
   with_options if: -> { format == "xml" } do
     validates :layout_template, presence: true
@@ -165,14 +166,25 @@ class Export < ApplicationRecord
     }
   end
 
-  # Computes the next run time based on time-of-day in app timezone
+  # Computes the next run time:
+  # - interval_hours present → from_time + interval_hours
+  # - time present, interval_hours blank → daily at that time
+  # - both blank → nil (manual only)
   def next_run_at(from_time: Time.zone.now)
-    return nil if time.blank?
+    if interval_hours.present? && interval_hours.positive?
+      from_time + interval_hours.hours
+    elsif time.present?
+      h, m = time.split(":").map(&:to_i)
+      candidate = from_time.in_time_zone.change(hour: h, min: m, sec: 0)
+      candidate += 1.day if candidate <= from_time
+      candidate
+    else
+      nil
+    end
+  end
 
-    h, m = time.split(":").map(&:to_i)
-    candidate = from_time.in_time_zone.change(hour: h, min: m, sec: 0)
-    candidate += 1.day if candidate <= from_time
-    candidate
+  def periodic_scheduled?
+    time.present? || interval_hours.present?
   end
 
   # Schedule the export job at the next occurrence and track scheduled_for.
@@ -350,16 +362,16 @@ class Export < ApplicationRecord
 
   private
 
-  # Schedule next run if time is present and this change affected time
   def enqueue_on_create
-    schedule! if time.present?
+    schedule! if periodic_scheduled?
   end
 
   def handle_enqueue_on_update
-    schedule! if time.present?
-    # if saved_change_to_time?
-    #   schedule! if time.present?
-    # end
+    if periodic_scheduled?
+      schedule!
+    else
+      cancel_pending_job
+    end
   end
 
 end

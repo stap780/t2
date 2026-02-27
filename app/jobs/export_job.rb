@@ -24,8 +24,8 @@ class ExportJob < ApplicationJob
 
     if success
       Rails.logger.info "🎯 ExportJob: Export completed successfully for Export ##{export.id}"
-      # If export has a daily time, schedule the next run
-      if export.time.present?
+      # If export has periodic schedule (interval or daily time), schedule next run
+      if export.periodic_scheduled?
         export.schedule_next_day!
       end
   
