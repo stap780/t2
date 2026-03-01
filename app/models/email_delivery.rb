@@ -11,6 +11,7 @@ class EmailDelivery < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :moysklad_notifications, -> { where(mailer_class: 'MoyskladNotificationMailer') }
   scope :insale_notifications, -> { where(mailer_class: 'InsaleNotificationMailer') }
+  scope :xlsx_notifications, -> { where(mailer_class: 'XlsxNotificationMailer') }
   
   def self.ransackable_attributes(auth_object = nil)
     %w[id status recipient_email mailer_class mailer_method subject created_at sent_at]
@@ -37,6 +38,10 @@ class EmailDelivery < ApplicationRecord
   def insale_notification?
     mailer_class == 'InsaleNotificationMailer'
   end
+
+  def xlsx_notification?
+    mailer_class == 'XlsxNotificationMailer'
+  end
   
   # Методы для получения данных из metadata
   def operation_result
@@ -61,6 +66,8 @@ class EmailDelivery < ApplicationRecord
       'Обновление цен InSales'
     when 'images_sync_result'
       'Синхронизация изображений InSales'
+    when 'xlsx_zip_result'
+      'Экспорт Excel (ZIP)'
     else
       mailer_method
     end

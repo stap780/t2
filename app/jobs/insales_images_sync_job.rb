@@ -3,8 +3,8 @@
 class InsalesImagesSyncJob < ApplicationJob
   queue_as :insales_images_sync
 
-  def perform(days_back: 3)
-    result = Insales::ImagesSyncService.new(days_back: days_back).call
+  def perform
+    result = Insales::ImagesSyncService.new.call
 
     if result[:success]
       Rails.logger.info "InsalesImagesSyncJob: Completed. Processed: #{result[:processed]}, Images added: #{result[:images_added]}, Errors: #{result[:errors]}"

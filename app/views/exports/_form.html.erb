@@ -53,7 +53,15 @@
         <%= form.select(
           :interval_hours,
           options_for_select(
-            [[t("exports.form.not_set"), nil], [t("exports.form.every_n_hours", count: 1), 1], [t("exports.form.every_n_hours", count: 2), 2], [t("exports.form.every_n_hours", count: 3), 3]],
+            [
+              [t("exports.form.not_set"), nil], 
+              [t("exports.form.every_n_hours", count: 1), 1], 
+              [t("exports.form.every_n_hours", count: 2), 2], 
+              [t("exports.form.every_n_hours", count: 3), 3],
+              [t("exports.form.every_n_hours", count: 4), 4],
+              [t("exports.form.every_n_hours", count: 5), 5],
+              [t("exports.form.every_n_hours", count: 6), 6]
+            ],
             selected: form.object.interval_hours
           ),
           {},

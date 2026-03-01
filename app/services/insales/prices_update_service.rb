@@ -48,7 +48,7 @@ module Insales
         end
 
         stats[:updated] += batch.size
-        sleep 0.1
+        # sleep 0.1
       end
 
       result = {

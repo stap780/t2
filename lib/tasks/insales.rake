@@ -50,7 +50,7 @@ namespace :insales do
     puts "⏰ Время завершения: #{Time.zone.now}"
   end
 
-  desc "Синхронизация изображений: товары InSales без фото (updated_since N дней) — добавить из приложения"
+  desc "Синхронизация изображений: товары InSales без фото — добавить из приложения"
   task images_sync: :environment do
     puts "🔄 Синхронизация изображений InSales"
     puts "⏰ Время начала: #{Time.zone.now}"
@@ -60,8 +60,7 @@ namespace :insales do
       next
     end
 
-    days_back = (ENV["DAYS"] || 3).to_i
-    result = Insales::ImagesSyncService.new(days_back: days_back).call
+    result = Insales::ImagesSyncService.new.call
 
     if result[:success]
       puts "\n📊 Итого:"
@@ -81,4 +80,3 @@ end
 # rails insales:varbind_sync
 # rails insales:prices_update
 # rails insales:images_sync
-# DAYS=7 rails insales:images_sync  # за последние 7 дней

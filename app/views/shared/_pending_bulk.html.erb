@@ -5,8 +5,11 @@
     <% if message.present? %>
       <% if message == 'Success' %>
         <%= link_to 'Скачать', rails_blob_path(content, disposition: 'attachment'), class: 'btn btn-primary' %>
+      <% elsif message == 'LongProcess' %>
+        <p class="text-gray-700"><%= content %></p>
+        <%= link_to 'Отправка писем', email_deliveries_path, class: 'btn btn-secondary mt-2', data: { turbo: false } %>
       <% else %>
-        <%= tag.p content %>
+        <%= tag.p content, class: 'text-red-600' %>
       <% end %>
     <% else %>
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600 mr-3"></div>

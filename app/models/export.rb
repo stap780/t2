@@ -167,12 +167,22 @@ class Export < ApplicationRecord
   end
 
   # Computes the next run time:
-  # - interval_hours present → from_time + interval_hours
-  # - time present, interval_hours blank → daily at that time
+  # - interval_hours + time → every N hours starting from time (time as anchor)
+  # - interval_hours only → from_time + interval_hours
+  # - time only → daily at that time
   # - both blank → nil (manual only)
   def next_run_at(from_time: Time.zone.now)
     if interval_hours.present? && interval_hours.positive?
-      from_time + interval_hours.hours
+      if time.present?
+        h, m = time.split(":").map(&:to_i)
+        anchor = from_time.in_time_zone.change(hour: h, min: m, sec: 0)
+        anchor -= 1.day if anchor > from_time
+        elapsed = from_time - anchor
+        periods = (elapsed / interval_hours.hours).ceil
+        anchor + (periods * interval_hours).hours
+      else
+        from_time + interval_hours.hours
+      end
     elsif time.present?
       h, m = time.split(":").map(&:to_i)
       candidate = from_time.in_time_zone.change(hour: h, min: m, sec: 0)

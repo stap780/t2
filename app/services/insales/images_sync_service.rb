@@ -4,9 +4,8 @@ module Insales
   class ImagesSyncService
     include Insales::Concerns::EmailNotification
 
-    def initialize(insale = nil, days_back: 3)
+    def initialize(insale = nil)
       @insale = insale || Insale.first
-      @days_back = days_back
       raise ArgumentError, "Insale configuration not found" unless @insale
     end
 
@@ -46,8 +45,7 @@ module Insales
     def sync_images_single_store(stats)
       batch_size = 250
       page = 1
-      max_pages = 100
-      since_str = @days_back.days.ago.strftime("%Y-%m-%dT%H:%M:%S%:z")
+      max_pages = 400
 
       loop do
         break if page > max_pages
@@ -58,18 +56,14 @@ module Insales
         InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
 
         products = InsalesApi.wait_retry do
-          InsalesApi::Product.find(:all, params: {
-            per_page: batch_size,
-            page: page,
-            updated_since: since_str
-          })
+          InsalesApi::Product.find(:all, params: { per_page: batch_size, page: page })
         end
 
         break if products.blank?
 
         products.each { |ins_product| process_insales_product_images(ins_product, stats) }
 
-        sleep 0.1
+        # sleep 0.1
         page += 1
 
         break if products.size < batch_size
@@ -98,7 +92,7 @@ module Insales
       end
 
       product = varbind.record
-      ordered_images = product.images.order(:position).select { |img| img.file.attached? }
+      ordered_images = product.images.select { |img| img.file.attached? }
       return if ordered_images.empty?
 
       ins_image_ids = []

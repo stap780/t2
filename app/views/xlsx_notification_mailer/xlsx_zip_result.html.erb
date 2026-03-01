@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2>✅ Экспорт Excel (ZIP) успешно завершён</h2>
+
+    <p>Файл с экспортом готов и прикреплён к этому письму.</p>
+
+    <% if @items_count.present? && @items_count > 0 %>
+      <p><strong>Количество позиций:</strong> <%= @items_count %></p>
+    <% end %>
+    <% if @model_name.present? %>
+      <p><strong>Тип данных:</strong> <%= @model_name %></p>
+    <% end %>
+
+    <p>Скачайте прикреплённый ZIP-файл для получения данных.</p>
+  </body>
+</html>
