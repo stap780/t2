@@ -9,8 +9,18 @@ module Insales
       raise ArgumentError, "Insale configuration not found" unless @insale
     end
 
+    MAX_ERROR_SAMPLES = 20
+
     def call
-      stats = { processed: 0, images_added: 0, skipped: 0, not_found: 0, errors: 0 }
+      stats = {
+        processed: 0,
+        images_added: 0,
+        skipped: 0,
+        not_found: 0,
+        errors: 0,
+        error_samples: [],
+        error_types: Hash.new(0)
+      }
 
       sync_images_single_store(stats)
 
@@ -20,7 +30,9 @@ module Insales
         images_added: stats[:images_added],
         skipped: stats[:skipped],
         not_found: stats[:not_found],
-        errors: stats[:errors]
+        errors: stats[:errors],
+        error_samples: stats[:error_samples],
+        error_types: stats[:error_types]
       }
 
       Rails.logger.info "Insales::ImagesSyncService: Completed. Processed: #{stats[:processed]}, Images added: #{stats[:images_added]}, Errors: #{stats[:errors]}"
@@ -69,8 +81,18 @@ module Insales
         break if products.size < batch_size
       end
     rescue StandardError => e
-      stats[:errors] += 1
+      record_error(stats, e, context: "batch page #{page}")
       Rails.logger.error "Insales::ImagesSyncService: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    end
+
+    def record_error(stats, error, context: nil)
+      stats[:errors] += 1
+      stats[:error_types][error.class.name] += 1
+      return if stats[:error_samples].size >= MAX_ERROR_SAMPLES
+
+      sample = { "class" => error.class.name, "message" => error.message }
+      sample["context"] = context if context.present?
+      stats[:error_samples] << sample
     end
 
     def process_insales_product_images(ins_product, stats)
@@ -115,7 +137,7 @@ module Insales
 
       stats[:images_added] += ins_image_ids.size
     rescue StandardError => e
-      stats[:errors] += 1
+      record_error(stats, e, context: "product #{ext_product_id}")
       Rails.logger.warn "Insales::ImagesSyncService: не удалось добавить изображения для product #{ext_product_id}: #{e.message}"
     end
   end

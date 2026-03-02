@@ -20,6 +20,24 @@
     <% end %>
     <% if @details['errors'].present? && @details['errors'].to_i > 0 %>
       <p><strong>Ошибок:</strong> <%= @details['errors'] %></p>
+      <% if @details['error_types'].present? && @details['error_types'].is_a?(Hash) %>
+        <p><strong>Типы ошибок:</strong></p>
+        <ul>
+          <% @details['error_types'].each do |klass, count| %>
+            <li><%= klass %>: <%= count %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if @details['error_samples'].present? && @details['error_samples'].is_a?(Array) %>
+        <p><strong>Примеры ошибок (первые <%= @details['error_samples'].size %>):</strong></p>
+        <ul>
+          <% @details['error_samples'].each do |sample| %>
+            <li>
+              <%= sample['context'] %> — <%= sample['class'] %>: <%= sample['message'] %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
     <% end %>
     <% if @details['completed_at'].present? %>
       <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
