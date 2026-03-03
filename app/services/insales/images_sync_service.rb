@@ -54,7 +54,22 @@ module Insales
 
     private
 
+    UPLOAD_DELAY_SECONDS = 0.1
+
     def sync_images_single_store(stats)
+      to_upload = []
+
+      # Фаза 1: сбор продуктов без картинок (только GET, без загрузки)
+      collect_products_without_images(to_upload, stats)
+
+      # Фаза 2: загрузка изображений с задержкой между продуктами
+      upload_collected_products(to_upload, stats)
+    rescue StandardError => e
+      record_error(stats, e, context: "sync_images_single_store")
+      Rails.logger.error "Insales::ImagesSyncService: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    end
+
+    def collect_products_without_images(to_upload, stats)
       batch_size = 250
       page = 1
       max_pages = 400
@@ -73,16 +88,54 @@ module Insales
 
         break if products.blank?
 
-        products.each { |ins_product| process_insales_product_images(ins_product, stats) }
+        products.each do |ins_product|
+          item = collect_product_for_upload(ins_product, stats)
+          to_upload << item if item
+        end
 
-        # sleep 0.1
+        sleep 0.1
         page += 1
 
         break if products.size < batch_size
       end
-    rescue StandardError => e
-      record_error(stats, e, context: "batch page #{page}")
-      Rails.logger.error "Insales::ImagesSyncService: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    end
+
+    def collect_product_for_upload(ins_product, stats)
+      stats[:processed] += 1
+      ext_product_id = (ins_product.try(:id) || ins_product.try(:[], "id")).to_s.presence
+
+      ins_images = Array(ins_product.try(:images))
+      unless ins_images.empty?
+        stats[:skipped] += 1
+        return nil
+      end
+
+      return nil if ext_product_id.blank?
+
+      varbind = Varbind.find_by(bindable: @insale, record_type: "Product", value: ext_product_id)
+      unless varbind&.record.is_a?(Product)
+        stats[:not_found] += 1
+        return nil
+      end
+
+      product = varbind.record
+      ordered_images = product.images.select { |img| img.file.attached? }
+      return nil if ordered_images.empty?
+
+      { ins_product: ins_product, product: product }
+    end
+
+    def upload_collected_products(to_upload, stats)
+      to_upload.each_with_index do |item, idx|
+        creds = Insales::Config::CREDENTIALS[idx % Insales::Config::CREDENTIALS.size]
+
+        InsalesApi::App.api_key = creds[:api_key]
+        InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
+
+        upload_product_images(item[:ins_product], item[:product], stats)
+
+        sleep UPLOAD_DELAY_SECONDS if idx < to_upload.size - 1
+      end
     end
 
     def record_error(stats, error, context: nil)
@@ -95,25 +148,9 @@ module Insales
       stats[:error_samples] << sample
     end
 
-    def process_insales_product_images(ins_product, stats)
-      stats[:processed] += 1
+    def upload_product_images(ins_product, product, stats)
       ext_product_id = (ins_product.try(:id) || ins_product.try(:[], "id")).to_s.presence
 
-      ins_images = Array(ins_product.try(:images))
-      unless ins_images.empty?
-        stats[:skipped] += 1
-        return
-      end
-
-      return if ext_product_id.blank?
-
-      varbind = Varbind.find_by(bindable: @insale, record_type: "Product", value: ext_product_id)
-      unless varbind&.record.is_a?(Product)
-        stats[:not_found] += 1
-        return
-      end
-
-      product = varbind.record
       ordered_images = product.images.select { |img| img.file.attached? }
       return if ordered_images.empty?
 
