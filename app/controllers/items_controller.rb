@@ -82,7 +82,7 @@ class ItemsController < ApplicationController
       variant = Variant.find_by(id: variant_id)
       if variant
         @item.variant_id = variant.id
-        @item.title = @item.present? ? @item.title : variant.product.title
+        @item.title = item_id ? @item.title : variant.product.title
         @item.price = variant.price
         @item.quantity = variant.quantity
         @item.katnumber = variant.sku
