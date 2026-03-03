@@ -52,30 +52,33 @@ module Insales
       loop do
         break if page > max_pages
 
-        creds = Insales::Config::CREDENTIALS[(page - 1) % Insales::Config::CREDENTIALS.size]
+        begin
+          creds = Insales::Config::CREDENTIALS[(page - 1) % Insales::Config::CREDENTIALS.size]
 
-        InsalesApi::App.api_key = creds[:api_key]
-        InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
+          InsalesApi::App.api_key = creds[:api_key]
+          InsalesApi::App.configure_api(creds[:api_link], creds[:api_password])
 
-        products = InsalesApi.wait_retry do
-          InsalesApi::Product.all(params: { per_page: batch_size, page: page })
-        end
-
-        break if products.empty?
-
-        products.each do |ins_product|
-          variants = Array(ins_product.try(:variants))
-          variants.each do |ins_variant|
-            process_insales_variant(ins_product, ins_variant, stats)
+          products = InsalesApi.wait_retry do
+            InsalesApi::Product.all(params: { per_page: batch_size, page: page })
           end
+
+          break if products.empty?
+
+          products.each do |ins_product|
+            variants = Array(ins_product.try(:variants))
+            variants.each do |ins_variant|
+              process_insales_variant(ins_product, ins_variant, stats)
+            end
+          end
+
+          sleep 0.1
+        rescue StandardError => e
+          stats[:errors] += 1
+          Rails.logger.error "Insales::VarbindSyncService: page #{page} failed: #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
         end
 
-        sleep 0.1
         page += 1
       end
-    rescue StandardError => e
-      stats[:errors] += 1
-      Rails.logger.error "Insales::VarbindSyncService: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     end
 
     def process_insales_variant(ins_product, ins_variant, stats)
