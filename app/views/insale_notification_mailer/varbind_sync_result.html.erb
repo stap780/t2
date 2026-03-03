@@ -24,6 +24,9 @@
     <% if @details['not_found'].present? %>
       <p><strong>Не найдено в БД по штрихкоду:</strong> <%= @details['not_found'] %></p>
     <% end %>
+    <% if @details['duplicate_barcode'].present? && @details['duplicate_barcode'].to_i > 0 %>
+      <p><strong>Пропущено (дубль штрихкода):</strong> <%= @details['duplicate_barcode'] %></p>
+    <% end %>
     <% if @details['errors'].present? && @details['errors'].to_i > 0 %>
       <p><strong>Ошибок:</strong> <%= @details['errors'] %></p>
     <% end %>

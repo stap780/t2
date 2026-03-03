@@ -10,7 +10,7 @@ module Insales
     end
 
     def call
-      stats = { processed: 0, created: 0, skipped: 0, not_found: 0, errors: 0, product_created: 0, product_skipped: 0 }
+      stats = { processed: 0, created: 0, skipped: 0, not_found: 0, errors: 0, product_created: 0, product_skipped: 0, duplicate_barcode: 0 }
 
       sync_varbinds_single_store(stats)
 
@@ -22,7 +22,8 @@ module Insales
         not_found: stats[:not_found],
         errors: stats[:errors],
         product_created: stats[:product_created],
-        product_skipped: stats[:product_skipped]
+        product_skipped: stats[:product_skipped],
+        duplicate_barcode: stats[:duplicate_barcode]
       }
 
       Rails.logger.info "Insales::VarbindSyncService: Completed. Processed: #{stats[:processed]}, Created: #{stats[:created]}, Errors: #{stats[:errors]}"
@@ -89,11 +90,18 @@ module Insales
 
       return if barcode.blank? || ext_variant_id.blank?
 
-      variant = Variant.find_by_barcode(barcode)
-      unless variant
+      variants = Variant.where(barcode: barcode)
+      if variants.empty?
         stats[:not_found] += 1
         return
       end
+      if variants.size > 1
+        stats[:duplicate_barcode] += 1
+        Rails.logger.warn "VarbindSyncService: пропуск — дубль штрихкода #{barcode} (варианты: #{variants.pluck(:id).join(', ')})"
+        return
+      end
+
+      variant = variants.first
 
       existing = Varbind.find_by(bindable: @insale, value: ext_variant_id)
       if existing

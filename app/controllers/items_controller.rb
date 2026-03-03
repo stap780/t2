@@ -82,7 +82,7 @@ class ItemsController < ApplicationController
       variant = Variant.find_by(id: variant_id)
       if variant
         @item.variant_id = variant.id
-        @item.title = variant.product.title
+        @item.title = @item.present? ? @item.title : variant.product.title
         @item.price = variant.price
         @item.quantity = variant.quantity
         @item.katnumber = variant.sku
@@ -100,9 +100,10 @@ class ItemsController < ApplicationController
 
   def search
     if params[:title].present?
+      # var.full_title
       @search_results = Variant.ransack(sku_or_barcode_or_product_title_cont: params[:title]).result
         .limit(20)
-        .map { |var| { title: var.full_title, id: var.id } }
+        .map { |var| { title: var.item.title, id: var.id } }
         .reject(&:blank?)
       render json: @search_results, status: :ok
     else
