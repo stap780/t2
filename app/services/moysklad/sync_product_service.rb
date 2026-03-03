@@ -26,7 +26,7 @@ class Moysklad::SyncProductService
     end
   
     if existing_binding&.value.present?
-      update_in_moysklad(payload, existing_binding.value)
+      update_in_moysklad(build_payload(for_update: true), existing_binding.value)
     else
       send_to_moysklad(payload)
     end
@@ -35,7 +35,8 @@ class Moysklad::SyncProductService
   private
 
   # Один и тот же payload для создания и обновления. code = barcode.
-  def build_payload
+  # При for_update: true не добавляем code, чтобы избежать 412 при обновлении.
+  def build_payload(for_update: false)
     payload = {
       "name" => @product.title.to_s,
       "externalCode" => @product.id.to_s,
@@ -70,7 +71,7 @@ class Moysklad::SyncProductService
       "buyPrice" => build_buy_price
     }
 
-    payload["code"] = barcode_for_payload
+    payload["code"] = barcode_for_payload unless for_update
 
     payload
   end
