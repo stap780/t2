@@ -12,7 +12,7 @@ all_attributes = inc_attributes + item_attributes
 inc_headers  = inc_attributes.map  { |attr| Incase.human_attribute_name(attr) }
 item_headers = item_attributes.map { |attr| Item.human_attribute_name(attr) }
 headers      = inc_headers + item_headers
-check_int = ["id","price","quantity","cost_price"]
+check_int = ["id","price","quantity","cost_price","totalsum"]
 wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row headers
   types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
