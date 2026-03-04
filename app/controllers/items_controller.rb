@@ -103,7 +103,7 @@ class ItemsController < ApplicationController
       # var.full_title
       @search_results = Variant.ransack(sku_or_barcode_or_product_title_cont: params[:title]).result
         .limit(20)
-        .map { |var| { title: var.item.title, id: var.id } }
+        .map { |var| { title: var.item.present? ? var.item.title : var.full_title, id: var.id } }
         .reject(&:blank?)
       render json: @search_results, status: :ok
     else
