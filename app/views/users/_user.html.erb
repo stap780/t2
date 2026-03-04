@@ -16,7 +16,7 @@
   
   <div class="flex items-center space-x-2">
     <% if Current.user&.admin? %>
-      <%= link_to edit_user_path(user), data: { turbo_frame: :offcanvas } %>
+      <%= link_to_edit edit_user_path(user), data: { turbo_frame: :offcanvas } %>
       <%= link_to_delete user_path(user), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
     <% end %>
   </div>
