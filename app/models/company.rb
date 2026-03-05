@@ -6,6 +6,7 @@ class Company < ApplicationRecord
   
   has_many :incases
   has_many :acts
+  has_many :strah_acts, class_name: 'Act', foreign_key: 'strah_id'
   has_many :client_companies, dependent: :destroy
   has_many :clients, through: :client_companies
   accepts_nested_attributes_for :client_companies, allow_destroy: true
@@ -138,6 +139,9 @@ class Company < ApplicationRecord
     end
     if acts.count.positive?
       errors.add(:base, "Удалить компанию нельзя, так как есть Акты с ней.")
+    end
+    if strah_acts.count.positive?
+      errors.add(:base, "Удалить компанию нельзя, так как есть Акты с ней (как страховая).")
     end
     
     throw(:abort) if errors.present?
