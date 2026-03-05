@@ -76,7 +76,7 @@
       <% end %>
     </div>
   </div>
-  <%= f.collection_select :strah_id_eq, Company.strah.limit(20), :id, :short_title, 
+  <%= f.collection_select :strah_id_eq, Company.strah, :id, :short_title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.strah_id') }, 
       { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <div>
