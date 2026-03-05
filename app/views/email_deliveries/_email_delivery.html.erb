@@ -69,7 +69,7 @@
   <div class="flex justify-end space-x-2">
     <%= link_to "Просмотр", email_delivery_path(email_delivery), class: "px-3 py-1 text-sm bg-violet-600 text-white rounded-md hover:bg-violet-700", data: { turbo: false } %>
     <% if email_delivery.failed? %>
-      <%= button_to "Повторить", retry_email_delivery_path(email_delivery), method: :post, class: "px-3 py-1 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
+    ⚠️ <%# button_to "Повторить", retry_email_delivery_path(email_delivery), method: :post, class: "px-3 py-1 text-sm bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
     <% end %>
   </div>
 </div>
