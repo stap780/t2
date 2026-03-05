@@ -43,7 +43,7 @@
   <%= f.search_field :items_barcode_or_items_katnumber_cont, value: params.dig(:q, :items_barcode_or_items_katnumber_cont), placeholder: "Штрихкод / Кат.номер", class: "h-8 px-2 py-1 border border-gray-300 rounded mb-3", style: "min-width: 150px;" %>
   <%= f.search_field :company_title_cont, value: params.dig(:q, :company_title_cont), placeholder: t('activerecord.attributes.incase.company_id'), class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md"%>
   <%= f.collection_select :company_okrug_id_eq, Okrug.all, :id, :title, 
-    { include_blank: false, prompt: 'Okrug' }, { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
+    { include_blank: false, prompt: 'Округ' }, { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <% selected_status_ids = Array(params.dig(:q, :incase_status_id_in)).reject(&:blank?).map(&:to_s) %>
   <div class="relative mb-3" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
     <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_status_id') %>" data-action="click->multiselect-dropdown#toggle"

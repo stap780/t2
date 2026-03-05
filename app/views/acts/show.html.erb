@@ -69,7 +69,12 @@
       <!-- Информация о страховой компании (передающая сторона) -->
       <div>
         <h2 class="text-lg font-semibold text-gray-900 mb-2"><%= t('.transferring_party') %></h2>
-        <p class="text-gray-700 font-medium"><%= @act.strah&.title %> <%= @act.strah&.ur_address %></p>
+        <%= form_with model: @act do |f| %>
+          <%= f.collection_select :strah_id_eq, Company.strah, :id, :short_title, { include_blank: false }, 
+              onchange: 'this.form.requestSubmit();', 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 h-8", 
+              style: "max-width: 250px;" %>
+        <% end %>
       </div>
     </div>
 
@@ -79,7 +84,7 @@
           <span class="text-sm text-gray-500"><%= t('.act_date') %>:</span>
           <%= form_with model: @act do |f| %>
             <%= f.date_field :date, 
-              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 h-8", 
               style: "max-width: 250px;",
               onchange: 'this.form.requestSubmit();' %>
           <% end %>
@@ -89,7 +94,7 @@
           <%= form_with model: @act do |f| %>
             <%= f.select :status, options_for_select(Act.statuses.keys.map { |k| [t("enums.act.status.#{k}"), k] }, @act.status), { include_blank: false }, 
                 onchange: 'this.form.requestSubmit();', 
-                class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500", 
+                class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 h-8", 
                 style: "max-width: 250px;" %>
           <% end %>
         </div>
@@ -116,7 +121,7 @@
                 <%= hidden_field_tag 'item_ids[]', item.id %>
               <% end %>
             <% end %>
-            <%= f.select :item_status_id, options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }), { include_blank: false, prompt: t('activerecord.attributes.item.item_status_id') }, onchange: 'this.form.requestSubmit();', class: "w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 text-sm", style: "max-width: 250px;" %>
+            <%= f.select :item_status_id, options_for_select(ItemStatus.all.map { |s| [s.title, s.id] }), { include_blank: false, prompt: t('activerecord.attributes.item.item_status_id') }, onchange: 'this.form.requestSubmit();', class: "w-full px-2 py-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-violet-500 focus:border-violet-500 text-sm h-8", style: "max-width: 250px;" %>
           <% end %>
         </div>
       </div>
