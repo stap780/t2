@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authentication
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  # Only allow modern browsers for UI; skip for external endpoints (webhooks, export files, health)
+  before_action :check_browser_version
 
   before_action :set_locale
   before_action :set_active_storage_url_options
@@ -13,7 +13,18 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   private
-  
+
+    def check_browser_version
+      return if external_request?
+      allow_browser(versions: :modern)
+    end
+
+    def external_request?
+      request.path.start_with?("/api/webhooks/", "/api/moisklad/") ||
+        request.path.match?(%r{^/exports/export-\d+}) ||
+        request.path == "/up"
+    end
+
     def set_locale
       requested = params[:locale]
       available = I18n.available_locales.map(&:to_s)

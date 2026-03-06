@@ -245,11 +245,10 @@ Rails.application.routes.draw do
     end
   end
 
-  # API webhooks
+  # API webhooks and external endpoints (bypass allow_browser)
   namespace :api do
-    namespace :webhooks do
-      post 'insales/order', to: 'insales#order'
-    end
+    post 'insales/order', to: 'insales#order'
+    post 'moisklad/order', to: 'moisklad#order'
   end
   
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
