@@ -16,7 +16,10 @@ class ApplicationController < ActionController::Base
 
     def check_browser_version
       return if external_request?
-      allow_browser(versions: :modern)
+      allow_browser(
+        versions: :modern,
+        block: -> { render file: Rails.root.join("public/406-unsupported-browser.html"), layout: false, status: :not_acceptable }
+      )
     end
 
     def external_request?
