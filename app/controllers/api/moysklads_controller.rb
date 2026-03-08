@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-class Api::MoiskladsController < ApplicationController
+class Api::MoyskladsController < ApplicationController
   skip_before_action :require_authentication
   skip_before_action :verify_authenticity_token
 
-  # POST /api/moisklads/order
   def order
     payload = request.body.read
     data = JSON.parse(payload.presence || "{}")
@@ -27,10 +26,10 @@ class Api::MoiskladsController < ApplicationController
 
     head :ok
   rescue JSON::ParserError => e
-    Rails.logger.error "[Api::MoiskladsController] Invalid JSON: #{e.message}"
+    Rails.logger.error "[Api::MoyskladsController] Invalid JSON: #{e.message}"
     head :unprocessable_entity
   rescue StandardError => e
-    Rails.logger.error "[Api::MoiskladsController] Error: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    Rails.logger.error "[Api::MoyskladsController] Error: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     head :ok
   end
 
@@ -57,7 +56,7 @@ class Api::MoiskladsController < ApplicationController
       new_quantity = [variant.quantity - reserve, 0].max
       variant.update!(quantity: new_quantity)
     rescue StandardError => e
-      Rails.logger.error "[Api::MoiskladsController] Error processing position: #{e.message}"
+      Rails.logger.error "[Api::MoyskladsController] Error processing position: #{e.message}"
     end
   end
 end

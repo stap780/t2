@@ -12,10 +12,21 @@ all_attributes = inc_attributes + item_attributes
 inc_headers  = inc_attributes.map  { |attr| Incase.human_attribute_name(attr) }
 item_headers = item_attributes.map { |attr| Item.human_attribute_name(attr) }
 headers      = inc_headers + item_headers
-check_int = ["id","price","quantity","cost_price","totalsum"]
+check_int = ["id", "quantity"]
+check_float = ["price", "cost_price", "totalsum"]
+decimal_style = wb.styles.add_style(format_code: "0,00")
 wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row headers
-  types = all_attributes.map{ |attr| check_int.include?(attr) ? 'integer'.to_sym : 'string'.to_sym}
+  types = all_attributes.map do |attr|
+    if check_float.include?(attr)
+      :float
+    elsif check_int.include?(attr)
+      :integer
+    else
+      :string
+    end
+  end
+  styles = all_attributes.map { |attr| check_float.include?(attr) ? decimal_style : nil }
   collection.find_each(batch_size: 1000) do |item|
     inc_values = inc_attributes.map do |attr|
       value = item.send(attr)
@@ -28,13 +39,13 @@ wb.add_worksheet(name: "Убытки") do |sheet|
     end
     if is_mono
       # Для mono режима добавляем только строку с данными убытка (без позиций)
-      sheet.add_row inc_values, types: types
+      sheet.add_row inc_values, types: types, style: styles
     else
       # Для обычного режима добавляем строку для каждой позиции
       item.items.each do |it|
         it_values = item_attributes.map { |attr| it.send(attr) }
         values = inc_values + it_values
-        sheet.add_row values, types: types
+        sheet.add_row values, types: types, style: styles
       end
     end
   end
