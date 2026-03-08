@@ -16,15 +16,17 @@ class EmailDeliveriesController < ApplicationController
     
     case @email_delivery.mailer_class
     when 'IncaseMailer'
-      unless @email_delivery.attachment.attached?
+      if @email_delivery.mailer_method == 'incase_item_prices_result'
+        IncaseCalcPriceJob.perform_later(@email_delivery.id)
+      elsif @email_delivery.attachment.attached?
+        # Унифицированная отправка (работает для одиночных и массовых)
+        company_id = @email_delivery.recipient.id
+        incase_ids = @email_delivery.metadata&.dig('incase_ids') || [@email_delivery.record.id]
+        IncaseEmailJob.perform_later(incase_ids, company_id, @email_delivery.id)
+      else
         redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'
         return
       end
-      
-      # Унифицированная отправка (работает для одиночных и массовых)
-      company_id = @email_delivery.recipient.id
-      incase_ids = @email_delivery.metadata&.dig('incase_ids') || [@email_delivery.record.id]
-      IncaseEmailJob.perform_later(incase_ids, company_id, @email_delivery.id)
     when 'ActMailer'
       unless @email_delivery.attachment.attached?
         redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'

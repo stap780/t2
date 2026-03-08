@@ -34,4 +34,16 @@ class IncaseMailer < ApplicationMailer
       reply_to: "dizautodealer@gmail.com"
     )
   end
+
+  def incase_item_prices_result(email_delivery_id)
+    @email_delivery = EmailDelivery.find(email_delivery_id)
+    @details = @email_delivery.operation_details
+    @success = @email_delivery.operation_result == "success"
+
+    mail(
+      to: @email_delivery.recipient_email,
+      subject: @email_delivery.subject,
+      reply_to: "dizautodealer@gmail.com"
+    )
+  end
 end

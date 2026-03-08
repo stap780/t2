@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Массовый пересчет себестоимости выполнен успешно' : '⚠️ Массовый пересчет себестоимости завершён с ошибками' %></h2>
+
+    <% if @success %>
+      <% if @details['processed_count'].present? %>
+        <p><strong>Обработано убытков:</strong> <%= @details['processed_count'] %></p>
+      <% end %>
+      <% if @details['completed_at'].present? %>
+        <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+      <% end %>
+    <% else %>
+      <% if @details['errors'].present? %>
+        <p><strong>Ошибки:</strong></p>
+        <ul>
+          <% @details['errors'].each do |err| %>
+            <li><%= err %></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <% if @email_delivery.error_message.present? %>
+        <p><strong>Сообщение:</strong> <%= @email_delivery.error_message %></p>
+      <% end %>
+      <% if @details['completed_at'].present? %>
+        <p><strong>Дата завершения:</strong> <%= @details['completed_at'] %></p>
+      <% end %>
+    <% end %>
+  </body>
+</html>

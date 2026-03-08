@@ -13,8 +13,8 @@ inc_headers  = inc_attributes.map  { |attr| Incase.human_attribute_name(attr) }
 item_headers = item_attributes.map { |attr| Item.human_attribute_name(attr) }
 headers      = inc_headers + item_headers
 check_int = ["id", "quantity"]
-check_float = ["price", "cost_price", "totalsum"]
-decimal_style = wb.styles.add_style(format_code: "0,00")
+check_float = ["price","cost_price","totalsum","sum"]
+decimal_style = wb.styles.add_style(format_code: "0.00")
 wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row headers
   types = all_attributes.map do |attr|

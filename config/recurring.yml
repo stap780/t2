@@ -29,7 +29,11 @@ production:
 
   moysklad_create_products_batch:
     class: MoyskladCreateProductsBatchJob
-    schedule: at 20:00 every day  # Массовое создание товаров в МойСклад вечером после 20:00
+    schedule: "0 8,20 * * *"  # Массовое создание товаров в МойСклад в 8:00 и 20:00
+
+  incase_calc_price:
+    class: IncaseCalcPriceJob
+    schedule: "0 9 * * *"  # Массовый пересчет себестоимости в 9:00
 
   insales_varbind_sync:
     class: InsalesVarbindSyncJob
