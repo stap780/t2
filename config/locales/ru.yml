@@ -452,8 +452,12 @@ ru:
     check:
       check_success: "Подключение к API успешно"
       check_error: "Ошибка подключения к API: %{messages}"
+    add_order_webhook:
+      webhook_success: "Webhook успешно добавлен: %{message}"
+      webhook_error: "Не удалось добавить webhook: %{messages}"
     moysklad:
       check: "Проверить"
+      add_webhook: "Добавить Webhook"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
   products:
     index:

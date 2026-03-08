@@ -1,5 +1,4 @@
 class ExportsController < ApplicationController
-  allow_browser versions: :modern, except: [:file]
   # Allow public access to the stable file URL for external services
   allow_unauthenticated_access only: [:file]
 

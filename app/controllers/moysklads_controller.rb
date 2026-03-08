@@ -1,7 +1,7 @@
 class MoyskladsController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_moysklad, only: %i[ show edit update destroy check ]
+  before_action :set_moysklad, only: %i[ show edit update destroy check add_order_webhook ]
 
   # GET /moysklads
   def index
@@ -69,6 +69,22 @@ class MoyskladsController < ApplicationController
           turbo_stream.remove(dom_id(@moysklad))
         ]
       end
+    end
+  end
+
+  # POST /moysklads/:id/add_order_webhook
+  def add_order_webhook
+    success, messages = Moysklad::Webhook.add(moysklad: @moysklad)
+
+    if success
+      flash[:notice] = t(".webhook_success", message: messages.is_a?(Array) ? messages.join(", ") : messages)
+    else
+      flash[:alert] = t(".webhook_error", messages: messages.join(", "))
+    end
+
+    respond_to do |format|
+      format.html { redirect_to moysklads_path }
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
 

@@ -136,6 +136,7 @@ Rails.application.routes.draw do
   resources :moysklads do
     member do
       get :check
+      post :add_order_webhook
     end
   end
 
@@ -248,7 +249,7 @@ Rails.application.routes.draw do
   # API webhooks and external endpoints (bypass allow_browser)
   namespace :api do
     post 'insales/order', to: 'insales#order'
-    post 'moisklad/order', to: 'moisklad#order'
+    post 'moysklads/order', to: 'moysklads#order'
   end
   
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

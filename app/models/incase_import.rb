@@ -44,5 +44,6 @@ class IncaseImport < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     ['user']
   end
+  
 end
 

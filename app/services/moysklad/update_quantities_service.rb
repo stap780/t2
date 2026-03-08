@@ -1,9 +1,8 @@
-require 'rest-client'
-require 'base64'
-require 'json'
+require "rest-client"
+require "json"
 
 class Moysklad::UpdateQuantitiesService
-  MOYSKLAD_API_URL = "https://api.moysklad.ru/api/remap/1.2/report/stock/bystore/current".freeze
+  STOCK_URL = "#{Moysklad::Api::API_BASE}/report/stock/bystore/current".freeze
   
   # Email для уведомлений (можно вынести в настройки)
   NOTIFICATION_EMAIL = Rails.application.credentials.dig(:moysklad_notification_email) || 'dizautodealer@gmail.com'
@@ -71,15 +70,15 @@ class Moysklad::UpdateQuantitiesService
   private
 
   def fetch_stock_data
-    auth = authorization_header
+    auth = Moysklad::Api.basic_auth(@moysklad)
     max_retries = 3
     retry_count = 0
     
     loop do
       begin
         response = RestClient::Request.execute(
-          method: :get, 
-          url: MOYSKLAD_API_URL, 
+          method: :get,
+          url: STOCK_URL, 
           headers: { 
             Authorization: auth,
             Accept: 'application/json;charset=utf-8'
@@ -220,11 +219,6 @@ class Moysklad::UpdateQuantitiesService
     nil
   end
 
-  def authorization_header
-    credentials = "#{@moysklad.api_key}:#{@moysklad.api_password}"
-    'Basic ' + Base64.encode64(credentials).chomp
-  end
-  
   def create_email_delivery_and_notify(result, error_class = nil)
     subject = result[:success] ? 
       "✅ Обновление остатков из МойСклад - успешно" :

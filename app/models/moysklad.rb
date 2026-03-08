@@ -5,13 +5,12 @@ class Moysklad < ApplicationRecord
   # Check API works
   # Returns [true, ""] or [false, messages]
   def api_work?
-    return [false, ["No Moysklad configuration"]] unless self.persisted?
+    return [false, ["No Moysklad configuration"]] unless persisted?
 
     message = []
     begin
-      # TODO: Implement Moysklad API check
-      # For now, just return success
-      [true, ""]
+      token = Moysklad::Webhook.fetch_access_token(self)
+      [token.present?, ""]
     rescue SocketError
       message << "SocketError Check Key,Password"
     rescue StandardError => e
@@ -19,6 +18,4 @@ class Moysklad < ApplicationRecord
     end
     message.size.positive? ? [false, message] : [true, ""]
   end
-  
 end
-

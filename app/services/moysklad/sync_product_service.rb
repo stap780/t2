@@ -1,9 +1,8 @@
-require 'barby'
-require 'barby/barcode/ean_13'
-require 'rest-client'
-require 'base64'
-require 'json'
-require 'cgi'
+require "barby"
+require "barby/barcode/ean_13"
+require "rest-client"
+require "json"
+require "cgi"
 
 class Moysklad::SyncProductService
   def initialize(product, moysklad_config = nil)
@@ -286,8 +285,8 @@ class Moysklad::SyncProductService
   end
 
   def send_to_moysklad(payload)
-    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product"
-    auth = authorization_header
+    uri = "#{Moysklad::Api::API_BASE}/entity/product"
+    auth = Moysklad::Api.basic_auth(@moysklad)
     
     Rails.logger.info "Moysklad::SyncProductService: Creating product ##{@product.id} in Moysklad"
     
@@ -319,8 +318,8 @@ class Moysklad::SyncProductService
   end
 
   def update_in_moysklad(payload, ms_id)
-    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product/#{ms_id}"
-    auth = authorization_header
+    uri = "#{Moysklad::Api::API_BASE}/entity/product/#{ms_id}"
+    auth = Moysklad::Api.basic_auth(@moysklad)
     
     Rails.logger.info "Moysklad::SyncProductService: Updating product ##{@product.id} in Moysklad (ms_id: #{ms_id})"
     
@@ -348,9 +347,8 @@ class Moysklad::SyncProductService
   def find_and_bind_existing_product(code)
     search_code = CGI.escape(code)
     # Ищем существующий товар по code
-    uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?filter=code=#{search_code}"
-    # uri = "https://api.moysklad.ru/api/remap/1.2/entity/product?search=#{search_code}" # очень долгий ответ
-    auth = authorization_header
+    uri = "#{Moysklad::Api::API_BASE}/entity/product?filter=code=#{search_code}"
+    auth = Moysklad::Api.basic_auth(@moysklad)
     
     begin
       response = RestClient.get(uri, Authorization: auth, accept: 'application/json;charset=utf-8')
@@ -373,11 +371,6 @@ class Moysklad::SyncProductService
       Rails.logger.error "Moysklad::SyncProductService: Cannot create varbind for product ##{@product.id}: #{e.message}"
       { success: false, error_code: 412, error: e.record.errors.full_messages.join(", ") }
     end
-  end
-
-  def authorization_header
-    credentials = "#{@moysklad.api_key}:#{@moysklad.api_password}"
-    'Basic ' + Base64.encode64(credentials).chomp
   end
 
   def create_varbind(ms_id)

@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
     end
 
     def external_request?
-      request.path.start_with?("/api/webhooks/", "/api/moisklad/") ||
+      request.path.start_with?("/api/webhooks/", "/api/moysklads/") ||
         request.path.match?(%r{^/exports/export-\d+}) ||
         request.path == "/up"
     end
