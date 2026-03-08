@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class InsalesPricesUpdateJob < ApplicationJob
-  queue_as :insales_prices_update
+  queue_as :insales_prices_and_qt_update
 
   def perform
     result = Insales::PricesUpdateService.new.call

@@ -188,7 +188,7 @@ class Incase < ApplicationRecord
         next unless moysklad.present?
 
         begin
-          Moysklad::SyncProductService.new(product, moysklad).call
+          MoyskladApi::SyncProduct.new(product, moysklad).call
         rescue => e
           Rails.logger.error "Failed to sync product #{product.id} to Moysklad: #{e.message}"
         end

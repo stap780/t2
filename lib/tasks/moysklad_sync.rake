@@ -11,7 +11,7 @@ namespace :moysklad do
     puts "⏰ Время сервера: #{Time.now}"
     puts "⏰ Московское время: #{Time.zone.now}"
 
-    service = Moysklad::CreateProductsBatchService.new(moysklad)
+    service = MoyskladApi::CreateProductsBatch.new(moysklad)
     result = service.call
 
     if result[:success]
@@ -38,7 +38,7 @@ namespace :moysklad do
     puts "⏰ Время сервера: #{Time.now}"
     puts "⏰ Московское время: #{Time.zone.now}"
 
-    service = Moysklad::UpdateQuantitiesService.new(moysklad)
+    service = MoyskladApi::UpdateQuantities.new(moysklad)
     result = service.call
 
     if result[:success]

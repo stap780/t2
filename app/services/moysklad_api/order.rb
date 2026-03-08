@@ -2,7 +2,7 @@
 
 require "rest-client"
 
-module Moysklad
+module MoyskladApi
   class Order
     # Fetch customerorder with positions by href
     # Returns order JSON or nil

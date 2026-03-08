@@ -74,7 +74,7 @@ class MoyskladsController < ApplicationController
 
   # POST /moysklads/:id/add_order_webhook
   def add_order_webhook
-    success, messages = Moysklad::Webhook.add(moysklad: @moysklad)
+    success, messages = MoyskladApi::Webhook.add(moysklad: @moysklad)
 
     if success
       flash[:notice] = t(".webhook_success", message: messages.is_a?(Array) ? messages.join(", ") : messages)

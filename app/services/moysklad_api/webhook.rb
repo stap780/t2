@@ -2,7 +2,7 @@
 
 require "rest-client"
 
-module Moysklad
+module MoyskladApi
   class Webhook
     DEFAULT_URL = "https://cpt.dizauto.ru/api/moysklads/order".freeze
 

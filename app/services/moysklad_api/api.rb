@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Moysklad
+module MoyskladApi
   module Api
     API_BASE = "https://api.moysklad.ru/api/remap/1.2".freeze
 

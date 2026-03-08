@@ -8,7 +8,7 @@ class MoyskladCreateProductsBatchJob < ApplicationJob
       return
     end
 
-    service = Moysklad::CreateProductsBatchService.new(moysklad)
+    service = MoyskladApi::CreateProductsBatch.new(moysklad)
     result = service.call
 
     if result[:success]

@@ -4,12 +4,12 @@ require "rest-client"
 require "json"
 require "cgi"
 
-class Moysklad::SyncProductService
+class MoyskladApi::SyncProduct
   def initialize(product, moysklad_config = nil)
     @product = product
     @variant = product.variants.first
     @moysklad = moysklad_config || Moysklad.first
-    
+
     raise ArgumentError, "Product must have at least one variant" unless @variant
     raise ArgumentError, "Moysklad configuration not found" unless @moysklad
   end
@@ -20,10 +20,10 @@ class Moysklad::SyncProductService
     payload = build_payload
 
     unless payload["code"].present?
-      Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} - skipping sync (no valid barcode)"
+      Rails.logger.info "MoyskladApi::SyncProduct: Product ##{@product.id} - skipping sync (no valid barcode)"
       return { success: false, skipped: true, reason: "no_valid_barcode" }
     end
-  
+
     if existing_binding&.value.present?
       update_in_moysklad(build_payload(for_update: true), existing_binding.value)
     else
@@ -103,7 +103,7 @@ class Moysklad::SyncProductService
 
   def build_attributes
     features_hash = @product.features_to_h
-    
+
     # Базовые атрибуты (всегда присутствуют)
     base_attributes = [
       {
@@ -127,7 +127,7 @@ class Moysklad::SyncProductService
         "value" => { "name" => extract_supplier }
       }
     ]
-    
+
     # Проверяем наличие "Тип диска" (dtype)
     if features_hash['Тип диска'].present?
       base_attributes += build_disk_attributes(features_hash)
@@ -135,7 +135,7 @@ class Moysklad::SyncProductService
     elsif features_hash['Диаметр, дюймы'].present?
       base_attributes += build_tire_attributes(features_hash)
     end
-    
+
     base_attributes
   end
 
@@ -143,7 +143,7 @@ class Moysklad::SyncProductService
     features_hash = @product.features_to_h
     marka = features_hash['Марка'] || features_hash['Brand']
     model = features_hash['Модель'] || features_hash['Model']
-    
+
     if marka.present? && model.present?
       "#{marka} #{model}"
     elsif marka.present?
@@ -285,61 +285,61 @@ class Moysklad::SyncProductService
   end
 
   def send_to_moysklad(payload)
-    uri = "#{Moysklad::Api::API_BASE}/entity/product"
-    auth = Moysklad::Api.basic_auth(@moysklad)
-    
-    Rails.logger.info "Moysklad::SyncProductService: Creating product ##{@product.id} in Moysklad"
-    
+    uri = "#{MoyskladApi::Api::API_BASE}/entity/product"
+    auth = MoyskladApi::Api.basic_auth(@moysklad)
+
+    Rails.logger.info "MoyskladApi::SyncProduct: Creating product ##{@product.id} in Moysklad"
+
     RestClient.post(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json;charset=utf-8') do |response, request, result|
       data = JSON.parse(response.body)
-      
+
       case response.code
       when 200
         ms_id = data['id']
         create_varbind(ms_id)
-        Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} successfully created, ms_id: #{ms_id}"
+        Rails.logger.info "MoyskladApi::SyncProduct: Product ##{@product.id} successfully created, ms_id: #{ms_id}"
         { success: true, ms_id: ms_id }
       when 412
         # Товар уже существует, но varbind не создан - нужно найти существующий товар
-        Rails.logger.warn "Moysklad::SyncProductService: Product ##{@product.id} - error 412 (duplicate code), trying to find existing product"
+        Rails.logger.warn "MoyskladApi::SyncProduct: Product ##{@product.id} - error 412 (duplicate code), trying to find existing product"
         find_and_bind_existing_product(payload['code'])
       else
-        Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error #{response.code}: #{data.inspect}"
+        Rails.logger.error "MoyskladApi::SyncProduct: Product ##{@product.id} - error #{response.code}: #{data.inspect}"
         { success: false, error_code: response.code, error: data['errors'] || data['error_message'] || 'Unknown error' }
       end
     end
   rescue RestClient::ExceptionWithResponse => e
-    Rails.logger.error "Moysklad::SyncProductService: RestClient error for product ##{@product.id}: #{e.message}"
+    Rails.logger.error "MoyskladApi::SyncProduct: RestClient error for product ##{@product.id}: #{e.message}"
     { success: false, error: e.message }
   rescue StandardError => e
-    Rails.logger.error "Moysklad::SyncProductService: Error for product ##{@product.id}: #{e.class} - #{e.message}"
+    Rails.logger.error "MoyskladApi::SyncProduct: Error for product ##{@product.id}: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     raise
   end
 
   def update_in_moysklad(payload, ms_id)
-    uri = "#{Moysklad::Api::API_BASE}/entity/product/#{ms_id}"
-    auth = Moysklad::Api.basic_auth(@moysklad)
-    
-    Rails.logger.info "Moysklad::SyncProductService: Updating product ##{@product.id} in Moysklad (ms_id: #{ms_id})"
-    
+    uri = "#{MoyskladApi::Api::API_BASE}/entity/product/#{ms_id}"
+    auth = MoyskladApi::Api.basic_auth(@moysklad)
+
+    Rails.logger.info "MoyskladApi::SyncProduct: Updating product ##{@product.id} in Moysklad (ms_id: #{ms_id})"
+
     RestClient.put(uri, payload.to_json, Authorization: auth, content_type: 'json', accept: 'application/json;charset=utf-8') do |response, request, result|
       data = JSON.parse(response.body)
-      
+
       case response.code
       when 200
-        Rails.logger.info "Moysklad::SyncProductService: Product ##{@product.id} successfully updated, ms_id: #{ms_id}"
+        Rails.logger.info "MoyskladApi::SyncProduct: Product ##{@product.id} successfully updated, ms_id: #{ms_id}"
         { success: true, ms_id: ms_id }
       else
-        Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - update error #{response.code}: #{data.inspect}"
+        Rails.logger.error "MoyskladApi::SyncProduct: Product ##{@product.id} - update error #{response.code}: #{data.inspect}"
         { success: false, error_code: response.code, error: data['errors'] || data['error_message'] || 'Unknown error' }
       end
     end
   rescue RestClient::ExceptionWithResponse => e
-    Rails.logger.error "Moysklad::SyncProductService: RestClient update error for product ##{@product.id}: #{e.message}"
+    Rails.logger.error "MoyskladApi::SyncProduct: RestClient update error for product ##{@product.id}: #{e.message}"
     { success: false, error: e.message }
   rescue StandardError => e
-    Rails.logger.error "Moysklad::SyncProductService: Update error for product ##{@product.id}: #{e.class} - #{e.message}"
+    Rails.logger.error "MoyskladApi::SyncProduct: Update error for product ##{@product.id}: #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")
     raise
   end
@@ -347,28 +347,28 @@ class Moysklad::SyncProductService
   def find_and_bind_existing_product(code)
     search_code = CGI.escape(code)
     # Ищем существующий товар по code
-    uri = "#{Moysklad::Api::API_BASE}/entity/product?filter=code=#{search_code}"
-    auth = Moysklad::Api.basic_auth(@moysklad)
-    
+    uri = "#{MoyskladApi::Api::API_BASE}/entity/product?filter=code=#{search_code}"
+    auth = MoyskladApi::Api.basic_auth(@moysklad)
+
     begin
       response = RestClient.get(uri, Authorization: auth, accept: 'application/json;charset=utf-8')
       data = JSON.parse(response.body)
-      
+
       if data['rows'].present? && data['rows'].first.present?
         ms_id = data['rows'].first['id']
         create_varbind(ms_id)
-        Rails.logger.info "Moysklad::SyncProductService: Found existing product ##{@product.id} in Moysklad, created varbind, ms_id: #{ms_id}"
+        Rails.logger.info "MoyskladApi::SyncProduct: Found existing product ##{@product.id} in Moysklad, created varbind, ms_id: #{ms_id}"
         { success: true, ms_id: ms_id, message: "Product already exists, varbind created" }
       else
-        Rails.logger.error "Moysklad::SyncProductService: Product ##{@product.id} - error 412 but product not found by code"
+        Rails.logger.error "MoyskladApi::SyncProduct: Product ##{@product.id} - error 412 but product not found by code"
         @product.update_column(:status, 'archived')
         { success: false, error_code: 412, error: "Duplicate code but product not found" }
       end
     rescue RestClient::ExceptionWithResponse => e
-      Rails.logger.error "Moysklad::SyncProductService: Error finding existing product ##{@product.id}: #{e.message}"
+      Rails.logger.error "MoyskladApi::SyncProduct: Error finding existing product ##{@product.id}: #{e.message}"
       { success: false, error_code: 412, error: "Duplicate code, failed to find existing product: #{e.message}" }
     rescue ActiveRecord::RecordInvalid => e
-      Rails.logger.error "Moysklad::SyncProductService: Cannot create varbind for product ##{@product.id}: #{e.message}"
+      Rails.logger.error "MoyskladApi::SyncProduct: Cannot create varbind for product ##{@product.id}: #{e.message}"
       { success: false, error_code: 412, error: e.record.errors.full_messages.join(", ") }
     end
   end
@@ -379,6 +379,5 @@ class Moysklad::SyncProductService
       value: ms_id
     )
   end
-  
-end
 
+end

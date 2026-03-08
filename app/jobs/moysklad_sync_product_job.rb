@@ -10,7 +10,7 @@ class MoyskladSyncProductJob < ApplicationJob
       return
     end
 
-    service = Moysklad::SyncProductService.new(product, moysklad)
+    service = MoyskladApi::SyncProduct.new(product, moysklad)
     result = service.call
     
     if result[:success]

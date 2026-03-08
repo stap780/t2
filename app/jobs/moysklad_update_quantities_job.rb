@@ -8,7 +8,7 @@ class MoyskladUpdateQuantitiesJob < ApplicationJob
       return
     end
 
-    service = Moysklad::UpdateQuantitiesService.new(moysklad)
+    service = MoyskladApi::UpdateQuantities.new(moysklad)
     result = service.call
 
     if result[:success]

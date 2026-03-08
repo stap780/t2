@@ -9,7 +9,7 @@ class Moysklad < ApplicationRecord
 
     message = []
     begin
-      token = Moysklad::Webhook.fetch_access_token(self)
+      token = MoyskladApi::Webhook.fetch_access_token(self)
       [token.present?, ""]
     rescue SocketError
       message << "SocketError Check Key,Password"

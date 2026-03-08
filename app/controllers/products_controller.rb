@@ -282,7 +282,7 @@ class ProductsController < ApplicationController
     else
       # flash_message = t("products.sync_with_moysklad_no_binding")
       # flash_type = :alert
-      service = Moysklad::SyncProductService.new(@product, Moysklad.first)
+      service = MoyskladApi::SyncProduct.new(@product, Moysklad.first)
       result = service.call
       
       if result[:success]

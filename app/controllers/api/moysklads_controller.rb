@@ -18,7 +18,7 @@ class Api::MoyskladsController < ApplicationController
       href = event.dig("meta", "href")
       next if href.blank?
 
-      order_json = Moysklad::Order.fetch(moysklad, href)
+      order_json = MoyskladApi::Order.fetch(moysklad, href)
       next unless order_json
 
       process_order_positions(order_json, moysklad)
