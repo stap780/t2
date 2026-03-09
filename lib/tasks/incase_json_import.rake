@@ -95,7 +95,7 @@ module IncaseJsonImporter
     
     Net::HTTP.start(uri.host, uri.port, read_timeout: 30) do |http|
       # First, get the login page to get CSRF token and session cookie
-      get_request = Net::HTTP::Get.new('/')
+      get_request = Net::HTTP::Get.new('/login')
       login_response = http.request(get_request)
       
       # Extract CSRF token from the page
@@ -123,19 +123,38 @@ module IncaseJsonImporter
       
       if login_result.code == '302' || login_result.code == '200'
         puts "  ✓ Authentication successful"
-        # Follow redirect after login to establish session (some apps require this)
+        # Follow redirect after login to establish session
         if login_result['location']
           redirect_path = login_result['location']
           redirect_path = URI.parse(redirect_path).request_uri if redirect_path.start_with?('http')
-          puts "  Following login redirect to establish session..."
+          puts "  Following login redirect..."
           follow_req = Net::HTTP::Get.new(redirect_path)
           follow_req['Cookie'] = cookies if cookies
           redirect_resp = http.request(follow_req)
           cookies = update_cookies(cookies, redirect_resp)
         end
-        # Now download JSON with authenticated cookies
-        json_data = download_json(url, 5, cookies)
-        return [json_data, cookies]
+        # Fetch JSON using SAME connection (keeps session)
+        json_req = Net::HTTP::Get.new(uri.request_uri)
+        json_req['Cookie'] = cookies if cookies
+        json_resp = http.request(json_req)
+        if json_resp.code == '200'
+          return [json_resp.body, cookies]
+        elsif %w[301 302 303 307 308].include?(json_resp.code)
+          # Follow redirects within same connection (max 3)
+          resp = json_resp
+          3.times do
+            redirect_loc = resp['location']
+            break unless redirect_loc
+            redirect_path = redirect_loc.start_with?('http') ? URI.parse(redirect_loc).request_uri : redirect_loc
+            redirect_req = Net::HTTP::Get.new(redirect_path)
+            redirect_req['Cookie'] = cookies if cookies
+            resp = http.request(redirect_req)
+            cookies = update_cookies(cookies, resp)
+            return [resp.body, cookies] if resp.code == '200'
+            break unless %w[301 302 303 307 308].include?(resp.code)
+          end
+        end
+        raise "Failed to download JSON: HTTP #{json_resp.code}"
       else
         puts "  ⚠️  Login response: HTTP #{login_result.code}"
         puts "  Response body preview: #{login_result.body[0..200]}"
