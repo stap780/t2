@@ -94,21 +94,17 @@ module IncaseJsonImporter
     puts "  Authenticating..."
     
     Net::HTTP.start(uri.host, uri.port, read_timeout: 30) do |http|
-      # First, get the login page to get CSRF token and session cookie
+      # Get login page for session cookie (CarParts form has no CSRF token)
       get_request = Net::HTTP::Get.new('/login')
       login_response = http.request(get_request)
-      
-      # Extract CSRF token from the page
-      csrf_token = extract_csrf_token(login_response.body)
       cookies = extract_cookies(login_response)
       
-      # Prepare login form data (form sends to /sessions with email and password)
+      # Prepare login form data
       login_data = URI.encode_www_form({
         'email' => email,
         'password' => password,
         'utf8' => '✓'
       })
-      login_data += "&authenticity_token=#{csrf_token}" if csrf_token.present?
       
       # Submit login form to /sessions
       post_request = Net::HTTP::Post.new('/sessions')
@@ -123,17 +119,8 @@ module IncaseJsonImporter
       
       if login_result.code == '302' || login_result.code == '200'
         puts "  ✓ Authentication successful"
-        # Follow redirect after login to establish session
-        if login_result['location']
-          redirect_path = login_result['location']
-          redirect_path = URI.parse(redirect_path).request_uri if redirect_path.start_with?('http')
-          puts "  Following login redirect..."
-          follow_req = Net::HTTP::Get.new(redirect_path)
-          follow_req['Cookie'] = cookies if cookies
-          redirect_resp = http.request(follow_req)
-          cookies = update_cookies(cookies, redirect_resp)
-        end
-        # Fetch JSON using SAME connection (keeps session)
+        # Use cookies from POST response directly (auth_token is set there)
+        # Fetch JSON using SAME connection
         json_req = Net::HTTP::Get.new(uri.request_uri)
         json_req['Cookie'] = cookies if cookies
         json_resp = http.request(json_req)
