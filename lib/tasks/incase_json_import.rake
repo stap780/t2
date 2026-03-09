@@ -133,11 +133,10 @@ module IncaseJsonImporter
   def self.fetch_json_via_curl(url, email, password)
     path = "/tmp/cp_cookies_#{Process.pid}_#{rand(99999)}"
     begin
-      # Use shell - system() with array may have issues in container
       login_cmd = "curl -sL -c #{path} -b #{path} http://138.197.52.153/login -o /dev/null"
-      post_cmd = "curl -sL -c #{path} -b #{path} -X POST http://138.197.52.153/sessions -d 'utf8=✓' -d 'email=#{email}' -d 'password=#{password}' -o /dev/null"
-      json_cmd = "curl -sL -b #{path} #{url}"
-      `#{login_cmd} && #{post_cmd} && #{json_cmd}`
+      post_cmd = "curl -sL -c #{path} -b #{path} -X POST http://138.197.52.153/sessions -d utf8=%E2%9C%93 -d email=#{email} -d password=#{password} -o /dev/null"
+      json_cmd = "curl -sL -b #{path} '#{url}'"
+      `#{login_cmd} && #{post_cmd} && #{json_cmd}`.force_encoding('UTF-8')
     ensure
       File.unlink(path) if File.exist?(path)
     end
