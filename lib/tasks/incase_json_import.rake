@@ -123,6 +123,16 @@ module IncaseJsonImporter
       
       if login_result.code == '302' || login_result.code == '200'
         puts "  ✓ Authentication successful"
+        # Follow redirect after login to establish session (some apps require this)
+        if login_result['location']
+          redirect_path = login_result['location']
+          redirect_path = URI.parse(redirect_path).request_uri if redirect_path.start_with?('http')
+          puts "  Following login redirect to establish session..."
+          follow_req = Net::HTTP::Get.new(redirect_path)
+          follow_req['Cookie'] = cookies if cookies
+          redirect_resp = http.request(follow_req)
+          cookies = update_cookies(cookies, redirect_resp)
+        end
         # Now download JSON with authenticated cookies
         json_data = download_json(url, 5, cookies)
         return [json_data, cookies]
