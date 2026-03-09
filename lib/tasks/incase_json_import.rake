@@ -119,29 +119,9 @@ module IncaseJsonImporter
       
       if login_result.code == '302' || login_result.code == '200'
         puts "  ✓ Authentication successful"
-        # Use cookies from POST response directly (auth_token is set there)
-        # Fetch JSON using SAME connection
-        json_req = Net::HTTP::Get.new(uri.request_uri)
-        json_req['Cookie'] = cookies if cookies
-        json_resp = http.request(json_req)
-        if json_resp.code == '200'
-          return [json_resp.body, cookies]
-        elsif %w[301 302 303 307 308].include?(json_resp.code)
-          # Follow redirects within same connection (max 3)
-          resp = json_resp
-          3.times do
-            redirect_loc = resp['location']
-            break unless redirect_loc
-            redirect_path = redirect_loc.start_with?('http') ? URI.parse(redirect_loc).request_uri : redirect_loc
-            redirect_req = Net::HTTP::Get.new(redirect_path)
-            redirect_req['Cookie'] = cookies if cookies
-            resp = http.request(redirect_req)
-            cookies = update_cookies(cookies, resp)
-            return [resp.body, cookies] if resp.code == '200'
-            break unless %w[301 302 303 307 308].include?(resp.code)
-          end
-        end
-        raise "Failed to download JSON: HTTP #{json_resp.code}"
+        # Use cookies from POST response (auth_token). New connection for JSON (like curl).
+        json_data = download_json(url, 5, cookies)
+        return [json_data, cookies]
       else
         puts "  ⚠️  Login response: HTTP #{login_result.code}"
         puts "  Response body preview: #{login_result.body[0..200]}"
