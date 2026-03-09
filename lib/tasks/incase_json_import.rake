@@ -130,6 +130,20 @@ module IncaseJsonImporter
     end
   end
   
+  def self.fetch_json_via_curl(url, email, password)
+    cookie_jar = Tempfile.new('cookies')
+    path = cookie_jar.path
+    begin
+      system('curl', '-sL', '-c', path, '-b', path, 'http://138.197.52.153/login', out: File::NULL, err: File::NULL)
+      system('curl', '-sL', '-c', path, '-b', path, '-X', 'POST', 'http://138.197.52.153/sessions',
+        '-d', 'utf8=✓', '-d', "email=#{email}", '-d', "password=#{password}", out: File::NULL, err: File::NULL)
+      IO.popen(["curl", "-sL", "-b", path, url], &:read)
+    ensure
+      cookie_jar.close
+      cookie_jar.unlink
+    end
+  end
+
   def self.extract_csrf_token(html)
     # Try to find CSRF token in meta tag or form
     if html =~ /name="csrf-token"\s+content="([^"]+)"/
@@ -792,6 +806,10 @@ namespace :incase do
 
     json_data = if email.present? && password.present?
       json_data, _cookies = IncaseJsonImporter.authenticate_and_download(base_url, email, password)
+      if json_data.to_s.strip.start_with?('<!DOCTYPE', '<html')
+        puts "  Fallback: using curl (Ruby auth returned HTML)"
+        json_data = IncaseJsonImporter.fetch_json_via_curl(base_url, email, password)
+      end
       json_data
     else
       IncaseJsonImporter.download_json(base_url)
