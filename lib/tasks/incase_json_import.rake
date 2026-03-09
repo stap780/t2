@@ -131,18 +131,15 @@ module IncaseJsonImporter
   end
   
   def self.fetch_json_via_curl(url, email, password)
-    cookie_jar = Tempfile.new('cookies')
-    path = cookie_jar.path
+    path = "/tmp/cp_cookies_#{Process.pid}_#{rand(99999)}"
     begin
-      # Run curl flow as single shell command (works in container)
-      cmd = "curl -sL -c '#{path}' -b '#{path}' http://138.197.52.153/login >/dev/null && " \
-            "curl -sL -c '#{path}' -b '#{path}' -X POST http://138.197.52.153/sessions " \
-            "-d 'utf8=✓' -d 'email=#{email.gsub("'", "'\\\\''")}' -d 'password=#{password.gsub("'", "'\\\\''")}' >/dev/null && " \
-            "curl -sL -b '#{path}' '#{url}'"
-      `#{cmd}`
+      # Use shell - system() with array may have issues in container
+      login_cmd = "curl -sL -c #{path} -b #{path} http://138.197.52.153/login -o /dev/null"
+      post_cmd = "curl -sL -c #{path} -b #{path} -X POST http://138.197.52.153/sessions -d 'utf8=✓' -d 'email=#{email}' -d 'password=#{password}' -o /dev/null"
+      json_cmd = "curl -sL -b #{path} #{url}"
+      `#{login_cmd} && #{post_cmd} && #{json_cmd}`
     ensure
-      cookie_jar.close
-      cookie_jar.unlink
+      File.unlink(path) if File.exist?(path)
     end
   end
 
