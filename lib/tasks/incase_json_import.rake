@@ -134,10 +134,12 @@ module IncaseJsonImporter
     cookie_jar = Tempfile.new('cookies')
     path = cookie_jar.path
     begin
-      system('curl', '-sL', '-c', path, '-b', path, 'http://138.197.52.153/login', out: File::NULL, err: File::NULL)
-      system('curl', '-sL', '-c', path, '-b', path, '-X', 'POST', 'http://138.197.52.153/sessions',
-        '-d', 'utf8=✓', '-d', "email=#{email}", '-d', "password=#{password}", out: File::NULL, err: File::NULL)
-      IO.popen(["curl", "-sL", "-b", path, url], &:read)
+      # Run curl flow as single shell command (works in container)
+      cmd = "curl -sL -c '#{path}' -b '#{path}' http://138.197.52.153/login >/dev/null && " \
+            "curl -sL -c '#{path}' -b '#{path}' -X POST http://138.197.52.153/sessions " \
+            "-d 'utf8=✓' -d 'email=#{email.gsub("'", "'\\\\''")}' -d 'password=#{password.gsub("'", "'\\\\''")}' >/dev/null && " \
+            "curl -sL -b '#{path}' '#{url}'"
+      `#{cmd}`
     ensure
       cookie_jar.close
       cookie_jar.unlink
