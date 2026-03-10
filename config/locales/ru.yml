@@ -1050,6 +1050,8 @@ ru:
         carnumber: "Номер автомобиля"
         modelauto: "Модель автомобиля"
         totalsum: "Сумма"
+        items_sum: "Сумма деталей из убытка"
+        items_sale_sum: "Сумма продажных цен деталей из убытка"
         company_id: "Компания"
         strah_id: "Страховая компания"
         incase_status_id: "Статус"

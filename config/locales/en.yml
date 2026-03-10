@@ -305,6 +305,8 @@ en:
         carnumber: "Car Number"
         modelauto: "Car Model"
         totalsum: "Total Sum"
+        items_sum: "Sum of parts from incase"
+        items_sale_sum: "Sum of sale prices of parts from incase"
         company_id: "Company"
         strah_id: "Insurance Company"
         incase_status_id: "Incase Status"

@@ -1,10 +1,10 @@
 wb = xlsx_package.workbook
-inc_attributes = Incase.file_export_attributes
 
 # Приводим download_kind к строке для надежного сравнения (может быть символом :mono или строкой "mono")
 # Проверяем, что download_kind существует и равен 'mono'
 is_mono = !download_kind.nil? && download_kind.to_s == 'mono'
 
+inc_attributes = Incase.file_export_attributes(download_kind: download_kind)
 item_attributes = is_mono ? [] : Item.file_export_attributes
 all_attributes = inc_attributes + item_attributes
 
@@ -13,7 +13,7 @@ inc_headers  = inc_attributes.map  { |attr| Incase.human_attribute_name(attr) }
 item_headers = item_attributes.map { |attr| Item.human_attribute_name(attr) }
 headers      = inc_headers + item_headers
 check_int = ["id", "quantity"]
-check_float = ["price","cost_price","totalsum","sum"]
+check_float = ["price","cost_price","totalsum","sum","items_sum","items_sale_sum"]
 decimal_style = wb.styles.add_style(format_code: "0.00")
 wb.add_worksheet(name: "Убытки") do |sheet|
   sheet.add_row headers

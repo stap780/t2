@@ -7,19 +7,20 @@ class CreateZipXlsxJob < ApplicationJob
   def perform(collection_ids, options = {})
     model_name = options[:model] # 'products' or 'detals'
     model_class = model_name.singularize.camelize.constantize # 'Product' or 'Detal'
-    items = model_class.where(id: collection_ids)
+    relation = model_class.where(id: collection_ids)
+    relation = relation.includes(items: :variant) if model_name == 'incases'
     download_kind = options[:download_kind]
 
     if collection_ids.size > LONG_PROCESS_THRESHOLD
-      perform_long_process(collection_ids, model_name, items, download_kind, options)
+      perform_long_process(collection_ids, model_name, relation, download_kind, options)
     else
-      perform_standard(collection_ids, model_name, items, download_kind, options)
+      perform_standard(collection_ids, model_name, relation, download_kind, options)
     end
   end
 
   private
 
-  def perform_long_process(collection_ids, model_name, items, download_kind, options)
+  def perform_long_process(collection_ids, model_name, relation, download_kind, options)
     user = User.find_by(id: options[:current_user_id])
     unless user
       broadcast_result(model_name, 'Error', 'Для отправки на почту необходимо войти в систему')
@@ -46,7 +47,7 @@ class CreateZipXlsxJob < ApplicationJob
       }
     )
 
-    success, content = ZipXlsxService.new(items, { model: model_name, download_kind: download_kind }).call
+    success, content = ZipXlsxService.new(relation, { model: model_name, download_kind: download_kind }).call
 
     if success
       email_delivery.attachment.attach(content)
@@ -59,8 +60,8 @@ class CreateZipXlsxJob < ApplicationJob
     end
   end
 
-  def perform_standard(collection_ids, model_name, items, download_kind, options)
-    success, content = ZipXlsxService.new(items, { model: model_name, download_kind: download_kind }).call
+  def perform_standard(collection_ids, model_name, relation, download_kind, options)
+    success, content = ZipXlsxService.new(relation, { model: model_name, download_kind: download_kind }).call
     message = success ? 'Success' : 'Error'
     broadcast_result(model_name, message, content)
 

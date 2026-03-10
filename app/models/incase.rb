@@ -36,7 +36,7 @@ class Incase < ApplicationRecord
   attribute :incase_status_title
   attribute :incase_tip_title
 
-  def self.file_export_attributes
+  def self.file_export_attributes(download_kind: nil)
     # Базовый порядок колонок для экспорта
     base = %w[
       unumber          # Номер убытка
@@ -55,7 +55,14 @@ class Incase < ApplicationRecord
     attrs = attribute_names - %w[region sendstatus company_contacts_data id strah_id company_id incase_status_id incase_tip_id created_at updated_at]
 
     # Сначала атрибуты в нужном порядке, затем остальные
-    (base & attrs) + (attrs - base)
+    result = (base & attrs) + (attrs - base)
+
+    # Для mono-экспорта добавляем вычисляемые столбцы
+    if download_kind.to_s == 'mono'
+      result += %w[items_sum items_sale_sum]
+    end
+
+    result
   end
   
   def self.ransackable_attributes(auth_object = nil)
@@ -116,6 +123,16 @@ class Incase < ApplicationRecord
   def incase_tip_title
     return '' unless incase_tip.present?
     incase_tip.title
+  end
+
+  # Сумма деталей из убытка (quantity * price по позициям)
+  def items_sum
+    items.sum(&:sum)
+  end
+
+  # Сумма продажных цен деталей из убытка (quantity * variant.price по позициям)
+  def items_sale_sum
+    items.includes(:variant).sum { |i| (i.quantity || 0) * (i.variant&.price || 0) }
   end
 
   def item_prices
