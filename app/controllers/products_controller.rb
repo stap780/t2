@@ -238,6 +238,12 @@ class ProductsController < ApplicationController
     end
   end
 
+  REFILL_REQUIRED_PARAMS = %w[
+    Станция Марка Модель Год Деталь Гарантия Состояние
+    Avito\ код Avito\ название
+  ].freeze
+  REFILL_DEFAULT_VALUE = 'fake'
+
   def refill
     detal = nil
 
@@ -248,9 +254,12 @@ class ProductsController < ApplicationController
     if detal.present?
       @product.title = detal.title
       @product.description = detal.desc
-      # Удаляем существующие features и копируем новые из detal в product
+      # Удаляем существующие features
       @product.features.destroy_all
-      new_features = detal.features.select(:property_id, :characteristic_id).map(&:attributes)
+      # Дополняем Detal отсутствующими параметрами со значением fake
+      refill_missing_params_in_detal(detal)
+      # Копируем все features из Detal в Product
+      new_features = detal.features.reload.select(:property_id, :characteristic_id).map(&:attributes)
       @product.features_attributes = new_features
       @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
       respond_to do |format|
@@ -351,6 +360,19 @@ class ProductsController < ApplicationController
       images_attributes: [:id, :product_id, :position, :file, :_destroy],
       variants_attributes: [:id, :product_id, :sku, :barcode, :quantity, :cost_price, :price, :_destroy]
     )
+  end
+
+  def refill_missing_params_in_detal(detal)
+    existing_titles = detal.features.joins(:property).pluck('properties.title')
+    missing = REFILL_REQUIRED_PARAMS - existing_titles
+
+    missing.each do |prop_title|
+      property = Property.find_or_create_by!(title: prop_title)
+      characteristic = property.characteristics.find_or_create_by!(title: REFILL_DEFAULT_VALUE)
+      detal.features.find_or_create_by!(property: property) do |f|
+        f.characteristic = characteristic
+      end
+    end
   end
 
 end
