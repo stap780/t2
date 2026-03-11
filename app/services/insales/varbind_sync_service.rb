@@ -10,7 +10,17 @@ module Insales
     end
 
     def call
-      stats = { processed: 0, created: 0, skipped: 0, not_found: 0, errors: 0, product_created: 0, product_skipped: 0, duplicate_barcode: 0 }
+      stats = {
+        processed: 0,
+        created: 0,
+        skipped: 0,
+        not_found: 0,
+        errors: 0,
+        product_created: 0,
+        product_skipped: 0,
+        duplicate_barcode: 0,
+        error_messages: []
+      }
 
       sync_varbinds_single_store(stats)
 
@@ -23,7 +33,8 @@ module Insales
         errors: stats[:errors],
         product_created: stats[:product_created],
         product_skipped: stats[:product_skipped],
-        duplicate_barcode: stats[:duplicate_barcode]
+        duplicate_barcode: stats[:duplicate_barcode],
+        error_messages: stats[:error_messages]
       }
 
       Rails.logger.info "Insales::VarbindSyncService: Completed. Processed: #{stats[:processed]}, Created: #{stats[:created]}, Errors: #{stats[:errors]}"
@@ -75,6 +86,7 @@ module Insales
           sleep 0.1
         rescue StandardError => e
           stats[:errors] += 1
+          stats[:error_messages] << "Страница #{page}: #{e.class} — #{e.message}"
           Rails.logger.error "Insales::VarbindSyncService: page #{page} failed: #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
         end
 
@@ -124,6 +136,7 @@ module Insales
       ensure_product_varbind(ins_product, variant, stats)
     rescue ActiveRecord::RecordInvalid => e
       stats[:errors] += 1
+      stats[:error_messages] << "Variant #{variant&.id || 'N/A'} (barcode #{barcode}): #{e.class} — #{e.message}"
       Rails.logger.warn "Insales::VarbindSyncService: не удалось создать varbind: #{e.message}"
     end
 
@@ -143,6 +156,7 @@ module Insales
       stats[:product_created] += 1
     rescue ActiveRecord::RecordInvalid => e
       stats[:errors] += 1
+      stats[:error_messages] << "Product #{product&.id || 'N/A'} (ext_id #{ext_product_id || 'N/A'}): #{e.class} — #{e.message}"
       Rails.logger.warn "Insales::VarbindSyncService: не удалось создать varbind для Product: #{e.message}"
     end
   end

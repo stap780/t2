@@ -1,0 +1,48 @@
+<%# Детали результата синхронизации varbind InSales (varbind_sync_result) %>
+<% details = email_delivery.operation_details %>
+
+<dl class="grid grid-cols-2 gap-4">
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Тип операции</dt>
+    <dd class="mt-1 text-sm text-gray-900"><%= email_delivery.operation_type_name %></dd>
+  </div>
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Результат</dt>
+    <dd class="mt-1 text-sm text-gray-900">
+      <%= email_delivery.operation_result == 'success' ? 'Успешно' : 'С ошибками' %>
+    </dd>
+  </div>
+
+  <% {
+    'processed' => 'Обработано вариантов',
+    'created' => 'Создано varbind для вариантов',
+    'skipped' => 'Пропущено (уже связаны)',
+    'not_found' => 'Не найдены по штрихкоду',
+    'duplicate_barcode' => 'Дубликаты штрихкода',
+    'product_created' => 'Создано varbind для товаров',
+    'product_skipped' => 'Товары уже были связаны',
+    'errors' => 'Ошибки (количество)'
+  }.each do |key, label| %>
+    <% if details[key].present? %>
+      <div>
+        <dt class="text-sm font-medium text-gray-500"><%= label %></dt>
+        <dd class="mt-1 text-sm text-gray-900"><%= details[key] %></dd>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% error_messages = details['error_messages'].to_a %>
+  <% if error_messages.any? %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Ошибки (подробно)</dt>
+      <dd class="mt-1 text-sm text-gray-900">
+        <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
+          <% error_messages.each do |msg| %>
+            <li><span class="text-red-700"><%= msg %></span></li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+</dl>
+

@@ -121,6 +121,16 @@
       </div>
     <% end %>
 
+    <!-- Детали операции varbind_sync_result -->
+    <% if @email_delivery.mailer_method == 'varbind_sync_result' && @email_delivery.operation_details.present? %>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Детали операции</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <%= render 'varbind_sync_result_details', email_delivery: @email_delivery %>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Детали операции Moysklad / InSales / Xlsx -->
     <% if @email_delivery.moysklad_notification? || @email_delivery.insale_notification? || @email_delivery.xlsx_notification? %>
       <div>
@@ -148,59 +158,7 @@
               </div>
             <% end %>
             <% if @email_delivery.mailer_method == 'create_products_batch_result' && @email_delivery.operation_details.present? %>
-              <% details = @email_delivery.operation_details %>
-              <% created_ids = details['created_product_ids'].to_a %>
-              <% error_412_ids = details['error_412_product_ids'].to_a %>
-              <% error_items = details['error_product_ids'].to_a %>
-              <% created_products = Product.where(id: created_ids).index_by(&:id).values_at(*created_ids).compact %>
-              <% error_412_products = Product.where(id: error_412_ids).index_by(&:id).values_at(*error_412_ids).compact %>
-
-              <% if created_products.any? %>
-                <div class="col-span-2">
-                  <dt class="text-sm font-medium text-gray-500 mb-2">Созданные товары (<%= created_products.size %>)</dt>
-                  <dd class="mt-1 text-sm text-gray-900">
-                    <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
-                      <% created_products.each do |product| %>
-                        <li><%= link_to "#{product.title} (##{product.id})", product_path(product), class: "text-violet-600 hover:text-violet-700" %></li>
-                      <% end %>
-                    </ul>
-                  </dd>
-                </div>
-              <% end %>
-
-              <% if error_412_products.any? %>
-                <div class="col-span-2">
-                  <dt class="text-sm font-medium text-gray-500 mb-2">Товары с ошибкой 412 — дубликат code/barcode (<%= error_412_products.size %>)</dt>
-                  <dd class="mt-1 text-sm text-gray-900">
-                    <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
-                      <% error_412_products.each do |product| %>
-                        <li><%= link_to "#{product.title} (##{product.id})", product_path(product), class: "text-violet-600 hover:text-violet-700" %></li>
-                      <% end %>
-                    </ul>
-                  </dd>
-                </div>
-              <% end %>
-
-              <% if error_items.any? %>
-                <div class="col-span-2">
-                  <dt class="text-sm font-medium text-gray-500 mb-2">Товары с другими ошибками (<%= error_items.size %>)</dt>
-                  <dd class="mt-1 text-sm text-gray-900">
-                    <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
-                      <% error_items.each do |item| %>
-                        <% product = Product.find_by(id: item['product_id']) %>
-                        <li>
-                          <% if product %>
-                            <%= link_to "#{product.title} (##{item['product_id']})", product_path(product), class: "text-violet-600 hover:text-violet-700" %>
-                          <% else %>
-                            Товар ##<%= item['product_id'] %>
-                          <% end %>
-                          — <span class="text-red-600"><%= item['error'] %></span>
-                        </li>
-                      <% end %>
-                    </ul>
-                  </dd>
-                </div>
-              <% end %>
+              <%= render 'create_products_batch_result_details', email_delivery: @email_delivery %>
             <% end %>
 
             <% if @email_delivery.xlsx_notification? && @email_delivery.operation_details.present? %>
@@ -223,7 +181,7 @@
               <div class="col-span-2">
                 <dt class="text-sm font-medium text-gray-500">Сводка (JSON)</dt>
                 <dd class="mt-1 text-sm text-gray-900">
-                  <pre class="bg-white p-2 rounded text-xs overflow-auto max-h-32"><%= JSON.pretty_generate(@email_delivery.operation_details.except('created_product_ids', 'error_412_product_ids', 'error_product_ids')) %></pre>
+                  <pre class="bg-white p-2 rounded text-xs overflow-auto max-h-32"><%= JSON.pretty_generate(@email_delivery.operation_details.except('created_product_ids', 'error_412_product_ids', 'error_product_ids', 'error_messages')) %></pre>
                 </dd>
               </div>
             <% end %>

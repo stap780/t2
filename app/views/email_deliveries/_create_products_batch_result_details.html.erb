@@ -1,0 +1,69 @@
+<%# Детали результата массового создания товаров (create_products_batch_result) %>
+<% details = email_delivery.operation_details %>
+
+<dl class="grid grid-cols-2 gap-4">
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Тип операции</dt>
+    <dd class="mt-1 text-sm text-gray-900"><%= email_delivery.operation_type_name %></dd>
+  </div>
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Результат</dt>
+    <dd class="mt-1 text-sm text-gray-900">
+      <%= email_delivery.operation_result == 'success' ? 'Успешно' : 'С ошибками' %>
+    </dd>
+  </div>
+
+  <% created_ids = details['created_product_ids'].to_a %>
+  <% error_412_ids = details['error_412_product_ids'].to_a %>
+  <% error_items = details['error_product_ids'].to_a %>
+  <% created_products = Product.where(id: created_ids).index_by(&:id).values_at(*created_ids).compact %>
+  <% error_412_products = Product.where(id: error_412_ids).index_by(&:id).values_at(*error_412_ids).compact %>
+
+  <% if created_products.any? %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Созданные товары (<%= created_products.size %>)</dt>
+      <dd class="mt-1 text-sm text-gray-900">
+        <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
+          <% created_products.each do |product| %>
+            <li><%= link_to "#{product.title} (##{product.id})", product_path(product), class: "text-violet-600 hover:text-violet-700" %></li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+
+  <% if error_412_products.any? %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Товары с ошибкой 412 — дубликат code/barcode (<%= error_412_products.size %>)</dt>
+      <dd class="mt-1 text-sm text-gray-900">
+        <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
+          <% error_412_products.each do |product| %>
+            <li><%= link_to "#{product.title} (##{product.id})", product_path(product), class: "text-violet-600 hover:text-violet-700" %></li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+
+  <% if error_items.any? %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Товары с другими ошибками (<%= error_items.size %>)</dt>
+      <dd class="mt-1 text-sm text-gray-900">
+        <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
+          <% error_items.each do |item| %>
+            <% product = Product.find_by(id: item['product_id']) %>
+            <li>
+              <% if product %>
+                <%= link_to "#{product.title} (##{item['product_id']})", product_path(product), class: "text-violet-600 hover:text-violet-700" %>
+              <% else %>
+                Товар ##<%= item['product_id'] %>
+              <% end %>
+              — <span class="text-red-600"><%= item['error'] %></span>
+            </li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+</dl>
+
