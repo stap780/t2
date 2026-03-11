@@ -49,6 +49,8 @@
       </span>
     <% elsif email_delivery.mailer_class == 'ActMailer' %>
       <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">Акты</span>
+    <% elsif email_delivery.mailer_class == 'IncaseMailer' && email_delivery.mailer_method == 'incase_item_prices_result' %>
+      <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800"><%= email_delivery.operation_type_name %></span>
     <% else %>
       <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">Убытки</span>
     <% end %>

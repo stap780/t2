@@ -1,0 +1,59 @@
+<%# Детали результата проценки убытков (incase_item_prices_result) %>
+<% details = email_delivery.operation_details %>
+<dl class="grid grid-cols-2 gap-4">
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Тип операции</dt>
+    <dd class="mt-1 text-sm text-gray-900"><%= email_delivery.operation_type_name %></dd>
+  </div>
+  <div>
+    <dt class="text-sm font-medium text-gray-500">Результат</dt>
+    <dd class="mt-1 text-sm text-gray-900">
+      <%= email_delivery.operation_result == 'success' ? 'Успешно' : 'С ошибками' %>
+    </dd>
+  </div>
+  <% if details['processed_count'].present? %>
+    <div>
+      <dt class="text-sm font-medium text-gray-500">Обработано убытков</dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= details['processed_count'] %></dd>
+    </div>
+  <% end %>
+  <% if details['completed_at'].present? %>
+    <div>
+      <dt class="text-sm font-medium text-gray-500">Дата завершения</dt>
+      <dd class="mt-1 text-sm text-gray-900"><%= details['completed_at'] %></dd>
+    </div>
+  <% end %>
+  <% incase_ids = details['incase_ids'].to_a %>
+  <% if incase_ids.any? %>
+    <% incases = Incase.where(id: incase_ids).index_by(&:id) %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Убытки с проценкой (<%= incase_ids.size %>)</dt>
+      <dd class="mt-1 text-sm text-gray-900">
+        <ul class="list-disc list-inside space-y-1 max-h-48 overflow-y-auto">
+          <% incase_ids.each do |id| %>
+            <% incase = incases[id] %>
+            <li>
+              <% if incase %>
+                <%= link_to "Убыток ##{id}", incase_path(incase), class: "text-violet-600 hover:text-violet-700" %>
+              <% else %>
+                Убыток ##{id}
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+  <% if details['errors'].present? %>
+    <div class="col-span-2">
+      <dt class="text-sm font-medium text-gray-500 mb-2">Ошибки</dt>
+      <dd class="mt-1 text-sm text-red-600">
+        <ul class="list-disc list-inside space-y-1">
+          <% details['errors'].each do |err| %>
+            <li><%= err %></li>
+          <% end %>
+        </ul>
+      </dd>
+    </div>
+  <% end %>
+</dl>

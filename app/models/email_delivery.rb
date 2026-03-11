@@ -68,6 +68,8 @@ class EmailDelivery < ApplicationRecord
       'Синхронизация изображений InSales'
     when 'xlsx_zip_result'
       'Экспорт Excel (ZIP)'
+    when 'incase_item_prices_result'
+      'Результат проценки убытков'
     else
       mailer_method
     end

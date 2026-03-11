@@ -134,9 +134,11 @@ class ExportService
     layout_template = Liquid::Template.parse(@export.layout_template)
 
     # Build items XML in Ruby loop (one render per product)
+    # Escape all string values for valid XML (& < > " ')
     items_xml = +""
     products.each do |product_hash|
-      items_xml << item_template.render("product" => product_hash)
+      escaped_product = xml_escape_hash(product_hash)
+      items_xml << item_template.render("product" => escaped_product)
       items_xml << "\n"
     end
 
@@ -235,6 +237,20 @@ class ExportService
       
       Rails.logger.debug "📤 ExportService: Flattened product #{product_hash['id']}: #{flattened.keys.join(', ')}"
       flattened
+    end
+  end
+
+  # Recursively escape strings for valid XML (fixes "xmlParseEntityRef: no name" for & etc.)
+  def xml_escape_hash(obj)
+    case obj
+    when Hash
+      obj.transform_values { |v| xml_escape_hash(v) }
+    when Array
+      obj.map { |v| xml_escape_hash(v) }
+    when String
+      obj.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub('"', "&quot;").gsub("'", "&apos;")
+    else
+      obj
     end
   end
 

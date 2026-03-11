@@ -59,6 +59,10 @@
               <span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800">
                 <%= @email_delivery.operation_type_name %>
               </span>
+            <% elsif @email_delivery.mailer_class == 'IncaseMailer' && @email_delivery.mailer_method == 'incase_item_prices_result' %>
+              <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">
+                <%= @email_delivery.operation_type_name %>
+              </span>
             <% else %>
               <span class="px-2 py-1 text-xs rounded <%= @email_delivery.mailer_class == 'ActMailer' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' %>">
                 <%= @email_delivery.mailer_class == 'ActMailer' ? 'Акты' : 'Заявки' %>
@@ -103,6 +107,16 @@
               <br><%= link_to "Просмотреть товар", product_path(@email_delivery.record), class: "text-violet-600 hover:text-violet-700" %>
             <% end %>
           </p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Детали операции incase_item_prices_result -->
+    <% if @email_delivery.mailer_class == 'IncaseMailer' && @email_delivery.mailer_method == 'incase_item_prices_result' %>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Детали операции</h2>
+        <div class="bg-gray-50 rounded-lg p-4">
+          <%= render 'incase_item_prices_result_details', email_delivery: @email_delivery %>
         </div>
       </div>
     <% end %>
@@ -246,7 +260,7 @@
     <!-- Действия -->
     <div class="flex justify-end space-x-3 pt-4 border-t">
       <% if @email_delivery.failed? %>
-        <% if @email_delivery.moysklad_notification? || @email_delivery.insale_notification? || @email_delivery.xlsx_notification? || @email_delivery.attachment.attached? %>
+        <% if @email_delivery.moysklad_notification? || @email_delivery.insale_notification? || @email_delivery.xlsx_notification? || @email_delivery.attachment.attached? || (@email_delivery.mailer_class == 'IncaseMailer' && @email_delivery.mailer_method == 'incase_item_prices_result') %>
           <%= button_to "Повторить отправку", retry_email_delivery_path(@email_delivery), method: :post, class: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700" %>
         <% end %>
       <% end %>
