@@ -12,7 +12,7 @@ class Incase < ApplicationRecord
   accepts_nested_attributes_for :items, allow_destroy: true, reject_if: :all_blank
 
   has_many :comments, as: :commentable, dependent: :destroy
-  accepts_nested_attributes_for :comments, allow_destroy: true
+  accepts_nested_attributes_for :comments, allow_destroy: true, reject_if: ->(attrs) { attrs['body'].blank? }
   has_many :email_deliveries, as: :record, dependent: :destroy
   
   # after_create_commit { broadcast_prepend_to 'incases' }

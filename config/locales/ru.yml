@@ -1009,6 +1009,11 @@ ru:
         few: "Товара"
         many: "Товаров"
         other: "Товаров"
+      item:
+        one: "Позиция"
+        few: "Позиции"
+        many: "Позиций"
+        other: "Позиций"
     attributes:
       audit:
         auditable_type: "Тип записи"
@@ -1052,7 +1057,9 @@ ru:
         totalsum: "Сумма"
         items_sum: "Сумма деталей из убытка"
         items_sale_sum: "Сумма продажных цен деталей из убытка"
+        company: "Компания"
         company_id: "Компания"
+        strah: "Страховая компания"
         strah_id: "Страховая компания"
         incase_status_id: "Статус"
         incase_tip_id: "Тип"
@@ -1067,6 +1074,8 @@ ru:
         incase_tip_title: "Тип убытка"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
+      "incase/items":
+        title: "Название позиции"
       company:
         short_title: "Краткое название"
         title: "Название"
