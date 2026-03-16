@@ -149,7 +149,8 @@ class MoyskladApi::UpdateQuantities
     end
 
     # Группируем данные по остатку и обновляем батчами
-    data_group_by_stock = data.group_by { |d| d['stock'] || 0 }
+    # data_group_by_stock = data.group_by { |d| d['stock'] || 0 }
+    data_group_by_stock = data.group_by { |d| d['quantity'] || 0 }
     updated_count = 0
 
     data_group_by_stock.each do |stock_quantity, items|
