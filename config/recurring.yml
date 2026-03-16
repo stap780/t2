@@ -33,7 +33,7 @@ production:
 
   incase_calc_price:
     class: IncaseCalcPriceJob
-    schedule: "0 9 * * *"  # Массовый пересчет себестоимости в 9:00
+    schedule: "0 8 * * *"  # Массовый пересчет себестоимости в 8:00
 
   insales_varbind_sync:
     class: InsalesVarbindSyncJob

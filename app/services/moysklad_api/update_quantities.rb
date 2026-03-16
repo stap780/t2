@@ -2,7 +2,7 @@ require "rest-client"
 require "json"
 
 class MoyskladApi::UpdateQuantities
-  STOCK_URL = "#{MoyskladApi::Api::API_BASE}/report/stock/bystore/current".freeze
+  STOCK_URL = "#{MoyskladApi::Api::API_BASE}/report/stock/bystore/current?stockType=quantity".freeze
 
   # Email для уведомлений (можно вынести в настройки)
   NOTIFICATION_EMAIL = Rails.application.credentials.dig(:moysklad_notification_email) || 'dizautodealer@gmail.com'
