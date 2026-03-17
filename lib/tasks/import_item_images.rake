@@ -34,6 +34,7 @@ namespace :product do
     barcode = item_data['barcode']
 
     images = item_data['images'] || []
+    images = images.sort_by { |img| img.is_a?(Hash) ? img['position'].to_i : 0 }
     image_urls = images.map do |img|
       raw = img.is_a?(Hash) ? (img['image'] || img['url']) : img.to_s
       next if raw.blank?
