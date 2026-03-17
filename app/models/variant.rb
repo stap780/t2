@@ -129,6 +129,7 @@ class Variant < ApplicationRecord
     barcode_obj = Barby::EAN13.new(code_value)
     update_column(:barcode, barcode_obj.data_with_checksum)
     
+    etiketka.purge if etiketka.attached?
     generate_etiketka
   end
 
