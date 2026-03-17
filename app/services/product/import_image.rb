@@ -1,7 +1,7 @@
 require 'open-uri'
 
 class Product::ImportImage
-  MAX_CONCURRENT_DOWNLOADS = 5  # Количество одновременных загрузок
+  MAX_CONCURRENT_DOWNLOADS = 1  # Количество одновременных загрузок
   
   def initialize(product, image_urls)
     @product = product.is_a?(Product) ? product : Product.find(product)
