@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline download_images ]
   after_action :clear_preloaded_detals, only: [:index, :edit, :update, :open_filter, :filter_price]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
@@ -176,6 +176,12 @@ class ProductsController < ApplicationController
     head :ok
   end
 
+  def download_images
+    # Формирование ZIP или отдача файлов
+    zip_content = @product.download_images
+    send_data zip_content, filename: "product_#{@product.id}_images.zip", type: 'application/zip'
+  end
+
   def price_edit
     if params[:product_ids]
       @products = Product.where(id: params[:product_ids])
@@ -239,8 +245,7 @@ class ProductsController < ApplicationController
   end
 
   REFILL_REQUIRED_PARAMS = %w[
-    Станция Марка Модель Год Деталь Гарантия Состояние
-    Avito\ код Avito\ название
+    Станция Марка Модель Год Деталь Гарантия Состояние Avito\ код Avito\ название
   ].freeze
   REFILL_DEFAULT_VALUE = 'fake'
 

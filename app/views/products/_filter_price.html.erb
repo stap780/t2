@@ -98,7 +98,7 @@
     </div>
 
     <div class="flex gap-2 mt-4">
-        <%= submit_tag "Применить", class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+        <%= submit_tag "Применить", class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
         <%= link_to "Очистить", products_path(search_cancel: true), class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo_frame: '_top' } %>
     </div>
 <% end %>

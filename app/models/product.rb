@@ -228,6 +228,24 @@ class Product < ApplicationRecord
     feature.characteristic&.title
   end
 
+  def download_images
+    blobs = images.filter_map do |img|
+      img.file.blob if img.file.attached?
+    end
+    return nil if blobs.empty?
+
+    zip_buffer = StringIO.new
+    Zip::OutputStream.write_buffer(zip_buffer) do |zip|
+      blobs.each_with_index do |blob, idx|
+        ext = blob.filename.extension.presence || 'jpg'
+        zip.put_next_entry("image_#{idx + 1}.#{ext}")
+        zip.write(blob.download)
+      end
+    end
+    zip_buffer.rewind
+    zip_buffer.read
+  end
+
   private
 
   def check_variants_have_items

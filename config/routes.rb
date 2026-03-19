@@ -55,6 +55,7 @@ Rails.application.routes.draw do
       post :sync_with_moysklad
       get :edit_status_inline
       patch :update_status_inline
+      get :download_images
     end
     resources :variants do
       member do
