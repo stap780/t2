@@ -66,7 +66,7 @@
                         'incase-checkbox': true
                       }
                     } %>
-                    <span class="text-gray-900"><%= t('incases.show.title') %> #<%= incase.id %> (<%= incase.unumber %>)</span>
+                    <span class="text-gray-900"><%= t('incases.show.title') %> #<%= incase.id %> (<%= incase.unumber %>) (<%= incase.carnumber %>)</span>
                     <% if incase.incase_status.present? %>
                       <span class="text-sm text-gray-500">- <%= incase.incase_status.title %></span>
                     <% end %>
