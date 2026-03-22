@@ -131,16 +131,18 @@ class Incase < ApplicationRecord
   end
 
   # Сумма продажных цен деталей из убытка (quantity * variant.price по позициям)
+  # Требует preload: items: [:variant]
   def items_sale_sum
-    items.includes(:variant).sum { |i| (i.quantity || 0) * (i.variant&.price || 0) }
+    items.sum { |i| (i.quantity || 0) * (i.variant&.price || 0) }
   end
 
   # Убыток «проценен», если по всем позициям проставлены цены или статус с нулевой ценой
   ZERO_PRICE_STATUSES = ['Долг', 'Нет (Отсутствовала)', 'Нет (ДРМ)', 'Нет (Срез)', 'Нет (Стекло)', 'Нет', 'Не запрашиваем'].freeze
 
+  # Требует preload: items: [:item_status, :variant]
   def priced?
     return false if items.empty?
-    items.includes(:item_status, :variant).all? do |item|
+    items.all? do |item|
       (item.price.present? && item.price > 0) ||
         (item.item_status&.title.present? && ZERO_PRICE_STATUSES.include?(item.item_status.title))
     end
