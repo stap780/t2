@@ -213,6 +213,7 @@ Rails.application.routes.draw do
       post :bulk_delete
       post :send_emails
       get :filter
+      get :reports
     end
     resources :items do
       collection do

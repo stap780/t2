@@ -1,0 +1,23 @@
+<tr id="<%= dom_id(incase) %>" class="hover:bg-gray-50">
+  <td class="px-4 py-2 text-sm">
+    <%= link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800", data: { turbo: false }, target: "_blank" %>
+  </td>
+  <td class="px-4 py-2 text-sm text-gray-700"><%= incase.stoanumber %></td>
+  <td class="px-4 py-2 text-sm text-gray-700"><%= incase.date&.strftime('%d.%m.%Y') %></td>
+  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter((incase.totalsum || 0).to_f.round(2), delimiter: " ") %></td>
+  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.items_sum.round(2), delimiter: " ") %></td>
+  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.items_sale_sum.round(2), delimiter: " ") %></td>
+  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.margin.round(2), delimiter: " ") %></td>
+  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= incase.margin_pct.present? ? "#{incase.margin_pct}%" : "—" %></td>
+  <td class="px-4 py-2 text-center">
+    <% if incase.priced? %>
+      <span class="text-green-600">✓</span>
+    <% else %>
+      <span class="text-gray-400">—</span>
+    <% end %>
+  </td>
+  <td class="px-4 py-2 text-center">
+    <% calc_url = local_assigns[:date_from].present? && local_assigns[:date_to].present? ? calc_incase_path(incase, date_from: date_from, date_to: date_to) : calc_incase_path(incase) %>
+    <%= link_to_sync calc_url, title: "Рассчитать цены позициям", data: { turbo_stream: true, turbo_prefetch: false } %>
+  </td>
+</tr>

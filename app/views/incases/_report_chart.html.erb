@@ -1,0 +1,11 @@
+<div id="report_chart" class="bg-white rounded-lg shadow p-4 mb-6"
+     data-controller="chartjs"
+     data-chartjs-type-value="bar"
+     data-chartjs-data-value='<%= chart_data.to_json %>'>
+  <div class="mb-4">
+    <h2 class="text-lg font-medium text-gray-900">График по месяцам</h2>
+  </div>
+  <div class="h-80">
+    <canvas data-chartjs-target="canvas"></canvas>
+  </div>
+</div>

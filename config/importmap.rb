@@ -30,4 +30,7 @@ pin "w3c-keyname" # @2.2.8
 pin "@codemirror/legacy-modes/mode/xml", to: "@codemirror--legacy-modes--mode--xml.js" # @6.5.2
 pin "@stimulus-components/lightbox", to: "@stimulus-components--lightbox.js" # @4.0.0
 pin "lightgallery" # @2.9.0
+pin "@stimulus-components/chartjs", to: "@stimulus-components--chartjs.js" # @6.0.1
+pin "@kurkle/color", to: "@kurkle--color.js" # @0.3.4
+pin "chart.js", to: "https://esm.sh/chart.js@4.5.1", preload: true
 pin_all_from "app/javascript/controllers", under: "controllers"

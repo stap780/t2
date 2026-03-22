@@ -1,0 +1,115 @@
+<% content_for :title, "Отчёты по убыткам" %>
+
+<div class="mb-6">
+  <h1 class="text-xl font-semibold text-gray-900">Отчёты по убыткам</h1>
+</div>
+
+<%= form_with url: reports_incases_path, method: :get, html: { class: "flex flex-wrap items-end gap-4 mb-6 p-4 bg-white rounded-lg shadow", data: { turbo_frame: "incase_reports" } } do |f| %>
+  <div>
+    <%= label_tag :date_from, "Дата от", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= date_field_tag :date_from, @date_from, class: "h-9 px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500" %>
+  </div>
+  <div>
+    <%= label_tag :date_to, "Дата до", class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= date_field_tag :date_to, @date_to, class: "h-9 px-3 py-2 border border-gray-300 rounded-md focus:ring-violet-500 focus:border-violet-500" %>
+  </div>
+  <%= submit_tag "Применить", class: "h-9 px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
+<% end %>
+
+<%= turbo_frame_tag "incase_reports" do %>
+  <% if @totals&.dig(:count).to_i > 0 %>
+    <% priced_pct = @totals[:count].positive? ? (@totals[:priced_count].to_f / @totals[:count] * 100).round(1) : 0 %>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-sm font-medium text-gray-500">Сумма</div>
+        <div class="text-lg font-semibold text-gray-900"><%= number_with_delimiter(@totals[:totalsum].round(2), delimiter: " ") %></div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-sm font-medium text-gray-500">Сумма деталей</div>
+        <div class="text-lg font-semibold text-gray-900"><%= number_with_delimiter(@totals[:items_sum].round(2), delimiter: " ") %></div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-sm font-medium text-gray-500">Сумма продажных цен</div>
+        <div class="text-lg font-semibold text-gray-900"><%= number_with_delimiter(@totals[:items_sale_sum].round(2), delimiter: " ") %></div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-sm font-medium text-gray-500">Проценены</div>
+        <div class="text-lg font-semibold text-gray-900"><%= priced_pct %>%</div>
+      </div>
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-sm font-medium text-gray-500">НЕ ПРОЦ.</div>
+        <div class="text-lg font-semibold text-gray-900"><%= @totals[:unpriced_count] %></div>
+      </div>
+    </div>
+
+    <div id="report_chart" class="bg-white rounded-lg shadow p-4 mb-6"
+         data-controller="chartjs"
+         data-chartjs-type-value="bar"
+         data-chartjs-data-value='<%= @chart_data.to_json %>'>
+      <div class="mb-4">
+        <h2 class="text-lg font-medium text-gray-900">График по месяцам</h2>
+      </div>
+      <div class="h-80">
+        <canvas data-chartjs-target="canvas"></canvas>
+      </div>
+    </div>
+
+    <%= search_form_for @search, url: reports_incases_path, method: :get, html: { class: "flex flex-wrap items-end gap-4 mb-4 p-4 bg-white rounded-lg shadow", data: { turbo_frame: "incase_reports_table" } } do |f| %>
+      <%= hidden_field_tag :date_from, @date_from %>
+      <%= hidden_field_tag :date_to, @date_to %>
+      <div>
+        <%= f.label :unumber_cont, "Номер убытка", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.search_field :unumber_cont, class: "h-9 px-3 py-2 border border-gray-300 rounded-md" %>
+      </div>
+      <div>
+        <%= f.label :stoanumber_cont, "З.Н.", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.search_field :stoanumber_cont, class: "h-9 px-3 py-2 border border-gray-300 rounded-md" %>
+      </div>
+      <div>
+        <%= f.label :company_id_eq, "СТО", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.collection_select :company_id_eq, Company.standart.limit(20), :id, :short_title, { include_blank: true }, { class: "h-9 px-3 py-2 border border-gray-300 rounded-md" } %>
+      </div>
+      <%= f.submit "Поиск", class: "h-9 px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
+      <%= link_to reports_incases_path( date_from: @date_from, date_to: @date_to, search_cancel: true ), class: "h-9 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo: false } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      <% end %>
+    <% end %>
+
+    <%= turbo_frame_tag "incase_reports_table" do %>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Номер убытка</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">З.Н.</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Дата акта</th>
+                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Сумма</th>
+                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Сумма деталей</th>
+                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Сумма продажных цен</th>
+                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Маржа</th>
+                <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Рентаб. МД %</th>
+                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Проценены</th>
+                <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <%= render partial: "incases/report_row", collection: @incases, as: :incase, locals: { date_from: @date_from, date_to: @date_to } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-2 border-t border-gray-200">
+          <%= render "shared/paginate", f: @incases %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <p>Нет данных за выбранный период.</p>
+      <p class="mt-2 text-sm">Измените диапазон дат и нажмите «Применить».</p>
+    </div>
+  <% end %>
+<% end %>

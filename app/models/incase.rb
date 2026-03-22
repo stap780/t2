@@ -135,6 +135,27 @@ class Incase < ApplicationRecord
     items.includes(:variant).sum { |i| (i.quantity || 0) * (i.variant&.price || 0) }
   end
 
+  # Убыток «проценен», если по всем позициям проставлены цены или статус с нулевой ценой
+  ZERO_PRICE_STATUSES = ['Долг', 'Нет (Отсутствовала)', 'Нет (ДРМ)', 'Нет (Срез)', 'Нет (Стекло)', 'Нет', 'Не запрашиваем'].freeze
+
+  def priced?
+    return false if items.empty?
+    items.includes(:item_status, :variant).all? do |item|
+      (item.price.present? && item.price > 0) ||
+        (item.item_status&.title.present? && ZERO_PRICE_STATUSES.include?(item.item_status.title))
+    end
+  end
+
+  def margin
+    items_sale_sum.to_f - items_sum.to_f
+  end
+
+  def margin_pct
+    return nil unless items_sum.to_f.positive?
+
+    (margin / items_sum.to_f * 100).round(1)
+  end
+
   def item_prices
     Rails.logger.info 'start calc_price'
     errors = []
@@ -239,7 +260,7 @@ class Incase < ApplicationRecord
   end
 
   private
-  
+
   def set_default_status
     return if incase_status_id.present?
     

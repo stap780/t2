@@ -1,4 +1,6 @@
 ru:
+  date:
+    month_names: [~, Январь, Февраль, Март, Апрель, Май, Июнь, Июль, Август, Сентябрь, Октябрь, Ноябрь, Декабрь]
   edit: "Редактировать"
   delete: "Удалить"
   print_barcode: "Печать штрихкода"
@@ -17,6 +19,7 @@ ru:
     incases: "Убытки"
     incase_imports: "Импорт"
     incase_dubls: "Дубли"
+    incase_reports: "Отчёты"
     companies: "Компании"
     clients: "Клиенты"
     parameters: "Параметры"

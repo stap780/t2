@@ -214,11 +214,51 @@ class IncasesController < ApplicationController
       format.turbo_stream do
         @incase.reload
         flash.now[success ? :notice : :alert] = notice
-        render turbo_stream: [
-          turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
-          render_turbo_flash
-        ]
+
+        date_from = params[:date_from].presence&.to_date
+        date_to = params[:date_to].presence&.to_date
+
+        if date_from.present? && date_to.present?
+          base_scope = Incase.includes(:company, items: [:variant, :item_status])
+            .where(date: date_from..date_to)
+            .order(date: :asc)
+          chart_data = IncaseReportService.new(scope: base_scope).chart_data
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@incase), partial: 'incases/report_row', locals: { incase: @incase, date_from: date_from, date_to: date_to }),
+            turbo_stream.replace('report_chart', partial: 'incases/report_chart', locals: { chart_data: chart_data }),
+            render_turbo_flash
+          ]
+        else
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@incase), partial: 'incases/incase', locals: { incase: @incase }),
+            render_turbo_flash
+          ]
+        end
       end
+    end
+  end
+
+  def reports
+    date_to = params[:date_to].presence&.to_date || Date.current
+    date_from = params[:date_from].presence&.to_date || (date_to - 30.days)
+
+    base_scope = Incase.includes(:company, items: [:variant, :item_status])
+      .where(date: date_from..date_to)
+      .order(date: :asc)
+
+    @search = base_scope.ransack(params[:q])
+    @search.sorts = "date asc" if @search.sorts.empty?
+    @incases = @search.result.includes(:company, items: [:variant, :item_status]).paginate(page: params[:page], per_page: 50)
+
+    service = IncaseReportService.new(scope: base_scope)
+    @totals = service.totals rescue { count: 0, priced_count: 0, unpriced_count: 0, totalsum: 0, items_sum: 0, items_sale_sum: 0 }
+    @chart_data = service.chart_data
+    @date_from = date_from
+    @date_to = date_to
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @chart_data }
     end
   end
 

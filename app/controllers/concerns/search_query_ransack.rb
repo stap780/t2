@@ -3,7 +3,7 @@ module SearchQueryRansack
 
   included do
     before_action :search_params
-    before_action :clear_search_index, only: [:index]
+    before_action :clear_search_index, if: -> { params[:search_cancel].present? }
   end
 
   private
