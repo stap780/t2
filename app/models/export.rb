@@ -162,7 +162,7 @@ class Export < ApplicationRecord
       product_fields: %w[id status tip title description created_at updated_at],
       variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.quantity variants.first.cost_price],
       feature_fields: ['features (for iteration)'],
-      image_fields: %w[images] #images_zap images_second images_thumb
+      image_fields: %w[images images_with_ext] #images_zap images_second images_thumb
     }
   end
 
@@ -335,6 +335,7 @@ class Export < ApplicationRecord
     # Добавляем изображения только когда они нужны для экспорта
     if needs_images_for_export?
       hash['images'] = product_images_urls(product, 'original')
+      hash['images_with_ext'] = product_images_urls_with_ext(product, 'original')
     end
 
     hash
@@ -369,8 +370,24 @@ class Export < ApplicationRecord
     end.compact
   end
 
+  # URLs с расширением файла (для YML и сервисов, требующих .jpg/.png и т.д.)
+  def product_images_urls_with_ext(product, variant = 'original')
+    return [] unless product.images.present?
+
+    product.images.filter_map do |image|
+      url = image.s3_url
+      next unless url
+      ext = image.file.blob.filename.extension.presence || content_type_to_ext(image.file.content_type) || 'jpg'
+      "#{url}.#{ext}"
+    end
+  end
+
 
   private
+
+  def content_type_to_ext(content_type)
+    { 'image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif' }[content_type]
+  end
 
   def enqueue_on_create
     schedule! if periodic_scheduled?

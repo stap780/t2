@@ -45,7 +45,7 @@
   <%= f.collection_select :company_okrug_id_eq, Okrug.all, :id, :title, 
     { include_blank: false, prompt: 'Округ' }, { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
   <% selected_status_ids = Array(params.dig(:q, :incase_status_id_in)).reject(&:blank?).map(&:to_s) %>
-  <div class="relative mb-3" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
+  <div class="relative" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
     <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_status_id') %>" data-action="click->multiselect-dropdown#toggle"
             class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 180px;" >
       <span data-multiselect-dropdown-target="label"><%= selected_status_ids.size == 0 ? t('activerecord.attributes.incase.incase_status_id') : "#{selected_status_ids.size} выбрано" %></span>
@@ -61,7 +61,7 @@
     </div>
   </div>
   <% selected_tip_ids = Array(params.dig(:q, :incase_tip_id_in)).reject(&:blank?).map(&:to_s) %>
-  <div class="relative mb-3" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
+  <div class="relative" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
     <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_tip_id') %>" data-action="click->multiselect-dropdown#toggle"
             class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 180px;" >
       <span data-multiselect-dropdown-target="label"><%= selected_tip_ids.size == 0 ? t('activerecord.attributes.incase.incase_tip_id') : "#{selected_tip_ids.size} выбрано" %></span>
@@ -78,18 +78,18 @@
   </div>
   <%= f.collection_select :strah_id_eq, Company.strah, :id, :short_title, 
       { include_blank: false, prompt: t('activerecord.attributes.incase.strah_id') }, 
-      { class: "h-8 px-2 py-1 mb-3 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
-  <div>
-    <%= f.label :date_gteq, "Дата от", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.date_field :date_gteq, class: "h-8 px-2 py-1 mb-4 border border-gray-300 rounded-md" %>
+      { class: "h-8 px-2 py-1 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
+  <div class="flex items-center gap-1">
+    <span class="text-sm font-medium text-gray-500">от</span>
+    <%= f.date_field :date_gteq, class: "h-8 px-2 py-1 border border-gray-300 rounded-md" %>
   </div>
-  <div>
-    <%= f.label :date_lteq, "Дата до", class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <%= f.date_field :date_lteq, class: "h-8 px-2 py-1 mb-4 border border-gray-300 rounded-md" %>
+  <div class="flex items-center gap-1">
+    <span class="text-sm font-medium text-gray-500">до</span>
+    <%= f.date_field :date_lteq, class: "h-8 px-2 py-1 border border-gray-300 rounded-md" %>
   </div>
-  <div class="mb-4" data-controller="checkbox">
-    <div class="block text-sm font-medium text-gray-700 mb-1">Сумма</div>
-    <div class="flex flex-wrap gap-4 h-8">
+  <div class="flex items-center gap-1" data-controller="checkbox">
+    <div class="text-sm font-medium text-gray-500">Сумма</div>
+    <div class="flex flex-wrap gap-2 h-8">
       <div class="flex items-center space-x-2">
         <%= check_box_tag "q[totalsum_gteq]", "1", params.dig(:q, :totalsum_gteq).present?, class: "rounded border-gray-300 text-violet-600 focus:ring-violet-500", data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" } %>
         <%= label_tag "q_totalsum_gteq", "Есть", class: "text-sm text-gray-700" %>
@@ -100,8 +100,8 @@
       </div>
     </div>
   </div>
-  <%= f.submit t('.search'), class: "h-8 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 mb-3 mt-5" %>
-  <%= link_to incases_path(search_cancel: true), class: "h-8 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center mb-3 mt-5", title: t('.clear') do %>
+  <%= f.submit t('.search'), class: "h-8 px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" %>
+  <%= link_to incases_path(search_cancel: true), class: "h-8 px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 flex items-center", title: t('.clear') do %>
     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
     </svg>

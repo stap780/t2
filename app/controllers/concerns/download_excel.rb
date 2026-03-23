@@ -42,6 +42,15 @@ module DownloadExcel
     when 'selected'
       collection_ids = model.include_images.where(id: params[items]).pluck(:id) if model_product?
       collection_ids = model.where(id: params[items]).pluck(:id) unless model_product?
+    when 'reports'
+      if controller_name == 'incases'
+        date_from = params[:date_from].to_date
+        date_to = params[:date_to].to_date
+        base_scope = Incase.includes(:company, :strah).where(date: date_from..date_to)
+        collection_ids = base_scope.ransack(params[:q] || {}).result(distinct: true).pluck(:id)
+      else
+        collection_ids = []
+      end
     when 'filtered'
       if controller_name == 'incases'
         base_relation = Incase.includes(:company, :strah)

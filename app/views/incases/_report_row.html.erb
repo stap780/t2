@@ -1,23 +1,24 @@
-<tr id="<%= dom_id(incase) %>" class="hover:bg-gray-50">
-  <td class="px-4 py-2 text-sm">
+<div id="<%= dom_id(incase) %>" class="grid grid-cols-[minmax(140px,1fr)_minmax(100px,1fr)_minmax(90px,1fr)_minmax(100px,1fr)_minmax(95px,1fr)_minmax(95px,1fr)_minmax(110px,1fr)_minmax(80px,1fr)_minmax(85px,1fr)_minmax(70px,1fr)_40px] gap-x-2 px-4 py-2 text-sm border-b border-gray-200 hover:bg-gray-50 items-center min-w-0">
+  <div class="min-w-0 truncate">
     <%= link_to incase.unumber, edit_incase_path(incase), class: "text-blue-600 hover:text-blue-800", data: { turbo: false }, target: "_blank" %>
-  </td>
-  <td class="px-4 py-2 text-sm text-gray-700"><%= incase.stoanumber %></td>
-  <td class="px-4 py-2 text-sm text-gray-700"><%= incase.date&.strftime('%d.%m.%Y') %></td>
-  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter((incase.totalsum || 0).to_f.round(2), delimiter: " ") %></td>
-  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.items_sum.round(2), delimiter: " ") %></td>
-  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.items_sale_sum.round(2), delimiter: " ") %></td>
-  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= number_with_delimiter(incase.margin.round(2), delimiter: " ") %></td>
-  <td class="px-4 py-2 text-sm text-right text-gray-700"><%= incase.margin_pct.present? ? "#{incase.margin_pct}%" : "—" %></td>
-  <td class="px-4 py-2 text-center">
+  </div>
+  <div class="text-left text-gray-700 truncate min-w-0"><%= incase.stoanumber %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= incase.date&.strftime('%d.%m.%Y') %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= number_with_delimiter((incase.totalsum || 0).to_f.round(2), delimiter: " ") %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= number_with_delimiter(incase.strah_amount.round(2), delimiter: " ") %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= number_with_delimiter(incase.items_sum.round(2), delimiter: " ") %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= number_with_delimiter(incase.items_sale_sum.round(2), delimiter: " ") %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= number_with_delimiter(incase.margin.round(2), delimiter: " ") %></div>
+  <div class="text-left text-gray-700 whitespace-nowrap"><%= incase.margin_pct.present? ? "#{incase.margin_pct}%" : "—" %></div>
+  <div class="text-left">
     <% if incase.priced? %>
       <span class="text-green-600">✓</span>
     <% else %>
       <span class="text-gray-400">—</span>
     <% end %>
-  </td>
-  <td class="px-4 py-2 text-center">
+  </div>
+  <div class="flex justify-center">
     <% calc_url = local_assigns[:date_from].present? && local_assigns[:date_to].present? ? calc_incase_path(incase, date_from: date_from, date_to: date_to) : calc_incase_path(incase) %>
     <%= link_to_sync calc_url, title: "Рассчитать цены позициям", data: { turbo_stream: true, turbo_prefetch: false } %>
-  </td>
-</tr>
+  </div>
+</div>

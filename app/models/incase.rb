@@ -158,6 +158,13 @@ class Incase < ApplicationRecord
     (margin / items_sum.to_f * 100).round(1)
   end
 
+  # Сумма, которую платим в страховую (totalsum × strah.rate%)
+  # Требует preload: :strah
+  def strah_amount
+    rate = strah&.rate.present? ? strah.rate.to_f / 100.0 : 1.0
+    (totalsum || 0).to_f * rate
+  end
+
   def item_prices
     Rails.logger.info 'start calc_price'
     errors = []

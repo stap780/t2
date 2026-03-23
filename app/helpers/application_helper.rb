@@ -3,6 +3,22 @@ module ApplicationHelper
     obj.persisted? ? obj.id : obj.hash
   end
 
+  # Заголовок с иконкой-подсказкой (label + ℹ с CSS tooltip при наведении)
+  def header_with_info(label, tooltip:, align: :left)
+    align_classes = { right: "text-right justify-end", center: "text-center justify-center", left: "text-left justify-start" }
+    content_tag(:div, class: "whitespace-nowrap flex items-center gap-1 #{align_classes[align]}") do
+      info_span = content_tag(:span, class: "relative inline-flex group text-gray-400 shrink-0") do
+        svg_icon = tag.svg(class: "w-3.5 h-3.5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24") do
+          tag.path(stroke_linecap: "round", stroke_linejoin: "round", stroke_width: "2", d: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z")
+        end
+        tooltip_el = content_tag(:span, tooltip,
+          class: "absolute left-1/2 -translate-x-1/2 top-full mt-1 px-2 py-1 text-xs text-white bg-gray-800 rounded-md shadow-lg whitespace-normal max-w-[220px] z-[9999] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150 pointer-events-none normal-case")
+        safe_join([svg_icon, tooltip_el])
+      end
+      safe_join([label, info_span])
+    end
+  end
+
   def delete_icon
     '<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

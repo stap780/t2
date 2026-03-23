@@ -315,6 +315,10 @@
               <code class="bg-gray-100 px-2 py-1 rounded">product.images_zap</code>
               - массив URL изображений с водяным знаком
             </p>
+            <p class="mt-1">
+              <code class="bg-gray-100 px-2 py-1 rounded">product.images_with_ext</code>
+              - массив URL изображений с расширением (.jpg, .png)
+            </p>
           </div>
         </div>
 
@@ -371,6 +375,11 @@
             <div class="flex items-center">
               <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
                 {% for image in product.images_zap %}{{ image }}{% endfor %}
+              </code>
+            </div>
+            <div class="flex items-center">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
+                {% for image in product.images_with_ext %}{{ image }}{% endfor %}
               </code>
             </div>
           </div>
