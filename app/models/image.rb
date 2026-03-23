@@ -40,6 +40,14 @@ class Image < ApplicationRecord
     end
   end
 
+  # URL через Rails (в пути есть filename с расширением — для YML и сервисов, требующих .jpg/.png)
+  def rails_blob_url_with_filename(host: nil)
+    return unless file.attached?
+
+    host ||= Rails.env.development? ? 'http://localhost:3000' : 'https://cpt.dizauto.ru'
+    "#{host}#{rails_blob_path(file, only_path: true)}"
+  end
+
   # URL для zap варианта с водяным знаком
   def zap_url
     return nil unless file.attached?

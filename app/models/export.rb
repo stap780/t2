@@ -370,24 +370,15 @@ class Export < ApplicationRecord
     end.compact
   end
 
-  # URLs с расширением файла (для YML и сервисов, требующих .jpg/.png и т.д.)
+  # URLs с расширением в пути (через Rails blob URL — для YML и сервисов, требующих .jpg/.png)
   def product_images_urls_with_ext(product, variant = 'original')
     return [] unless product.images.present?
 
-    product.images.filter_map do |image|
-      url = image.s3_url
-      next unless url
-      ext = image.file.blob.filename.extension.presence || content_type_to_ext(image.file.content_type) || 'jpg'
-      "#{url}.#{ext}"
-    end
+    product.images.filter_map(&:rails_blob_url_with_filename)
   end
 
 
   private
-
-  def content_type_to_ext(content_type)
-    { 'image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif' }[content_type]
-  end
 
   def enqueue_on_create
     schedule! if periodic_scheduled?
