@@ -16,6 +16,8 @@
   <%= submit_tag "Применить", class: "h-8 px-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
 <% end %>
 
+<%= turbo_stream_from "incases" %>
+
 <%= turbo_frame_tag "incase_reports" do %>
   <% if @totals&.dig(:count).to_i > 0 %>
     <% priced_pct = @totals[:count].positive? ? (@totals[:priced_count].to_f / @totals[:count] * 100).round(1) : 0 %>

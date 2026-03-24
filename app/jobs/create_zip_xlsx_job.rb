@@ -81,4 +81,5 @@ class CreateZipXlsxJob < ApplicationJob
       locals: { message: message, content: content }
     )
   end
+  
 end
