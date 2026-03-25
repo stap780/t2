@@ -1,0 +1,42 @@
+wb = xlsx_package.workbook
+decimal_style = wb.styles.add_style(format_code: "0.00")
+
+headers = [
+  "Номер убытка",
+  "З.Н.",
+  "Дата акта",
+  "Сумма",
+  "В страховую",
+  "Сумма Д",
+  "Пр. цены",
+  "Маржа",
+  "МД %",
+  "Проц."
+]
+
+wb.add_worksheet(name: "Отчёт") do |sheet|
+  sheet.add_row headers
+
+  collection.find_each(batch_size: 500) do |incase|
+    md_pct = if incase.margin_pct.present?
+               "#{incase.margin_pct}%"
+             else
+               "—"
+             end
+
+    sheet.add_row [
+      incase.unumber,
+      incase.stoanumber,
+      incase.date&.strftime("%d.%m.%Y"),
+      (incase.totalsum || 0).to_f.round(2),
+      incase.strah_amount.round(2),
+      incase.items_sum.round(2),
+      incase.items_sale_sum.round(2),
+      incase.margin.round(2),
+      md_pct,
+      (incase.priced? ? "✓" : "—")
+    ],
+    types: [:string, :string, :string] + [:float] * 5 + [:string, :string],
+    style: [nil, nil, nil] + [decimal_style] * 5 + [nil, nil]
+  end
+end

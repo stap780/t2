@@ -8,7 +8,13 @@ class CreateZipXlsxJob < ApplicationJob
     model_name = options[:model] # 'products' or 'detals'
     model_class = model_name.singularize.camelize.constantize # 'Product' or 'Detal'
     relation = model_class.where(id: collection_ids)
-    relation = relation.includes(items: :variant) if model_name == 'incases'
+    if model_name == 'incases'
+      relation = if options[:download_type].to_s == 'reports'
+                   relation.includes(:strah, items: [:variant, :item_status])
+                 else
+                   relation.includes(items: :variant)
+                 end
+    end
     download_kind = options[:download_kind]
 
     if collection_ids.size > LONG_PROCESS_THRESHOLD
@@ -42,12 +48,13 @@ class CreateZipXlsxJob < ApplicationJob
         details: {
           model: model_name,
           items_count: collection_ids.size,
-          download_kind: download_kind
+          download_kind: download_kind,
+          download_type: options[:download_type]
         }
       }
     )
 
-    success, content = ZipXlsxService.new(relation, { model: model_name, download_kind: download_kind }).call
+    success, content = ZipXlsxService.new(relation, zip_xlsx_options(model_name, download_kind, options)).call
 
     if success
       email_delivery.attachment.attach(content)
@@ -61,7 +68,7 @@ class CreateZipXlsxJob < ApplicationJob
   end
 
   def perform_standard(collection_ids, model_name, relation, download_kind, options)
-    success, content = ZipXlsxService.new(relation, { model: model_name, download_kind: download_kind }).call
+    success, content = ZipXlsxService.new(relation, zip_xlsx_options(model_name, download_kind, options)).call
     message = success ? 'Success' : 'Error'
     broadcast_result(model_name, message, content)
 
@@ -70,6 +77,14 @@ class CreateZipXlsxJob < ApplicationJob
     else
       Rails.logger.error "CreateZipXlsxJob: Failed for #{model_name}: #{content.inspect}"
     end
+  end
+
+  def zip_xlsx_options(model_name, download_kind, options)
+    {
+      model: model_name,
+      download_kind: download_kind,
+      download_type: options[:download_type]
+    }
   end
 
   def broadcast_result(model_name, message, content)

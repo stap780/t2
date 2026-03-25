@@ -63,7 +63,7 @@
   <% selected_tip_ids = Array(params.dig(:q, :incase_tip_id_in)).reject(&:blank?).map(&:to_s) %>
   <div class="relative" data-controller="multiselect-dropdown" data-action="change->multiselect-dropdown#updateButtonLabel">
     <button type="button" data-multiselect-dropdown-target="button" data-placeholder="<%= t('activerecord.attributes.incase.incase_tip_id') %>" data-action="click->multiselect-dropdown#toggle"
-            class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 180px;" >
+            class="w-full h-8 px-2 py-1 text-left border border-gray-300 rounded-md flex items-center justify-between", style="min-width: 150px;" >
       <span data-multiselect-dropdown-target="label"><%= selected_tip_ids.size == 0 ? t('activerecord.attributes.incase.incase_tip_id') : "#{selected_tip_ids.size} выбрано" %></span>
       <svg class="w-4 h-4 text-gray-500 shrink-0 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
     </button>

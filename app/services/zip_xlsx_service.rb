@@ -6,10 +6,18 @@ class ZipXlsxService
   def initialize(collection, options = {})
     @collection = collection
     @model = options[:model].to_s
-    @filename = "#{@model.downcase}.xlsx"
-    @template = "#{@model.downcase.pluralize}/index"
-    @error_message = 'We have error whith zip create'
     @download_kind = options[:download_kind]
+    @download_type = options[:download_type].to_s
+
+    if @model == 'incases' && @download_type == 'reports'
+      @filename = 'incases_reports.xlsx'
+      @template = 'incases/reports'
+    else
+      @filename = "#{@model.downcase}.xlsx"
+      @template = "#{@model.downcase.pluralize}/index"
+    end
+
+    @error_message = 'We have error whith zip create'
   end
 
   def call
@@ -43,7 +51,11 @@ class ZipXlsxService
       handlers: [:axlsx],
       formats: [:xlsx],
       template: @template,
-      locals: { collection: @collection, download_kind: @download_kind }
+      locals: {
+        collection: @collection,
+        download_kind: @download_kind,
+        download_type: @download_type
+      }
     )
 
     Zip::OutputStream.write_buffer do |zos|
