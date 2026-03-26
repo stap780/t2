@@ -11,12 +11,16 @@ class Varbind < ApplicationRecord
   validates :value, presence: true
   validates :value, uniqueness: {
     scope: [:bindable_id, :bindable_type],
-    message: "этот ID уже привязан к другому варианту в данной интеграции"
+    message: "этот ID %{value} уже привязан к другому варианту в данной интеграции"
   }
   validates :record_id, uniqueness: {
     scope: [:record_type, :bindable_id, :bindable_type],
     message: "у варианта может быть только одна привязка к данной интеграции"
   }
+
+  def self.ransackable_attributes(auth_object = nil)
+    attribute_names
+  end
 
   def self.int_types
     [['insales','Insale'],['avitos','Avito'],['moysklads','Moysklad']]
@@ -28,7 +32,7 @@ class Varbind < ApplicationRecord
     # Avito.all.map { |a| ["Avito #{a.id}", a.id] }
   end
 
-  private
+  
 
 
 end
