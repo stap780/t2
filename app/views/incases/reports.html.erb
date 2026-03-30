@@ -63,71 +63,65 @@
 
     <%= turbo_frame_tag "incase_reports_table" do %>
     <div class="flex flex-wrap items-end gap-2 mb-4 p-4 bg-white rounded-lg shadow">
-    <%= search_form_for @search, url: reports_incases_path, method: :get, html: { class: "flex flex-wrap items-end gap-2", data: { turbo_frame: "incase_reports_table" } } do |f| %>
-      <%= hidden_field_tag :date_from, @date_from %>
-      <%= hidden_field_tag :date_to, @date_to %>
-      <div>
-        <%= f.label :unumber_cont, "Номер убытка", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= f.search_field :unumber_cont, class: "h-8 px-3 py-2 border border-gray-300 rounded-md" %>
-      </div>
-      <div>
-        <%= f.label :stoanumber_cont, "З.Н.", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= f.search_field :stoanumber_cont, class: "h-8 px-3 py-2 border border-gray-300 rounded-md" %>
-      </div>
-      <%# f.label :company_id_eq, "СТО", class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%# f.collection_select :company_id_eq, Company.standart.limit(20), :id, :short_title, { include_blank: true }, { class: "h-8 px-3 py-2 border border-gray-300 rounded-md" } %>
-      <%= f.submit "Поиск", class: "h-8 px-2 bg-gray-200 rounded-md hover:bg-violet-700 cursor-pointer" %>
-      <%= link_to reports_incases_path( date_from: @date_from, date_to: @date_to, search_cancel: true ), class: "h-8 p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo: false } do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      <% end %>
-    <% end %>
-    <%= form_with url: download_incases_path, method: :post, local: false, class: "inline ml-auto" do %>
-      <%= hidden_field_tag :date_from, @date_from %>
-      <%= hidden_field_tag :date_to, @date_to %>
-      <%= hidden_field_tag :download_type, 'reports' %>
-      <% (params[:q] || {}).each do |key, value| %>
-        <% next if value.blank? %>
-        <% if value.is_a?(Array) %>
-          <% value.reject(&:blank?).each do |v| %>
-            <%= hidden_field_tag "q[#{key}][]", v %>
-          <% end %>
-        <% else %>
-          <%= hidden_field_tag "q[#{key}]", value %>
+      <%= search_form_for @search, url: reports_incases_path, method: :get, html: { class: "flex flex-wrap items-end gap-2", data: { turbo_frame: "incase_reports_table" } } do |f| %>
+        <%= hidden_field_tag :date_from, @date_from %>
+        <%= hidden_field_tag :date_to, @date_to %>
+        <%= f.search_field :unumber_cont, value: params.dig(:q, :unumber_cont), placeholder: t('activerecord.attributes.incase.unumber'), class: "h-8 px-2 py-1 border border-gray-300 rounded-md" %>
+        <%= f.search_field :stoanumber_cont, value: params.dig(:q, :stoanumber_cont), placeholder: t('activerecord.attributes.incase.stoanumber'), class: "h-8 px-1 py-2 border border-gray-300 rounded-md" %>
+        <%= f.collection_select :strah_id_eq, Company.strah, :id, :short_title, 
+            { include_blank: false, prompt: t('activerecord.attributes.incase.strah_id') }, 
+            { class: "h-8 px-2 py-1 border border-gray-300 rounded-md", style: "max-width: 200px;" } %>
+        <%= f.submit "Поиск", class: "h-8 px-2 bg-gray-200 rounded-md hover:bg-violet-700 cursor-pointer" %>
+        <%= link_to reports_incases_path( date_from: @date_from, date_to: @date_to, search_cancel: true ), class: "h-8 p-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo: false } do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         <% end %>
       <% end %>
-      <%= button_tag type: "submit", class: "inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer" do %>
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Excel
+      <%= form_with url: download_incases_path, method: :post, local: false, class: "inline ml-auto" do %>
+        <%= hidden_field_tag :date_from, @date_from %>
+        <%= hidden_field_tag :date_to, @date_to %>
+        <%= hidden_field_tag :download_type, 'reports' %>
+        <% (params[:q] || {}).each do |key, value| %>
+          <% next if value.blank? %>
+          <% if value.is_a?(Array) %>
+            <% value.reject(&:blank?).each do |v| %>
+              <%= hidden_field_tag "q[#{key}][]", v %>
+            <% end %>
+          <% else %>
+            <%= hidden_field_tag "q[#{key}]", value %>
+          <% end %>
+        <% end %>
+        <%= button_tag type: "submit", class: "inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer" do %>
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Excel
+        <% end %>
       <% end %>
-    <% end %>
     </div>
-      <div class="bg-white rounded-lg shadow">
-        <div class="overflow-x-auto">
-          <div class="min-w-[960px]">
-            <div class="grid grid-cols-[minmax(140px,1fr)_minmax(100px,1fr)_minmax(90px,1fr)_minmax(100px,1fr)_minmax(95px,1fr)_minmax(95px,1fr)_minmax(110px,1fr)_minmax(80px,1fr)_minmax(85px,1fr)_minmax(70px,1fr)_40px] gap-x-2 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase border-b border-gray-200">
-              <div class="text-left whitespace-nowrap">Номер убытка</div>
-              <div class="text-left whitespace-nowrap">З.Н.</div>
-              <div class="text-left whitespace-nowrap">Дата акта</div>
-              <%= header_with_info("Сумма", tooltip: "Сумма убытка по акту (totalsum)") %>
-              <%= header_with_info("В страховую", tooltip: "Сумма, которую платим в страховую (totalsum × % СК)") %>
-              <%= header_with_info("Сумма Д", tooltip: "Сумма деталей: сумма (кол-во × цена позиции) по всем позициям") %>
-              <%= header_with_info("Пр. цены", tooltip: "Сумма продажных цен: сумма (кол-во × цена варианта) по всем позициям") %>
-              <%= header_with_info("Маржа", tooltip: "Маржа = Пр. цены − Сумма Д") %>
-              <%= header_with_info("МД %", tooltip: "Рентабельность маржинального дохода, %") %>
-              <%= header_with_info("Проц.", tooltip: "Убыток проценен, если всем позициям проставлены цены или подходящий статус", align: :center) %>
-              <div></div>
-            </div>
-            <%= render partial: "incases/report_row", collection: @incases, as: :incase, locals: { date_from: @date_from, date_to: @date_to } %>
-          </div>
+    <div class="bg-white rounded-lg shadow">
+      <div class="min-w-[1080px]">
+        <div class="grid grid-cols-[minmax(140px,1fr)_minmax(130px,1fr)_minmax(100px,1fr)_minmax(90px,1fr)_minmax(100px,1fr)_minmax(95px,1fr)_minmax(95px,1fr)_minmax(110px,1fr)_minmax(80px,1fr)_minmax(85px,1fr)_minmax(70px,1fr)_40px] gap-x-2 px-4 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase border-b border-gray-200">
+          <div class="text-left whitespace-nowrap">Номер убытка</div>
+          <div class="text-left whitespace-nowrap">Страховая</div>
+          <div class="text-left whitespace-nowrap">З.Н.</div>
+          <div class="text-left whitespace-nowrap">Дата акта</div>
+          <%= header_with_info("Сумма", tooltip: "Сумма убытка по акту (totalsum)") %>
+          <%= header_with_info("В страховую", tooltip: "Сумма, которую платим в страховую (totalsum × % СК)") %>
+          <%= header_with_info("Сумма Д", tooltip: "Сумма деталей: сумма (кол-во × цена позиции) по всем позициям") %>
+          <%= header_with_info("Пр. цены", tooltip: "Сумма продажных цен: сумма (кол-во × цена варианта) по всем позициям") %>
+          <%= header_with_info("Маржа", tooltip: "Маржа = Пр. цены − Сумма Д") %>
+          <%= header_with_info("МД %", tooltip: "Рентабельность маржинального дохода, %") %>
+          <%= header_with_info("Проц.", tooltip: "Убыток проценен, если всем позициям проставлены цены или подходящий статус", align: :center) %>
+          <div></div>
         </div>
-        <div class="px-4 py-2 border-t border-gray-200">
-          <%= render "shared/paginate", f: @incases %>
-        </div>
+        <%= render partial: "incases/report_row", collection: @incases, as: :incase, locals: { date_from: @date_from, date_to: @date_to } %>
       </div>
+      <div class="px-4 py-2 border-t border-gray-200">
+        <%= render "shared/paginate", f: @incases %>
+      </div>
+    </div>
     <% end %>
   <% else %>
     <div class="bg-white rounded-lg shadow p-8 text-center text-gray-500">

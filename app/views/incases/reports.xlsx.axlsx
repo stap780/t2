@@ -3,6 +3,7 @@ decimal_style = wb.styles.add_style(format_code: "0.00")
 
 headers = [
   "Номер убытка",
+  "Страховая",
   "З.Н.",
   "Дата акта",
   "Сумма",
@@ -26,6 +27,7 @@ wb.add_worksheet(name: "Отчёт") do |sheet|
 
     sheet.add_row [
       incase.unumber,
+      incase.strah&.short_title,
       incase.stoanumber,
       incase.date&.strftime("%d.%m.%Y"),
       (incase.totalsum || 0).to_f.round(2),
@@ -36,7 +38,7 @@ wb.add_worksheet(name: "Отчёт") do |sheet|
       md_pct,
       (incase.priced? ? "✓" : "—")
     ],
-    types: [:string, :string, :string] + [:float] * 5 + [:string, :string],
-    style: [nil, nil, nil] + [decimal_style] * 5 + [nil, nil]
+    types: [:string, :string, :string, :string] + [:float] * 5 + [:string, :string],
+    style: [nil, nil, nil, nil] + [decimal_style] * 5 + [nil, nil]
   end
 end
