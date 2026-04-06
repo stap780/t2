@@ -46,7 +46,8 @@ Rails.application.routes.draw do
       post :bulk_delete
       post :bulk_print_etiketkas, format: :pdf
       get :open_filter
-      get :filter_price
+      get :filter_history
+      get :filter_price, action: :filter_history
     end
     member do
       get :refill

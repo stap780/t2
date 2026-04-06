@@ -1,18 +1,30 @@
-<%= form_with url: filter_price_products_path, method: :get, html: { class: 'bg-white rounded-lg shadow p-4 mb-4', data: { controller: "filter", turbo_frame: '_top' } } do |f| %>
+<%= form_with url: filter_history_products_path, method: :get, html: { class: 'bg-white rounded-lg shadow p-4 mb-4', data: { controller: "filter", turbo_frame: '_top' } } do |f| %>
     <div class="pt-0 mt-0">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Атрибут (audit_q) -->
             <div>
                 <%= label_tag 'audit_q[audited_changes_has_key]', t('products.index.history_attribute'), class: "block text-sm font-medium text-gray-700 mb-1" %>
-                <%= select_tag 'audit_q[audited_changes_has_key]', options_for_select([['Цена', 'price']], params.dig(:audit_q, :audited_changes_has_key) || 'price'),
-                    { prompt: t('products.index.select_attribute'), class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
+                <%= select_tag 'audit_q[audited_changes_has_key]',
+                    options_for_select(Product::AUDIT_CHANGE_KEYS, params.dig(:audit_q, :audited_changes_has_key)),
+                    {
+                      include_blank: t('products.index.history_any_attribute'),
+                      class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md"
+                    } %>
             </div>
 
-            <!-- Пользователь (audit_q) -->
+            <!-- Действие (audit_q) — create / update / destroy -->
             <div>
-                <%= label_tag 'audit_q[user_id_eq]', t('products.index.history_user'), class: "block text-sm font-medium text-gray-700 mb-1" %>
-                <%= select_tag 'audit_q[user_id_eq]', options_from_collection_for_select(User.all, :id, :full_name, params.dig(:audit_q, :user_id_eq)),
-                    { prompt: t('products.index.select_user'), class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
+                <%= label_tag 'audit_q[action_eq]', t('products.index.history_action'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= select_tag 'audit_q[action_eq]',
+                    options_for_select(
+                      [
+                        [t('products.index.history_action_create'), 'create'],
+                        [t('products.index.history_action_update'), 'update'],
+                        [t('products.index.history_action_destroy'), 'destroy'],
+                      ],
+                      params.dig(:audit_q, :action_eq)
+                    ),
+                    { include_blank: t('products.index.history_any_action'), class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md" } %>
             </div>
 
             <!-- Наличие старого значения (audited_changes_key_old_present) -->
@@ -20,14 +32,14 @@
                 <%= label_tag 'audit_q[audited_changes_key_old_present]', t('products.index.history_old_value'), class: "block text-sm font-medium text-gray-700 mb-1" %>
                 <% attr_key = params.dig(:audit_q, :audited_changes_has_key).presence || 'price' %>
                 <%= select_tag 'audit_q[audited_changes_key_old_present]', options_for_select([[t('products.index.yes'), attr_key], [t('products.index.no'), '']], params.dig(:audit_q, :audited_changes_key_old_present)),
-                    { prompt: t('products.index.select_old_value'), class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
+                    { prompt: t('products.index.select_old_value'), class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md" } %>
             </div>
 
             <!-- Наличие нового значения (audited_changes_key_new_present) -->
             <div>
                 <%= label_tag 'audit_q[audited_changes_key_new_present]', t('products.index.history_new_value'), class: "block text-sm font-medium text-gray-700 mb-1" %>
                 <%= select_tag 'audit_q[audited_changes_key_new_present]', options_for_select([[t('products.index.yes'), attr_key], [t('products.index.no'), '']], params.dig(:audit_q, :audited_changes_key_new_present)),
-                    { prompt: t('products.index.select_new_value'), class: "w-full px-3 py-2 border border-gray-300 rounded-md" } %>
+                    { prompt: t('products.index.select_new_value'), class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md" } %>
             </div>
 
             <!-- Дата от (audit_q) -->
@@ -35,7 +47,7 @@
                 <%= label_tag 'audit_q[created_at_dategteq]', t('products.index.history_date_from'), class: "block text-sm font-medium text-gray-700 mb-1" %>
                 <%= text_field_tag 'audit_q[created_at_dategteq]', params.dig(:audit_q, :created_at_dategteq),
                     placeholder: t('products.index.history_date_from'),
-                    class: "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-pointer",
+                    class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md bg-gray-100 cursor-pointer",
                     autocomplete: "off",
                     data: { controller: 'flatpickr', flatpickr_alt_input: "true", flatpickr_alt_format: "d-m-Y" } %>
             </div>
@@ -45,7 +57,7 @@
                 <%= label_tag 'audit_q[created_at_datelteq]', t('products.index.history_date_to'), class: "block text-sm font-medium text-gray-700 mb-1" %>
                 <%= text_field_tag 'audit_q[created_at_datelteq]', params.dig(:audit_q, :created_at_datelteq),
                     placeholder: t('products.index.history_date_to'),
-                    class: "w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-pointer",
+                    class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md bg-gray-100 cursor-pointer",
                     autocomplete: "off",
                     data: { controller: 'flatpickr', flatpickr_alt_input: "true", flatpickr_alt_format: "d-m-Y" } %>
             </div>
@@ -94,6 +106,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Пользователь (audit_q) -->
+            <div>
+                <%= label_tag 'audit_q[user_id_eq]', t('products.index.history_user'), class: "block text-sm font-medium text-gray-700 mb-1" %>
+                <%= select_tag 'audit_q[user_id_eq]', options_from_collection_for_select(User.all, :id, :full_name, params.dig(:audit_q, :user_id_eq)),
+                    { prompt: t('products.index.select_user'), class: "w-full h-8 px-2 py-1 border border-gray-300 rounded-md" } %>
+            </div>
+
         </div>
     </div>
 

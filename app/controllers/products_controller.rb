@@ -1,6 +1,6 @@
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline download_images ]
-  after_action :clear_preloaded_detals, only: [:index, :edit, :update, :open_filter, :filter_price]
+  after_action :clear_preloaded_detals, only: [:index, :edit, :update, :open_filter, :filter_history]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -14,14 +14,14 @@ class ProductsController < ApplicationController
   def open_filter
     @search = Product.ransack(search_params || {})
     @search.sorts = "id desc" if @search.sorts.empty?
-    render params[:price].present? ? :filter_price : :filter
+    render filter_history_offcanvas? ? :filter_history : :filter
   end
 
-  def filter_price
+  def filter_history
     audit_q = params[:audit_q]&.to_unsafe_h&.compact_blank&.symbolize_keys
     base_scope = if audit_q.present?
-      ids = Audited::Audit.where(associated_type: "Product").ransack(audit_q).result.distinct.pluck(:associated_id).compact.uniq
-      Product.where(id: ids)
+      ids = product_ids_from_audit_ransack(audit_q)
+      ids.present? ? Product.where(id: ids) : Product.none
     else
       Product.all
     end
@@ -245,7 +245,7 @@ class ProductsController < ApplicationController
   end
 
   REFILL_REQUIRED_PARAMS = %w[
-    Станция Марка Модель Год Деталь Гарантия Состояние Avito\ код Avito\ название
+    Станция Марка Модель Год Деталь Гарантия Состояние Avito\ код Avito\ название Длина Высота Ширина
   ].freeze
   REFILL_DEFAULT_VALUE = 'fake'
 
@@ -345,6 +345,24 @@ class ProductsController < ApplicationController
 
   def clear_preloaded_detals
     Variant.clear_preloaded_detals
+  end
+
+  # Боковая панель: история изменений (раньше price: true для совместимости)
+  def filter_history_offcanvas?
+    params[:history].present? || params[:price].present?
+  end
+
+  # Прямые аудиты Product + связанные (Variant/Feature/… с associated_type Product)
+  def auditable_product_audits_scope
+    Audited::Audit.where(auditable_type: "Product")
+      .or(Audited::Audit.where(associated_type: "Product"))
+  end
+
+  def product_ids_from_audit_ransack(audit_q)
+    relation = auditable_product_audits_scope.ransack(audit_q).result
+    relation.distinct.pluck(:auditable_type, :auditable_id, :associated_id).filter_map do |type, aud_id, assoc_id|
+      type == "Product" ? aud_id : assoc_id
+    end.uniq
   end
 
   def check_positions(images)

@@ -95,6 +95,13 @@ class Product < ApplicationRecord
   STATUS = %w[draft pending in_progress active archived].freeze
   TIP = %w[product service kit].freeze
 
+  # Ключи audited_changes для фильтра по истории (прямые и связанные аудиты товара)
+  AUDIT_CHANGE_KEYS = [
+    ["Цена", "price"],
+    ["Название", "title"],
+    ["Статус", "status"],
+  ].freeze
+
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
     attribute_names + %w[acts_number]
