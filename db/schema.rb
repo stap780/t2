@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_08_121711) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -192,6 +192,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "departments", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_departments_on_name"
+  end
+
   create_table "detals", force: :cascade do |t|
     t.boolean "status"
     t.string "sku"
@@ -224,6 +231,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
     t.index ["record_type", "record_id"], name: "index_email_deliveries_on_record"
     t.index ["record_type", "record_id"], name: "index_email_deliveries_on_record_type_and_record_id"
     t.index ["status"], name: "index_email_deliveries_on_status"
+  end
+
+  create_table "employees", force: :cascade do |t|
+    t.string "full_name", null: false
+    t.bigint "department_id"
+    t.bigint "manager_id"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["department_id"], name: "index_employees_on_department_id"
+    t.index ["full_name"], name: "index_employees_on_full_name"
+    t.index ["manager_id"], name: "index_employees_on_manager_id"
+    t.index ["user_id"], name: "index_employees_on_user_id"
   end
 
   create_table "exports", force: :cascade do |t|
@@ -457,6 +477,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
     t.index ["title"], name: "index_properties_on_title", unique: true
   end
 
+  create_table "schedule_days", force: :cascade do |t|
+    t.bigint "employee_id", null: false
+    t.bigint "shift_code_id", null: false
+    t.date "worked_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["employee_id", "worked_on"], name: "index_schedule_days_on_employee_id_and_worked_on", unique: true
+    t.index ["employee_id"], name: "index_schedule_days_on_employee_id"
+    t.index ["shift_code_id"], name: "index_schedule_days_on_shift_code_id"
+    t.index ["worked_on"], name: "index_schedule_days_on_worked_on"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -464,6 +496,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "shift_codes", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "label", null: false
+    t.string "color"
+    t.integer "position", default: 0, null: false
+    t.boolean "vacation", default: false, null: false
+    t.boolean "day_off", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_shift_codes_on_code", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -517,6 +561,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
   add_foreign_key "client_companies", "clients"
   add_foreign_key "client_companies", "companies"
   add_foreign_key "company_plan_dates", "companies"
+  add_foreign_key "employees", "departments"
+  add_foreign_key "employees", "employees", column: "manager_id"
+  add_foreign_key "employees", "users"
   add_foreign_key "exports", "users"
   add_foreign_key "features", "characteristics"
   add_foreign_key "features", "properties"
@@ -530,6 +577,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_27_095715) do
   add_foreign_key "incases", "companies", column: "strah_id"
   add_foreign_key "items", "incases"
   add_foreign_key "items", "variants"
+  add_foreign_key "schedule_days", "employees"
+  add_foreign_key "schedule_days", "shift_codes"
   add_foreign_key "sessions", "users"
   add_foreign_key "variants", "products"
 end

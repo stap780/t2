@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  code: Al
+  label: Work shift
+  color: "#22c55e"
+  position: 1
+  vacation: false
+  day_off: false
+
+two:
+  code: Vyx
+  label: Day off
+  color: "#eab308"
+  position: 2
+  vacation: false
+  day_off: true

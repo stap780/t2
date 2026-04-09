@@ -44,8 +44,13 @@ class Image < ApplicationRecord
   def rails_blob_url_with_filename(host: nil)
     return unless file.attached?
 
-    host ||= Rails.env.development? ? 'http://localhost:3000' : 'https://cpt.dizauto.ru'
-    "#{host}#{rails_blob_path(file, only_path: true)}"
+    # host ||= Rails.env.development? ? 'http://localhost:3000' : 'https://cpt.dizauto.ru'
+    # "#{host}#{rails_blob_path(file, only_path: true)}"
+    base = host.presence || (Rails.env.development? ? 'http://localhost:3000' : 'https://cpt.dizauto.ru')
+    uri = URI.parse(base)
+    opts = { only_path: false, host: uri.host, protocol: uri.scheme }
+    opts[:port] = uri.port if uri.port != uri.default_port
+    rails_blob_url(file, **opts)
   end
 
   # URL для zap варианта с водяным знаком
@@ -116,4 +121,5 @@ class Image < ApplicationRecord
     # Генерируем zap вариант в фоне (с водяным знаком)
     # ImageZapVariantJob.perform_later(self)
   end
+  
 end

@@ -1,0 +1,51 @@
+<% month_param = staff_schedule_month_param(month) %>
+<% opts = shift_codes.map { |sc| ["#{sc.code} — #{sc.label}", sc.id] } %>
+<% wk = worked_on.saturday? || worked_on.sunday? %>
+
+<%= turbo_frame_tag schedule_row_dom_id(employee, worked_on), class: "block" do %>
+  <div class="flex items-center gap-2 px-3 py-2 text-sm <%= 'bg-slate-50' if wk %>">
+    <div class="w-24 shrink-0 text-gray-700">
+      <span class="font-medium"><%= worked_on.day %></span>
+      <span class="text-gray-500 text-xs ml-1"><%= l(worked_on, format: "%a") %></span>
+    </div>
+    <div class="flex-1 min-w-0 flex items-center gap-2">
+      <% if schedule_day %>
+        <%= form_with model: schedule_day,
+            url: schedule_day_path(schedule_day, month: month_param),
+            method: :patch,
+            class: "flex-1 min-w-0" do |f| %>
+          <%= f.select :shift_code_id,
+              options_for_select(opts, schedule_day.shift_code_id),
+              {},
+              {
+                class: "w-full text-xs border border-gray-300 rounded-md py-1 px-2 focus:ring-violet-500 focus:border-violet-500",
+                onchange: "this.form.requestSubmit()",
+                autocomplete: "off"
+              } %>
+        <% end %>
+        <%= button_to t(".clear"),
+            schedule_day_path(schedule_day, month: month_param),
+            method: :delete,
+            form: { data: { turbo_confirm: t(".confirm_clear") } },
+            class: "shrink-0 text-xs text-gray-600 hover:text-red-600 px-2 py-1" %>
+      <% else %>
+        <%= form_with model: ScheduleDay.new(employee_id: employee.id, worked_on: worked_on),
+            url: schedule_days_path(month: month_param),
+            scope: :schedule_day,
+            method: :post,
+            class: "flex-1 min-w-0" do |f| %>
+          <%= f.hidden_field :employee_id, value: employee.id %>
+          <%= f.hidden_field :worked_on, value: worked_on.to_fs(:db) %>
+          <%= f.select :shift_code_id,
+              options_for_select(opts, nil),
+              { include_blank: t("staff_schedules.grid.blank_cell") },
+              {
+                class: "w-full text-xs border border-gray-300 rounded-md py-1 px-2 focus:ring-violet-500 focus:border-violet-500",
+                onchange: "this.form.requestSubmit()",
+                autocomplete: "off"
+              } %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

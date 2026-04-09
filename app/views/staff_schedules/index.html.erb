@@ -1,0 +1,27 @@
+<% content_for :title, t(".title") %>
+
+<div class="max-w-3xl">
+  <h1 class="text-xl font-semibold text-gray-900 mb-2"><%= t(".heading") %></h1>
+  <p class="text-sm text-gray-600 mb-6"><%= t(".intro") %></p>
+
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-100">
+      <dt class="text-xs font-medium text-gray-500 uppercase"><%= Employee.model_name.human(count: 2) %></dt>
+      <dd class="text-2xl font-semibold text-violet-700"><%= @employees_count %></dd>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 border border-gray-100">
+      <dt class="text-xs font-medium text-gray-500 uppercase"><%= ScheduleDay.model_name.human(count: 2) %></dt>
+      <dd class="text-2xl font-semibold text-violet-700"><%= @schedule_days_count %></dd>
+    </div>
+  </dl>
+
+  <div class="bg-white rounded-lg shadow border border-gray-200 p-6 space-y-3">
+    <p class="text-sm text-gray-700"><%= t(".how_to_fill") %></p>
+    <div class="flex flex-wrap gap-3">
+      <%= link_to t("nav.staff_schedule_employees"), employees_path,
+          class: "inline-flex items-center px-4 py-2 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700" %>
+      <%= link_to t("nav.staff_schedule_shift_codes"), shift_codes_path,
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm rounded-md bg-white hover:bg-gray-50" %>
+    </div>
+  </div>
+</div>

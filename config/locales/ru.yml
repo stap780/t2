@@ -1,12 +1,123 @@
 ru:
   date:
     month_names: [~, Январь, Февраль, Март, Апрель, Май, Июнь, Июль, Август, Сентябрь, Октябрь, Ноябрь, Декабрь]
+    abbr_day_names:
+      - Вс
+      - Пн
+      - Вт
+      - Ср
+      - Чт
+      - Пт
+      - Сб
+    day_names:
+      - воскресенье
+      - понедельник
+      - вторник
+      - среда
+      - четверг
+      - пятница
+      - суббота
+    formats:
+      month_year: "%B %Y"
   edit: "Редактировать"
   delete: "Удалить"
   print_barcode: "Печать штрихкода"
   generate_barcode: "Генерация штрихкода"
   we_update_price: "Цены успешно обновлены"
   we_update_price_errors: "Обновлено с ошибками: %{updated} успешно, %{errors} с ошибками"
+  staff_schedules:
+    index:
+      title: "График работы и отпусков"
+      heading: "График работы и отпусков"
+      intro: "Сводка по данным графика. Заполнение — по каждому сотруднику в боковой панели."
+      how_to_fill: "Откройте список сотрудников и нажмите «График» у нужного человека: выберите месяц и вид дня для каждой даты. Для смены типа дня используйте список; чтобы сбросить день — «Очистить»."
+      prev_month: "Предыдущий месяц"
+      next_month: "Следующий месяц"
+      today: "Сегодня"
+      grid_heading: "Сетка месяца"
+      no_employees_hint: "Чтобы заполнить график, сначала добавьте сотрудников."
+      no_shift_codes_hint: "Нужен хотя бы один вид дня в справочнике."
+      work_schedule_heading: "График работы"
+      work_schedule_placeholder: "Сетка месяца по сменам — в разработке."
+      vacation_schedule_heading: "График отпусков"
+      vacation_schedule_placeholder: "Сетка месяца по отпускам — в разработке."
+    grid:
+      blank_cell: "—"
+  employees:
+    index:
+      title: "Сотрудники"
+      heading: "Сотрудники"
+      new: "Добавить сотрудника"
+      empty: "Пока нет сотрудников."
+      confirm_delete: "Удалить этого сотрудника?"
+    new:
+      title: "Новый сотрудник"
+      heading: "Новый сотрудник"
+    edit:
+      title: "Редактировать сотрудника"
+      heading: "Редактировать сотрудника"
+    create:
+      success: "Сотрудник сохранён."
+    update:
+      success: "Сотрудник обновлён."
+    destroy:
+      success: "Сотрудник удалён."
+    form:
+      department_blank: "— без отдела —"
+      manager_blank: "— без руководителя —"
+      user_blank: "— без учётной записи —"
+      back: "Назад к списку"
+    schedule:
+      title: "График: %{name}"
+      short: "График"
+    schedule_month:
+      hint: "Выберите вид дня в списке; пустая строка — день не заполнен. «Очистить» удаляет запись за дату."
+    schedule_day_row:
+      clear: "Очистить"
+      confirm_clear: "Сбросить вид дня за эту дату?"
+  departments:
+    index:
+      title: "Отделы"
+      heading: "Отделы"
+      new: "Добавить отдел"
+      empty: "Пока нет отделов."
+      confirm_delete: "Удалить этот отдел? У сотрудников поле «Отдел» будет очищено."
+    new:
+      title: "Новый отдел"
+      heading: "Новый отдел"
+    edit:
+      title: "Редактировать отдел"
+      heading: "Редактировать отдел"
+    create:
+      success: "Отдел сохранён."
+    update:
+      success: "Отдел обновлён."
+    destroy:
+      success: "Отдел удалён."
+    form:
+      back: "Назад к списку"
+  shift_codes:
+    index:
+      title: "Виды дня"
+      heading: "Виды дня"
+      new: "Добавить вид дня"
+      empty: "Нет видов дня. Добавьте вручную или выполните db:seed."
+      confirm_delete: "Удалить этот вид дня?"
+    new:
+      title: "Новый вид дня"
+      heading: "Новый вид дня"
+    edit:
+      title: "Редактировать вид дня"
+      heading: "Редактировать вид дня"
+    create:
+      success: "Вид дня сохранён."
+    update:
+      success: "Вид дня обновлён."
+    destroy:
+      success: "Вид дня удалён."
+      restrict_error: "Нельзя удалить: вид дня используется в графике."
+    form:
+      back: "Назад к списку"
   nav:
     brand: "App"
     dashboard: "Панель"
@@ -28,6 +139,10 @@ ru:
     insales: "InSales"
     moysklads: "Moysklad"
     users: "Пользователи"
+    staff_schedule: "График работы"
+    staff_schedule_employees: "Сотрудники"
+    staff_schedule_departments: "Отделы"
+    staff_schedule_shift_codes: "Виды дня"
     incase_statuses: "Статусы убытков"
     incase_tips: "Типы убытков"
     item_statuses: "Статусы позиций"
@@ -1024,6 +1139,26 @@ ru:
         few: "Позиции"
         many: "Позиций"
         other: "Позиций"
+      shift_code:
+        one: "Вид дня"
+        few: "Вида дня"
+        many: "Видов дня"
+        other: "Видов дня"
+      employee:
+        one: "Сотрудник"
+        few: "Сотрудника"
+        many: "Сотрудников"
+        other: "Сотрудников"
+      department:
+        one: "Отдел"
+        few: "Отдела"
+        many: "Отделов"
+        other: "Отделов"
+      schedule_day:
+        one: "День в графике"
+        few: "Дня в графике"
+        many: "Дней в графике"
+        other: "Дней в графике"
     attributes:
       audit:
         auditable_type: "Тип записи"
@@ -1041,6 +1176,24 @@ ru:
         tip: "Тип"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
+      shift_code:
+        code: "Код"
+        label: "Подпись"
+        color: "Цвет"
+        position: "Порядок"
+        vacation: "Отпуск"
+        day_off: "Выходной"
+      employee:
+        full_name: "ФИО"
+        department: "Отдел"
+        manager: "Руководитель"
+        user: "Учётная запись"
+      department:
+        name: "Название"
+      schedule_day:
+        employee: "Сотрудник"
+        shift_code: "Вид дня"
+        worked_on: "Дата"
       item:
         title: "Название"
         quantity: "Кол-во"

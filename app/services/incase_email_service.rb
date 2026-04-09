@@ -11,7 +11,8 @@ class IncaseEmailService
     # Группируем убытки по компаниям
     incases = Incase.where(id: incase_ids).includes(:company, :items)
     companies = incases.group_by(&:company_id)
-    
+    after_any_enqueue = false
+
     companies.each do |company_id, company_incases|
       company = Company.find(company_id)
       
@@ -23,7 +24,9 @@ class IncaseEmailService
       end
       
       next if valid_incases.empty?
-      
+
+      sleep 5 if after_any_enqueue
+
       # Определяем получателей
       client_emails = company.clients.pluck(:email).reject(&:blank?)
       emails = client_emails.join(',')
@@ -44,6 +47,7 @@ class IncaseEmailService
       
       # Запускаем Job для генерации Excel файла
       GenerateIncaseExcelJob.perform_later(valid_incases.map(&:id), company_id, email_delivery.id)
+      after_any_enqueue = true
     end
   end
   

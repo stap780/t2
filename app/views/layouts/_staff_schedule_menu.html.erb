@@ -1,0 +1,37 @@
+<details class="group" <%= 'open' if request.path.start_with?('/staff_schedules') || request.path.start_with?('/employees') || request.path.start_with?('/departments') || request.path.start_with?('/shift_codes') %>>
+    <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
+      <%= link_to staff_schedules_path,
+          class: "flex items-center text-sm font-medium text-white #{'bg-violet-500 bg-opacity-50 rounded-lg px-2 -mx-2' if request.path.start_with?('/staff_schedules')}" do %>
+        <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <%= t("nav.staff_schedule") %>
+      <% end %>
+      <svg class="ml-2 h-4 w-4 text-violet-100 transform transition-transform duration-150 ease-in-out group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </summary>
+    <div class="mt-1 space-y-1">
+      <%= link_to employees_path,
+          class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/employees')}" do %>
+        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <%= t("nav.staff_schedule_employees") %>
+      <% end %>
+      <%= link_to departments_path,
+          class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/departments')}" do %>
+        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+        <%= t("nav.staff_schedule_departments") %>
+      <% end %>
+      <%= link_to shift_codes_path,
+          class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/shift_codes')}" do %>
+        <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <%= t("nav.staff_schedule_shift_codes") %>
+      <% end %>
+    </div>
+  </details>

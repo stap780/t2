@@ -91,6 +91,15 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   get "dashboard", to: "dashboard#index"
+  resources :staff_schedules, only: [:index]
+  resources :schedule_days, only: %i[create update destroy]
+  resources :employees, except: [:show] do
+    member do
+      get :schedule
+    end
+  end
+  resources :departments, except: [:show]
+  resources :shift_codes, except: [:show]
   post "dashboard/fullsearch", to: "dashboard#fullsearch", as: :fullsearch_dashboard_index
   
   # Routes with modern RESTful patterns

@@ -1,0 +1,28 @@
+<% content_for :title, t(".title") %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t(".heading") %></h1>
+  <div class="flex space-x-2">
+    <%= link_to t(".new"), new_employee_path,
+        class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
+        data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+  </div>
+</div>
+<%= turbo_stream_from "employees" %>
+<div class="bg-white rounded-lg shadow divide-y overflow-x-auto">
+  <div class="grid grid-cols-[50px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 font-medium text-gray-700 min-w-[60rem]">
+    <div>#</div>
+    <div><%= Employee.human_attribute_name(:full_name) %></div>
+    <div><%= Department.model_name.human %></div>
+    <div><%= Employee.human_attribute_name(:manager) %></div>
+    <div><%= Employee.human_attribute_name(:user) %></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "employees" do %>
+    <% if @employees.empty? %>
+      <p id="employees_empty_placeholder" class="p-4 text-center text-gray-500 text-sm border-t"><%= t(".empty") %></p>
+    <% else %>
+      <%= render @employees %>
+    <% end %>
+  <% end %>
+</div>

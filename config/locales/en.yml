@@ -28,13 +28,115 @@
 #       enabled: "ON"
 
 en:
+  date:
+    formats:
+      month_year: "%B %Y"
+  edit: "Edit"
+  delete: "Delete"
   hello: "Hello world"
   generate_barcode: "Generate barcode"
   we_update_price: "Prices updated successfully"
   we_update_price_errors: "Updated with errors: %{updated} success, %{errors} failed"
+  staff_schedules:
+    index:
+      title: "Work & vacation schedule"
+      heading: "Work & vacation schedule"
+      intro: "Overview of schedule data. To fill the grid, use each employee’s side panel."
+      how_to_fill: "Open Employees and click “Schedule” for a person: pick a month and set the day type per date. Use “Clear” to remove a day."
+      prev_month: "Previous month"
+      next_month: "Next month"
+      today: "Today"
+      grid_heading: "Month grid"
+      no_employees_hint: "Add employees first — the grid needs rows to fill."
+      no_shift_codes_hint: "Add at least one day type in the catalog."
+      work_schedule_heading: "Work schedule"
+      work_schedule_placeholder: "Month grid — coming soon."
+      vacation_schedule_heading: "Vacation schedule"
+      vacation_schedule_placeholder: "Month grid — coming soon."
+    grid:
+      blank_cell: "—"
+  employees:
+    index:
+      title: "Employees"
+      heading: "Employees"
+      new: "Add employee"
+      empty: "No employees yet."
+      confirm_delete: "Delete this employee?"
+    new:
+      title: "New employee"
+      heading: "New employee"
+    edit:
+      title: "Edit employee"
+      heading: "Edit employee"
+    create:
+      success: "Employee saved."
+    update:
+      success: "Employee updated."
+    destroy:
+      success: "Employee deleted."
+    form:
+      department_blank: "— no department —"
+      manager_blank: "— no manager —"
+      user_blank: "— no user account —"
+      back: "Back to list"
+    schedule:
+      title: "Schedule: %{name}"
+      short: "Schedule"
+    schedule_month:
+      hint: "Pick a day type from the list; blank means the day is unset. “Clear” removes the entry for that date."
+    schedule_day_row:
+      clear: "Clear"
+      confirm_clear: "Remove the day type for this date?"
+  departments:
+    index:
+      title: "Departments"
+      heading: "Departments"
+      new: "Add department"
+      empty: "No departments yet."
+      confirm_delete: "Delete this department? Employees will have their department cleared."
+    new:
+      title: "New department"
+      heading: "New department"
+    edit:
+      title: "Edit department"
+      heading: "Edit department"
+    create:
+      success: "Department saved."
+    update:
+      success: "Department updated."
+    destroy:
+      success: "Department deleted."
+    form:
+      back: "Back to list"
+  shift_codes:
+    index:
+      title: "Day types"
+      heading: "Day types"
+      new: "Add day type"
+      empty: "No day types yet. Add manually or run db:seed."
+      confirm_delete: "Delete this day type?"
+    new:
+      title: "New day type"
+      heading: "New day type"
+    edit:
+      title: "Edit day type"
+      heading: "Edit day type"
+    create:
+      success: "Day type saved."
+    update:
+      success: "Day type updated."
+    destroy:
+      success: "Day type deleted."
+      restrict_error: "Cannot delete: day type is used in the schedule."
+    form:
+      back: "Back to list"
   nav:
     brand: "Exports"
     dashboard: "Dashboard"
+    staff_schedule: "Work schedule"
+    staff_schedule_employees: "Employees"
+    staff_schedule_departments: "Departments"
+    staff_schedule_shift_codes: "Day types"
     imports: "Imports"
     import_schedules: "Import Schedules"
     exports: "Exports"
@@ -250,6 +352,18 @@ en:
       comment:
         one: "Comment"
         other: "Comments"
+      shift_code:
+        one: "Day type"
+        other: "Day types"
+      employee:
+        one: "Employee"
+        other: "Employees"
+      department:
+        one: "Department"
+        other: "Departments"
+      schedule_day:
+        one: "Schedule day"
+        other: "Schedule days"
     attributes:
       export:
         name: "Name"
@@ -277,6 +391,24 @@ en:
         user: "User"
         audited_changes: "Changes"
         comment: "Comment"
+      shift_code:
+        code: "Code"
+        label: "Label"
+        color: "Color"
+        position: "Sort order"
+        vacation: "Vacation"
+        day_off: "Day off"
+      employee:
+        full_name: "Full name"
+        department: "Department"
+        manager: "Manager"
+        user: "User account"
+      department:
+        name: "Name"
+      schedule_day:
+        employee: "Employee"
+        shift_code: "Day type"
+        worked_on: "Date"
       product:
         title: "Title"
         description: "Description"

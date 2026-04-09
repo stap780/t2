@@ -1,0 +1,19 @@
+<%= turbo_frame_tag dom_id(employee), class: "grid grid-cols-[50px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 border-t hover:bg-gray-50 min-w-[60rem]" do %>
+  <div><%= employee.id %></div>
+  <div class="min-w-0">
+    <%= link_to employee.full_name, edit_employee_path(employee), class: "text-blue-600 hover:text-blue-800 font-medium", data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+  </div>
+  <div class="min-w-0 truncate text-sm text-gray-700"><%= employee.department&.name || "—" %></div>
+  <div class="min-w-0 truncate text-sm text-gray-700"><%= employee.manager&.full_name || "—" %></div>
+  <div class="min-w-0 truncate text-xs text-gray-600"><%= employee.user&.email_address || "—" %></div>
+  <div class="flex justify-end items-center gap-1 flex-wrap">
+    <%= link_to schedule_employee_path(employee, month: Date.current.strftime("%Y-%m")),
+        class: "inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-emerald-100 text-emerald-900 hover:bg-emerald-200",
+        data: { turbo_frame: "offcanvas", turbo_prefetch: false },
+        title: t("employees.schedule.short") do %>
+      <%= t("employees.schedule.short") %>
+    <% end %>
+    <%= link_to_edit edit_employee_path(employee), data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+    <%= link_to_delete employee_path(employee), data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
+  </div>
+<% end %>

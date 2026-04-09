@@ -1,0 +1,31 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between gap-2 flex-wrap">
+    <%= link_to schedule_employee_path(employee, month: staff_schedule_month_param(staff_schedule_prev_month(month))),
+        class: "inline-flex items-center px-2 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50" do %>
+      ←
+    <% end %>
+    <span class="text-sm font-medium text-gray-900">
+      <%= l(month, format: :month_year) %>
+    </span>
+    <%= link_to schedule_employee_path(employee, month: staff_schedule_month_param(staff_schedule_next_month(month))),
+        class: "inline-flex items-center px-2 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50" do %>
+      →
+    <% end %>
+    <%= link_to t("staff_schedules.index.today"), schedule_employee_path(employee, month: staff_schedule_month_param(Date.current.beginning_of_month)),
+        class: "text-xs text-violet-600 hover:text-violet-800" %>
+  </div>
+
+  <p class="text-xs text-gray-500"><%= t(".hint") %></p>
+
+  <div class="border border-gray-200 rounded-lg divide-y max-h-[min(70vh,32rem)] overflow-y-auto">
+    <% days.each do |day| %>
+      <% sd = schedule_by_day[day] %>
+      <%= render "employees/schedule_day_row",
+          employee: employee,
+          worked_on: day,
+          schedule_day: sd,
+          month: month,
+          shift_codes: shift_codes %>
+    <% end %>
+  </div>
+</div>
