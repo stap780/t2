@@ -7,7 +7,7 @@
   <div class="min-w-0 truncate text-sm text-gray-700"><%= employee.manager&.full_name || "—" %></div>
   <div class="min-w-0 truncate text-xs text-gray-600"><%= employee.user&.email_address || "—" %></div>
   <div class="flex justify-end items-center gap-1 flex-wrap">
-    <%= link_to schedule_employee_path(employee, month: Date.current.strftime("%Y-%m")),
+    <%= link_to schedule_employee_path(employee, year: Date.current.year),
         class: "inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-emerald-100 text-emerald-900 hover:bg-emerald-200",
         data: { turbo_frame: "offcanvas", turbo_prefetch: false },
         title: t("employees.schedule.short") do %>

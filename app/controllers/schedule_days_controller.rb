@@ -1,121 +1,91 @@
 class ScheduleDaysController < ApplicationController
   include ActionView::RecordIdentifier
+  before_action :set_employee, only: [:batch]
 
-  before_action :set_schedule_day, only: %i[update destroy]
+  def batch
+    year = schedule_days_params[:year].present? ? schedule_days_params[:year].to_i : Date.current.year
+    dates = parse_worked_on_dates(Array(schedule_days_params[:worked_on]))
 
-  def create
-    @schedule_day = ScheduleDay.new(schedule_day_params)
-    @month = month_from_param
+    return respond_batch_error(@employee, year, t(".select_dates")) if dates.empty?
 
-    if @schedule_day.save
-      respond_with_success(@schedule_day)
+    clear = ActiveModel::Type::Boolean.new.cast(schedule_days_params[:clear])
+    shift_code_id = schedule_days_params[:shift_code_id].presence
+
+    if clear
+      @employee.schedule_days.where(worked_on: dates).delete_all
+    elsif shift_code_id.present?
+      shift_code = ShiftCode.find(shift_code_id)
+      ScheduleDay.transaction do
+        dates.each do |date|
+          sd = @employee.schedule_days.find_or_initialize_by(worked_on: date)
+          sd.shift_code = shift_code
+          sd.save!
+        end
+      end
     else
-      employee = Employee.find(schedule_day_params[:employee_id])
-      worked_on = parse_worked_on(schedule_day_params[:worked_on])
-      respond_with_error(employee, worked_on, @schedule_day.errors.full_messages.to_sentence)
+      return respond_batch_error(@employee, year, t(".pick_action"))
     end
-  end
 
-  def update
-    @month = month_from_param
-
-    if @schedule_day.update(schedule_day_update_params)
-      respond_with_success(@schedule_day)
-    else
-      respond_with_error(@schedule_day.employee, @schedule_day.worked_on, @schedule_day.errors.full_messages.to_sentence)
-    end
-  end
-
-  def destroy
-    @month = month_from_param
-    employee = @schedule_day.employee
-    worked_on = @schedule_day.worked_on
-    @schedule_day.destroy!
-
+    flash.now[:success] = t(".success")
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          schedule_row_dom_id(employee, worked_on),
-          partial: "employees/schedule_day_row",
-          locals: schedule_row_locals(employee, worked_on, nil)
-        )
+        streams = dates.uniq.sort.flat_map do |date|
+          sd = @employee.schedule_days.find_by(worked_on: date)
+          [
+            turbo_stream.replace(
+              schedule_cell_dom_id(@employee, date),
+              partial: "employees/schedule_day_cell",
+              locals: { employee: @employee, date: date, schedule_day: sd }
+            ),
+            turbo_stream.replace(
+              matrix_cell_dom_id(@employee, date),
+              partial: "staff_schedules/matrix_day_cell",
+              locals: { employee: @employee, day: date, schedule_day: sd }
+            )
+          ]
+        end
+        streams << render_turbo_flash
+        render turbo_stream: streams
       end
-      format.html { redirect_to schedule_employee_path(employee, month: @month.strftime("%Y-%m")) }
+      format.html do
+        redirect_to schedule_employee_path(@employee, year: year), notice: t(".success")
+      end
     end
   end
 
   private
 
-  def set_schedule_day
-    @schedule_day = ScheduleDay.find(params[:id])
+  def set_employee
+    @employee = Employee.find(params.require(:employee_id))
   end
 
-  def month_from_param
-    if params[:month].present?
-      Date.parse("#{params[:month]}-01")
-    else
-      Date.current.beginning_of_month
-    end
-  rescue ArgumentError
-    Date.current.beginning_of_month
+  def schedule_days_params
+    @schedule_days_params ||= params.require(:schedule_days).permit(:shift_code_id, :year, :clear, worked_on: [])
   end
 
-  def parse_worked_on(value)
-    value.is_a?(Date) ? value : Date.parse(value.to_s)
-  end
-
-  def schedule_day_params
-    params.require(:schedule_day).permit(:employee_id, :worked_on, :shift_code_id)
-  end
-
-  def schedule_day_update_params
-    params.require(:schedule_day).permit(:shift_code_id)
-  end
-
-  def schedule_row_dom_id(employee, worked_on)
-    dom_id(employee, "schedule_row_#{worked_on.to_fs(:db)}")
-  end
-
-  def schedule_row_locals(employee, worked_on, schedule_day)
-    {
-      employee: employee,
-      worked_on: worked_on,
-      schedule_day: schedule_day,
-      month: @month,
-      shift_codes: ShiftCode.ordered
-    }
-  end
-
-  def respond_with_success(schedule_day)
-    employee = schedule_day.employee
-    worked_on = schedule_day.worked_on
-    respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          schedule_row_dom_id(employee, worked_on),
-          partial: "employees/schedule_day_row",
-          locals: schedule_row_locals(employee, worked_on, schedule_day)
-        )
-      end
-      format.html { redirect_to schedule_employee_path(employee, month: @month.strftime("%Y-%m")) }
+  def parse_worked_on_dates(values)
+    values.filter_map do |raw|
+      Date.parse(raw.to_s)
+    rescue ArgumentError
+      nil
     end
   end
 
-  def respond_with_error(employee, worked_on, message)
+  def schedule_cell_dom_id(employee, worked_on)
+    dom_id(employee, "schedule_cell_#{worked_on.to_fs(:db)}")
+  end
+
+  def matrix_cell_dom_id(employee, worked_on)
+    dom_id(employee, "matrix_cell_#{worked_on.to_fs(:db)}")
+  end
+
+  def respond_batch_error(employee, year, message)
     flash.now[:alert] = message
-    sd = ScheduleDay.find_by(employee_id: employee.id, worked_on: worked_on)
     respond_to do |format|
-      format.turbo_stream do
-        render turbo_stream: [
-          turbo_stream.replace(
-            schedule_row_dom_id(employee, worked_on),
-            partial: "employees/schedule_day_row",
-            locals: schedule_row_locals(employee, worked_on, sd)
-          ),
-          turbo_stream.replace("flash", partial: "shared/flash")
-        ]
+      format.turbo_stream { render turbo_stream: [render_turbo_flash], status: :unprocessable_entity }
+      format.html do
+        redirect_to schedule_employee_path(employee, year: year), alert: message
       end
-      format.html { redirect_to schedule_employee_path(employee, month: @month.strftime("%Y-%m")), alert: message }
     end
   end
 end

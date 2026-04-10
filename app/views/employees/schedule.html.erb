@@ -1,8 +1,8 @@
-<%= render "shared/offcanvas_inner", title: t(".title", name: @employee.full_name), width: "28rem" do %>
-  <%= render "employees/schedule_month",
+<%= render "shared/offcanvas_inner", title: t(".title", name: @employee.full_name), width: "68rem" do %>
+  <%= render "employees/schedule_year",
       employee: @employee,
-      month: @month,
-      days: @days,
+      year: @year,
+      month_starts: @month_starts,
       shift_codes: @shift_codes,
       schedule_by_day: @schedule_by_day %>
 <% end %>

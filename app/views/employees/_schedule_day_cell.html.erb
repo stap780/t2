@@ -1,0 +1,10 @@
+<div id="<%= schedule_cell_dom_id(employee, date) %>"
+  class="aspect-square min-h-[2.25rem] rounded border border-gray-200 text-xs flex flex-col items-stretch justify-center"
+  style="<%= schedule_cell_background_style(schedule_day, date) %>">
+  <label class="schedule-day-cell__label">
+    <%= check_box_tag "schedule_days[worked_on][]", date.to_fs(:db), false,
+        id: "schedule_days_worked_on_#{employee.id}_#{date.to_fs(:db)}",
+        class: "schedule-day-cell__checkbox sr-only" %>
+    <span class="schedule-day-cell__num"><%= date.day %></span>
+  </label>
+</div>

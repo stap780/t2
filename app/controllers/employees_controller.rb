@@ -14,12 +14,11 @@ class EmployeesController < ApplicationController
   end
 
   def schedule
-    @month = schedule_month_from_param
-    start = @month.beginning_of_month
-    finish = @month.end_of_month
-    @days = (start..finish).to_a
+    @year = schedule_year_from_param
+    range = Date.new(@year, 1, 1)..Date.new(@year, 12, 31)
     @shift_codes = ShiftCode.ordered
-    @schedule_by_day = @employee.schedule_days.where(worked_on: start..finish).index_by(&:worked_on)
+    @schedule_by_day = @employee.schedule_days.where(worked_on: range).includes(:shift_code).index_by(&:worked_on)
+    @month_starts = (1..12).map { |m| Date.new(@year, m, 1) }
   end
 
   def create
@@ -91,13 +90,12 @@ class EmployeesController < ApplicationController
     params.require(:employee).permit(:full_name, :department_id, :manager_id, :user_id)
   end
 
-  def schedule_month_from_param
-    if params[:month].present?
-      Date.parse("#{params[:month]}-01")
+  def schedule_year_from_param
+    y = params[:year].presence&.to_i
+    if y.present? && y.between?(1900, 2100)
+      y
     else
-      Date.current.beginning_of_month
+      Date.current.year
     end
-  rescue ArgumentError
-    Date.current.beginning_of_month
   end
 end

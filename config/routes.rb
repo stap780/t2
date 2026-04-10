@@ -91,11 +91,19 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   get "dashboard", to: "dashboard#index"
-  resources :staff_schedules, only: [:index]
-  resources :schedule_days, only: %i[create update destroy]
+  resources :staff_schedules, only: [:index] do
+    collection do
+      get :export
+    end
+  end
   resources :employees, except: [:show] do
     member do
       get :schedule
+    end
+    resources :schedule_days, only: [] do
+      collection do
+        post :batch
+      end
     end
   end
   resources :departments, except: [:show]

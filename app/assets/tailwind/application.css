@@ -24,4 +24,35 @@
   .sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.55);
   }
+
+  /* График: выбранный день (checkbox скрыт через sr-only) */
+  .schedule-day-cell__label {
+    @apply flex flex-col items-center justify-center min-h-full w-full cursor-pointer gap-0.5 rounded p-0.5;
+    border: 2px solid transparent;
+    transition:
+      border-color 0.12s ease,
+      box-shadow 0.12s ease,
+      background-color 0.12s ease;
+  }
+
+  .schedule-day-cell__label:has(.schedule-day-cell__checkbox:checked) {
+    border-color: rgb(109 40 217);
+    background-color: rgba(237, 233, 254, 0.85);
+    box-shadow:
+      inset 0 0 0 1px rgba(91, 33, 182, 0.35),
+      0 0 0 2px rgba(124, 58, 237, 0.45);
+  }
+
+  .schedule-day-cell__label:has(.schedule-day-cell__checkbox:focus-visible) {
+    outline: 2px solid rgb(124 58 237);
+    outline-offset: 2px;
+  }
+
+  .schedule-day-cell__num {
+    @apply pointer-events-none font-medium leading-none text-gray-900;
+  }
+
+  .schedule-day-cell__label:has(.schedule-day-cell__checkbox:checked) .schedule-day-cell__num {
+    @apply font-semibold text-violet-900;
+  }
 }

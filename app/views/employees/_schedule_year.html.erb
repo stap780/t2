@@ -1,0 +1,45 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between gap-2 flex-wrap">
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <%= link_to ' ← ',schedule_employee_path(employee, year: staff_schedule_prev_year(year)),
+          class: "inline-flex items-center px-2 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50"%>
+      <span class="text-sm font-medium text-gray-900"><%= year %></span>
+      <%= link_to ' → ',schedule_employee_path(employee, year: staff_schedule_next_year(year)),
+          class: "inline-flex items-center px-2 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50" %>
+    </div>
+    <%= link_to t("staff_schedules.index.today"), schedule_employee_path(employee, year: Date.current.year),
+        class: "text-xs text-violet-600 hover:text-violet-800" %>
+  </div>
+
+  <p class="text-xs text-gray-500"><%= t(".hint") %></p>
+
+  <%= form_with scope: :schedule_days, url: batch_employee_schedule_days_path(employee), method: :post, data: { turbo: true }, class: "space-y-4" do |f| %>
+    <%= f.hidden_field :year, value: year %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <% month_starts.each do |month_date| %>
+        <%= render "employees/schedule_month_calendar", employee: employee,
+            month_date: month_date, schedule_by_day: schedule_by_day %>
+      <% end %>
+    </div>
+
+    <div class="sticky bottom-0 flex flex-wrap gap-2 pt-3 pb-2 border-t border-gray-200 bg-white">
+      <% shift_codes.each do |sc| %>
+        <%= button_tag type: :submit, name: "schedule_days[shift_code_id]", value: sc.id,
+            class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-900" do %>
+          <span><%= sc.label %></span>
+          <% if sc.color.present? %>
+            <span class="inline-block w-3 h-3 rounded-sm shrink-0 border border-black/10" style="background-color: <%= sc.color %>"></span>
+          <% end %>
+        <% end %>
+      <% end %>
+      <%= button_tag t(".batch_clear"),
+          type: :submit,
+          name: "schedule_days[clear]",
+          value: "1",
+          class: "inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border border-red-200 bg-red-50 text-red-800 hover:bg-red-100",
+          data: { turbo_confirm: t(".confirm_clear") } %>
+    </div>
+  <% end %>
+
+</div>

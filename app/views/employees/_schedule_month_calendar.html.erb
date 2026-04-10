@@ -1,0 +1,19 @@
+<div class="border border-gray-200 rounded-lg p-2 bg-white">
+  <div class="text-center text-sm font-medium text-gray-900 mb-2">
+    <%= l(month_date, format: :month_year) %>
+  </div>
+  <div class="grid grid-cols-7 gap-px text-[0.65rem] leading-tight">
+    <% I18n.t("date.abbr_day_names").rotate(1).each do |abbr| %>
+      <div class="text-center text-gray-500 py-1 font-normal"><%= abbr %></div>
+    <% end %>
+    <% schedule_month_calendar_days(month_date).each do |cell_date| %>
+      <% if cell_date.nil? %>
+        <div class="aspect-square min-h-[2.25rem]"></div>
+      <% else %>
+        <% sd = schedule_by_day[cell_date] %>
+        <%= render "employees/schedule_day_cell", employee: employee,
+            date: cell_date, schedule_day: sd %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

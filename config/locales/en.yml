@@ -31,18 +31,24 @@ en:
   date:
     formats:
       month_year: "%B %Y"
+      long: "%B %d, %Y"
   edit: "Edit"
   delete: "Delete"
   hello: "Hello world"
   generate_barcode: "Generate barcode"
   we_update_price: "Prices updated successfully"
   we_update_price_errors: "Updated with errors: %{updated} success, %{errors} failed"
+  schedule_days:
+    batch:
+      success: "Schedule updated."
+      select_dates: "Select at least one day."
+      pick_action: "Choose a day type or Clear."
   staff_schedules:
     index:
       title: "Work & vacation schedule"
       heading: "Work & vacation schedule"
       intro: "Overview of schedule data. To fill the grid, use each employee’s side panel."
-      how_to_fill: "Open Employees and click “Schedule” for a person: pick a month and set the day type per date. Use “Clear” to remove a day."
+      how_to_fill: "Open Employees and click “Schedule” for a person: check dates, pick a year, assign a day type with a button, or clear the selection."
       prev_month: "Previous month"
       next_month: "Next month"
       today: "Today"
@@ -55,6 +61,22 @@ en:
       vacation_schedule_placeholder: "Month grid — coming soon."
     grid:
       blank_cell: "—"
+    matrix:
+      title: "Team schedule overview"
+      heading: "Schedule matrix"
+      intro: "All employees by day for the selected month. Cell color and code show the day type; a dot means no entry."
+      employee_col: "Employee"
+      legend: "Legend"
+      empty_employees: "No employees yet. Add them under Employees."
+      export_excel: "Export to Excel"
+      xlsx:
+        sheet_matrix: "Matrix"
+        sheet_legend: "Day types"
+        col_name: "Name"
+        col_department: "Department"
+        legend_code: "Code"
+        legend_label: "Label"
+        legend_color: "Color"
   employees:
     index:
       title: "Employees"
@@ -82,11 +104,10 @@ en:
     schedule:
       title: "Schedule: %{name}"
       short: "Schedule"
-    schedule_month:
-      hint: "Pick a day type from the list; blank means the day is unset. “Clear” removes the entry for that date."
-    schedule_day_row:
-      clear: "Clear"
-      confirm_clear: "Remove the day type for this date?"
+    schedule_year:
+      hint: "Check the dates you need, then click a day type or “Clear selection” to remove entries for those dates."
+      batch_clear: "Clear selection"
+      confirm_clear: "Remove the day type for all checked dates?"
   departments:
     index:
       title: "Departments"
@@ -400,6 +421,9 @@ en:
         day_off: "Day off"
       employee:
         full_name: "Full name"
+        department_id: "Department"
+        manager_id: "Manager"
+        user_id: "User account"
         department: "Department"
         manager: "Manager"
         user: "User account"

@@ -1,0 +1,12 @@
+<td id="<%= matrix_cell_dom_id(employee, day) %>"
+    class="p-0 align-middle text-center border-l border-gray-100/80 w-8 min-w-[2rem] max-w-[2.5rem]"
+    style="<%= schedule_matrix_cell_style(schedule_day, day) %>">
+  <% if schedule_day %>
+    <span class="inline-block px-0.5 py-1 max-w-full truncate text-[0.65rem] font-medium leading-tight text-gray-900"
+          title="<%= schedule_day.shift_code.label %>">
+      <%= truncate(schedule_day.shift_code.label, length: 3, omission: "") %>
+    </span>
+  <% else %>
+    <span class="inline-block py-1 text-gray-300">·</span>
+  <% end %>
+</td>
