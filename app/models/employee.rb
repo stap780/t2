@@ -1,5 +1,5 @@
 class Employee < ApplicationRecord
-  acts_as_list sequential_updates: false
+  acts_as_list
 
   belongs_to :department, optional: true
   belongs_to :manager, class_name: "Employee", optional: true, inverse_of: :direct_reports
