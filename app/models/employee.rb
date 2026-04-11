@@ -1,4 +1,6 @@
 class Employee < ApplicationRecord
+  acts_as_list sequential_updates: false
+
   belongs_to :department, optional: true
   belongs_to :manager, class_name: "Employee", optional: true, inverse_of: :direct_reports
   belongs_to :user, optional: true
@@ -8,5 +10,5 @@ class Employee < ApplicationRecord
 
   validates :full_name, presence: true
 
-  scope :ordered, -> { order(:full_name) }
+  scope :ordered, -> { order(:position, :full_name) }
 end

@@ -99,6 +99,7 @@ Rails.application.routes.draw do
   resources :employees, except: [:show] do
     member do
       get :schedule
+      patch :sort
     end
     resources :schedule_days, only: [] do
       collection do

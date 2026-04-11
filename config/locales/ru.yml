@@ -50,10 +50,11 @@ ru:
       blank_cell: "—"
     matrix:
       title: "Сводный график"
-      heading: "Сводная таблица"
+      heading: "График отпусков. Сводная таблица"
       employee_col: "Сотрудник"
       legend: "Легенда"
       empty_employees: "Нет сотрудников. Добавьте их в разделе «Сотрудники»."
+      vacation_days_year: "Отпуск за %{year}: %{count} дн."
       export_excel: "Выгрузить в Excel"
       xlsx:
         sheet_matrix: "Сводная таблица"
@@ -69,6 +70,8 @@ ru:
       heading: "Сотрудники"
       new: "Добавить сотрудника"
       empty: "Пока нет сотрудников."
+      order_col: "№"
+      drag_to_sort: "Перетащите для сортировки"
       confirm_delete: "Удалить этого сотрудника?"
     new:
       title: "Новый сотрудник"

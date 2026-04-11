@@ -20,9 +20,9 @@ class StaffSchedulesController < ApplicationController
     def assign_matrix(data)
       @month = data.month
       @days = data.days
-      @employees = data.employees
+      @employees = data.employees.ordered
       @matrix = data.matrix
       @shift_codes = data.shift_codes
+      @vacation_days_by_employee_id = data.vacation_days_by_employee_id
     end
-
 end

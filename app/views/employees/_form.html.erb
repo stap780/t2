@@ -13,7 +13,7 @@
 
   <fieldset>
     <%= f.label :manager_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
-    <% managers = employee.persisted? ? Employee.where.not(id: employee.id).order(:full_name) : Employee.order(:full_name) %>
+    <% managers = employee.persisted? ? Employee.where.not(id: employee.id).order(:position) : Employee.order(:position) %>
     <%= f.collection_select :manager_id, managers, :id, :full_name, { include_blank: t(".manager_blank") }, { class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-violet-500 focus:border-violet-500" } %>
   </fieldset>
 

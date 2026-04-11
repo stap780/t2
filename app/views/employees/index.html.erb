@@ -10,19 +10,15 @@
 </div>
 <%= turbo_stream_from "employees" %>
 <div class="bg-white rounded-lg shadow divide-y overflow-x-auto">
-  <div class="grid grid-cols-[50px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 font-medium text-gray-700 min-w-[60rem]">
-    <div>#</div>
+  <div class="grid grid-cols-[minmax(5.5rem,auto)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 font-medium text-gray-700 min-w-[60rem]">
+    <div><%= t(".order_col") %></div>
     <div><%= Employee.human_attribute_name(:full_name) %></div>
     <div><%= Department.model_name.human %></div>
     <div><%= Employee.human_attribute_name(:manager) %></div>
     <div><%= Employee.human_attribute_name(:user) %></div>
     <div></div>
   </div>
-  <%= turbo_frame_tag "employees" do %>
-    <% if @employees.empty? %>
-      <p id="employees_empty_placeholder" class="p-4 text-center text-gray-500 text-sm border-t"><%= t(".empty") %></p>
-    <% else %>
-      <%= render @employees %>
-    <% end %>
+  <%= turbo_frame_tag "employees", class: "divide-y", data: { controller: "sortable" } do %>
+    <%= render @employees %>
   <% end %>
 </div>

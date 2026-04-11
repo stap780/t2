@@ -1,7 +1,7 @@
 module StaffSchedules
   # Shared loader for the staff schedule matrix (HTML and Excel export).
   class MatrixData
-    attr_reader :month, :days, :employees, :matrix, :shift_codes
+    attr_reader :month, :days, :employees, :matrix, :shift_codes, :vacation_days_by_employee_id
 
     def initialize(month_param: nil)
       @month_param = month_param
@@ -20,6 +20,7 @@ module StaffSchedules
         end
       end
       @shift_codes = ShiftCode.ordered.to_a
+      @vacation_days_by_employee_id = vacation_days_counts_for_year(ids, @month.year)
       self
     end
 
@@ -36,6 +37,15 @@ module StaffSchedules
     rescue ArgumentError
       Date.current.beginning_of_month
     end
-  end
 
+    def vacation_days_counts_for_year(employee_ids, year)
+      return {} if employee_ids.empty?
+
+      year_range = Date.new(year, 1, 1)..Date.new(year, 12, 31)
+      ScheduleDay.joins(:shift_code)
+        .where(employee_id: employee_ids, worked_on: year_range, shift_codes: { vacation: true })
+        .group(:employee_id)
+        .count
+    end
+  end
 end

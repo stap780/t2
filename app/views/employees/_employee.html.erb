@@ -1,5 +1,17 @@
-<%= turbo_frame_tag dom_id(employee), class: "grid grid-cols-[50px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 border-t hover:bg-gray-50 min-w-[60rem]" do %>
-  <div><%= employee.id %></div>
+<%= turbo_frame_tag dom_id(employee),
+    class: "grid grid-cols-[minmax(4.5rem,auto)_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,14rem)] gap-4 p-4 border-t hover:bg-gray-50 min-w-[60rem]",
+    data: {
+      sort_item_id: employee.id,
+      sort_url: sort_employee_path(employee)
+    } do %>
+  <div class="flex items-center gap-1 min-w-0">
+    <button type="button" class="js-sort-handle flex items-center justify-center text-violet-400 hover:text-violet-600 rounded p-1 focus:outline-none focus:ring-2 focus:ring-violet-300 cursor-move shrink-0" title="<%= t("employees.index.drag_to_sort") %>">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 9h14M5 15h14" />
+      </svg>
+    </button>
+    <span class="bg-violet-100 text-violet-900 text-xs font-semibold px-2 py-1 rounded shrink-0 tabular-nums" data-sortable-target="position"><%= employee.position %></span>
+  </div>
   <div class="min-w-0">
     <%= link_to employee.full_name, edit_employee_path(employee), class: "text-blue-600 hover:text-blue-800 font-medium", data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
   </div>

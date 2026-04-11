@@ -1,9 +1,9 @@
 class EmployeesController < ApplicationController
-  before_action :set_employee, only: %i[edit update destroy schedule]
+  before_action :set_employee, only: %i[edit update destroy schedule sort]
   include ActionView::RecordIdentifier
 
   def index
-    @employees = Employee.includes(:department, :manager, :user).order(:full_name)
+    @employees = Employee.includes(:department, :manager, :user).order(:position)
   end
 
   def new
@@ -21,6 +21,15 @@ class EmployeesController < ApplicationController
     @month_starts = (1..12).map { |m| Date.new(@year, m, 1) }
   end
 
+  def sort
+    position = params[:new_position] || params[:position]
+    if position.present? && position.to_i.positive?
+      @employee.insert_at(position.to_i)
+    end
+
+    head :ok
+  end
+
   def create
     @employee = Employee.new(employee_params)
 
@@ -29,14 +38,12 @@ class EmployeesController < ApplicationController
         flash.now[:success] = t(".success")
         format.turbo_stream do
           streams = []
-          streams << turbo_stream.remove("employees_empty_placeholder") if Employee.one?
-          streams += turbo_close_offcanvas_flash + [
-            turbo_stream.append(
-              "employees",
-              partial: "employees/employee",
-              locals: { employee: @employee }
-            )
-          ]
+          streams << turbo_stream.append(
+            "employees",
+            partial: "employees/employee",
+            locals: { employee: @employee }
+          )
+          streams += turbo_close_offcanvas_flash
           render turbo_stream: streams
         end
         format.html { redirect_to employees_path, notice: t(".success") }
@@ -71,8 +78,10 @@ class EmployeesController < ApplicationController
     flash.now[:success] = t(".success")
     respond_to do |format|
       format.turbo_stream do
-        streams = [turbo_stream.remove(dom_id(@employee))]
-        streams << turbo_stream.append("employees", partial: "employees/empty_placeholder") if Employee.none?
+        streams = [ turbo_stream.remove(dom_id(@employee)) ]
+        if Employee.none?
+          streams << turbo_stream.update("employees", partial: "employees/empty_placeholder")
+        end
         streams << render_turbo_flash
         render turbo_stream: streams
       end
@@ -82,20 +91,20 @@ class EmployeesController < ApplicationController
 
   private
 
-  def set_employee
-    @employee = Employee.find(params[:id])
-  end
-
-  def employee_params
-    params.require(:employee).permit(:full_name, :department_id, :manager_id, :user_id)
-  end
-
-  def schedule_year_from_param
-    y = params[:year].presence&.to_i
-    if y.present? && y.between?(1900, 2100)
-      y
-    else
-      Date.current.year
+    def set_employee
+      @employee = Employee.find(params[:id])
     end
-  end
+
+    def employee_params
+      params.require(:employee).permit(:full_name, :department_id, :manager_id, :user_id)
+    end
+
+    def schedule_year_from_param
+      y = params[:year].presence&.to_i
+      if y.present? && y.between?(1900, 2100)
+        y
+      else
+        Date.current.year
+      end
+    end
 end

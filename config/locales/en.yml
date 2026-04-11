@@ -68,6 +68,7 @@ en:
       employee_col: "Employee"
       legend: "Legend"
       empty_employees: "No employees yet. Add them under Employees."
+      vacation_days_year: "Vacation in %{year}: %{count} days"
       export_excel: "Export to Excel"
       xlsx:
         sheet_matrix: "Matrix"
@@ -83,6 +84,8 @@ en:
       heading: "Employees"
       new: "Add employee"
       empty: "No employees yet."
+      order_col: "#"
+      drag_to_sort: "Drag to reorder"
       confirm_delete: "Delete this employee?"
     new:
       title: "New employee"
