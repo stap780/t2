@@ -7,13 +7,18 @@ class MoyskladApi::UpdateQuantities
   # Email для уведомлений (можно вынести в настройки)
   NOTIFICATION_EMAIL = Rails.application.credentials.dig(:moysklad_notification_email) || 'dizautodealer@gmail.com'
 
+  # storeId из отчёта остатков = id склада (GET #{MoyskladApi::Api::API_BASE}/entity/store)
   MS_SKLAD_MAPPING = {
     '381569e6-4f34-11e6-7a69-9711000bbbe5' => 'Волгоградский проспект',
     '79f911fc-fb81-11e7-7a31-d0fd001bf68c' => 'Котельники',
     '89dd64b8-4eba-11ed-0a80-0efd00020013' => 'Расходники ТО',
     'ef79a2a8-ae0e-11e8-9107-50480010c0b2' => 'Отрадное',
     'a2aa9dbc-d225-11ee-0a80-06b8001cca60' => 'Неликвид',
-    '27ea652f-d182-11ef-0a80-11a600285a13' => 'ШиловоМ5'
+    '27ea652f-d182-11ef-0a80-11a600285a13' => 'ШиловоМ5',
+    '2f9f52bf-335d-11f1-0a80-17b40013f3a0' => 'Потеряшки Автомобильный',
+    '27fdabb0-335d-11f1-0a80-078f001406fe' => 'Потеряшки Алтуфьево',
+    'de2e0700-335c-11f1-0a80-03f700138fa8' => 'Потеряшки Ручеек',
+    'c7565955-341e-11f1-0a80-16f500130cea' => 'Потеряшки Шилово'
   }.freeze
 
   def initialize(moysklad_config = nil)
