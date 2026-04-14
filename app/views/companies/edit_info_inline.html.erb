@@ -1,0 +1,7 @@
+<%= turbo_frame_tag dom_id(@company, :info) do %>
+    <%= form_with model: @company, url: update_info_inline_company_path(@company), method: :patch, 
+    class: "flex gap-1 z-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[320px] bg-white shadow-lg p-2" do |f| %>
+        <%= render "info", f: f %>
+        <%= f.submit "✓", class: "px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+    <% end %>
+<% end %>

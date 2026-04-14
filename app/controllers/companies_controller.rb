@@ -1,5 +1,5 @@
 class CompaniesController < ApplicationController
-  before_action :set_company, only: %i[show edit update destroy]
+  before_action :set_company, only: %i[show edit update edit_info_inline update_info_inline destroy]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
   include DownloadExcel
@@ -81,6 +81,25 @@ class CompaniesController < ApplicationController
         end
       end
       format.json { head :no_content }
+    end
+  end
+
+  def edit_info_inline; end
+
+  def update_info_inline
+    respond_to do |format|
+      if @company.update(company_params)
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@company, :info), partial: "companies/inline/info", locals: { company: @company })
+          ]
+        end
+      else
+        format.turbo_stream do
+          flash.now[:alert] = @company.errors.full_messages.join(", ")
+          render turbo_stream: [render_turbo_flash], status: :unprocessable_entity
+        end
+      end
     end
   end
 

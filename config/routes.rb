@@ -168,6 +168,10 @@ Rails.application.routes.draw do
       post :bulk_delete
       post :search
     end
+    member do
+      get :edit_info_inline
+      patch :update_info_inline
+    end
     resources :client_companies, only: [:new, :create, :destroy]
     resources :company_plan_dates, only: [:new, :create, :destroy]
   end
