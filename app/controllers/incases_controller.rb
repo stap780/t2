@@ -30,6 +30,7 @@ class IncasesController < ApplicationController
     @search = base_relation.ransack(processed_params)
     @search.sorts = "date desc" if @search.sorts.empty?
     @incases = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
+    @totalsum = @search.result(distinct: true).sum(:totalsum)
   end
 
   def show

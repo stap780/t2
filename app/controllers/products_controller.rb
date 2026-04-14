@@ -245,7 +245,7 @@ class ProductsController < ApplicationController
   end
 
   REFILL_REQUIRED_PARAMS = %w[
-    Станция Марка Модель Год Деталь Гарантия Состояние Avito\ код Avito\ название Длина Высота Ширина
+    Станция Марка Модель Год Деталь Гарантия Состояние Avito\ код Avito\ название Длина Высота Ширина Категория\ товара Вес
   ].freeze
   REFILL_DEFAULT_VALUE = 'fake'
 

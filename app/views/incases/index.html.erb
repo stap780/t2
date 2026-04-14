@@ -3,7 +3,7 @@
   <div class="flex flex-col">
     <h1 class="text-xl font-semibold"><%= t(".heading") %> <small class="text-sm text-gray-500"><%= @incases.count %></small></h1>
     <div class="flex space-x-2 items-center text-sm text-gray-500">
-      На сумму: <%= number_to_currency(@incases.sum(:totalsum), unit: "₽", separator: ",", delimiter: " ", format: "%n %u") %>
+      На сумму: <%= number_to_currency(@totalsum, unit: "₽", separator: ",", delimiter: " ", format: "%n %u") %>
     </div>
   </div>
 

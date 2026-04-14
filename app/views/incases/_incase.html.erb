@@ -60,7 +60,7 @@
     <span class="text-sm text-gray-600"><%= incase.modelauto %></span>
     <span class="text-sm text-gray-600"><%= incase.carnumber %></span> 
   </div>
-  <div class="text-sm text-gray-600"><%= number_to_currency(incase.totalsum, unit: '', delimiter: ' ', precision: 2) if incase.totalsum.present? %></div>
+  <div class="text-sm text-gray-600 totalsum"><%= number_to_currency(incase.totalsum, unit: '', delimiter: ' ', precision: 2) if incase.totalsum.present? %></div>
   <div class="text-sm text-gray-600"><%= incase.date&.strftime('%d.%m.%Y') %></div>
   <div class="flex items-center justify-center">
     <% title = incase.sendstatus == true ? "Отправлено" : "Отправить письмо" %>
