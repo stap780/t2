@@ -1,0 +1,18 @@
+<div class="space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+  <div class="space-y-2">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h3 class="text-sm font-semibold text-gray-800"><%= t("exports.form.export_rules_heading") %></h3>
+      <%= link_to t("exports.form.add_export_rule"), new_export_export_filter_rule_path(export),
+        class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400", data: { turbo_stream: "true" } %>
+    </div>
+    <p class="text-xs text-gray-600"><%= t("exports.form.filters_hint") %></p>
+    <p class="text-xs text-gray-600"><%= t("exports.form.property_filters_hint") %></p>
+
+    <%= turbo_frame_tag dom_id(export, :export_filter_rules), class: "space-y-2 w-full block" do %>
+      <% export.export_filter_rules.each do |rule| %>
+        <%= render "export_filter_rules/nested", export: export, rule: rule %>
+      <% end %>
+    <% end %>
+  </div>
+
+</div>

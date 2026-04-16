@@ -322,6 +322,16 @@ ru:
       not_completed: "Экспорт ещё не завершён"
       file_not_found: "Файл экспорта не найден"
     form:
+      filters_hint: "По умолчанию — активные товары с остатком, ценой и изображениями."
+      export_rules_heading: "Правила отбора"
+      property_filters_hint: "Сначала выберите параметр — подгрузятся его значения. Условия «равно» / «не равно» по выбранной характеристике. Несколько строк объединяются по И."
+      add_export_rule: "+ Добавить правило"
+      property_filter_property: "Параметр"
+      property_filter_predicate: "Условие"
+      property_filter_characteristic: "Значение (список)"
+      property_filter_characteristic_hint: "После выбора параметра список обновится (как при добавлении параметра к товару)."
+      predicate_eq: "равно"
+      predicate_not_eq: "не равно"
       settings: "Настройки экспорта"
       name_placeholder: "например, Экспорт клиентов — Январь 2025"
       test_mode: "Тестовый режим"
@@ -406,6 +416,11 @@ ru:
       feature_RimBoltsDiameter: "Диаметр отверстий"
       feature_RimOffset: "Вылет"
       feature_RimDIA: "Ступица (DIA)"
+  export_filter_rules:
+    destroy:
+      success: "Правило отбора удалено."
+    characteristics:
+      success: "Список значений обновлён."
   summary_title: "Шаблон Liquid (обязательно для XML)"
   click_to_customize: "Нажмите, чтобы настроить"
   example_xml_template: "Пример XML-шаблона:"

@@ -226,7 +226,24 @@ en:
       header: "Edit Export"
       subheader: "Modify your export settings and re-run the export"
       back: "← Back to Exports"
+    create:
+      success: "Export was created. Configure filters and format, then save."
+    update:
+      success: "Export was updated."
+    destroy:
+      success: "Export was deleted."
     form:
+      filters_heading: "Product selection"
+      filters_hint: "By default: active products with stock, price, and images. Optional rules below; multiple rows are combined with AND."
+      export_rules_heading: "Selection rules"
+      property_filters_hint: "Pick a parameter first — its values load next. «Equals» / «not equals» apply to the selected characteristic. Multiple rows are combined with AND."
+      add_export_rule: "+ Add rule"
+      property_filter_property: "Parameter"
+      property_filter_predicate: "Condition"
+      property_filter_characteristic: "Value (list)"
+      property_filter_characteristic_hint: "After you choose a parameter, the list updates (same idea as on the product form)."
+      predicate_eq: "equals"
+      predicate_not_eq: "not equals"
       settings: "Export Settings"
       name_placeholder: "e.g., Customer Export - January 2025"
       test_mode: "Test Mode"
@@ -261,6 +278,11 @@ en:
       item_fields: "item fields"
       use_as_html: "use as <code class=\"bg-gray-100 px-1 py-0.5 rounded\">{{ item.FIELD }}</code>"
       footer_hint: "Save your export configuration. Run it from the exports list."
+  export_filter_rules:
+    destroy:
+      success: "Filter rule removed."
+    characteristics:
+      success: "Values list updated."
   summary_title: "Liquid Template (Required for XML)"
   click_to_customize: "Click to customize"
   example_xml_template: "Example XML Template:"

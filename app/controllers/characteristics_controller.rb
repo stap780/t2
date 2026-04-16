@@ -16,6 +16,7 @@ class CharacteristicsController < ApplicationController
     @characteristic = @property.characteristics.build(characteristic_params)
     respond_to do |format|
       if @characteristic.save
+        flash.now[:success] = t('.success')
         format.turbo_stream do
           render turbo_stream: turbo_close_offcanvas_flash + [
             turbo_stream.append(

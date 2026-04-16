@@ -1,6 +1,16 @@
 class Export < ApplicationRecord
   # Use Rails 8 associations
   belongs_to :user
+  has_many :export_filter_rules, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :export
+  accepts_nested_attributes_for :export_filter_rules,
+    allow_destroy: true,
+    reject_if: proc { |attrs|
+      attrs = attrs.stringify_keys
+      next false if attrs["_destroy"] == "1" || attrs["_destroy"] == true || attrs["_destroy"] == "true"
+      next false unless attrs["rule_key"].to_s == "feature"
+
+      attrs["id"].blank? && attrs["property_id"].blank? && attrs["characteristic_id"].blank?
+    }
 
   # Active Storage attachment for the exported file
   has_one_attached :export_file
@@ -285,8 +295,12 @@ class Export < ApplicationRecord
   def extract_data_from_products
     Rails.logger.info "🎯 Export ##{id}: Extracting data from Product model"
 
+    base_scope = Product.active.yes_quantity.yes_price.with_images
+
+    base_scope = apply_property_filters(base_scope, property_filters_for_export)
+
     # Оптимизированная загрузка с includes для избежания N+1 запросов
-    products_scope = Product.active.yes_quantity.yes_price.with_images
+    products_scope = base_scope
       .includes(:variants, features: [:property, :characteristic], images: [:file_attachment, :file_blob])
 
     # Применение тестового режима
@@ -377,8 +391,57 @@ class Export < ApplicationRecord
     product.images.filter_map(&:rails_blob_url_with_filename)
   end
 
-
   private
+
+  def property_filters_for_export
+    export_filter_rules
+      .where(rule_key: ExportFilterRule::RULE_KEY_FEATURE)
+      .where.not(property_id: nil)
+      .where.not(characteristic_id: nil)
+      .map do |r|
+        {
+          "property_id" => r.property_id.to_s,
+          "predicate" => r.rule_condition,
+          "value" => r.characteristic_id.to_s
+        }
+      end
+  end
+
+  def apply_property_filters(scope, filters)
+    return scope if filters.blank?
+
+    filters.each do |row|
+      pid = row["property_id"].to_i
+      pred = row["predicate"]
+      val = row["value"]
+      next if pid.zero?
+
+      case pred
+      when "eq"
+        cid = val.to_i
+        next if cid.zero?
+
+        ids = feature_product_ids_for_eq(pid, cid)
+        scope = scope.where(id: ids)
+      when "not_eq"
+        cid = val.to_i
+        next if cid.zero?
+
+        ids = feature_product_ids_for_eq(pid, cid)
+        scope = scope.where.not(id: ids)
+      end
+    end
+
+    scope.distinct
+  end
+
+  def feature_product_ids_for_eq(property_id, characteristic_id)
+    Feature.where(
+      featureable_type: "Product",
+      property_id: property_id,
+      characteristic_id: characteristic_id
+    ).select(:featureable_id)
+  end
 
   def enqueue_on_create
     schedule! if periodic_scheduled?

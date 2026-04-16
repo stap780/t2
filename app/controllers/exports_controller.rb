@@ -6,8 +6,6 @@ class ExportsController < ApplicationController
   before_action :set_export_public, only: [:file]
 
   def index
-    # Show all exports from current user
-    # @exports = Current.user.exports.recent
     @exports = Export.recent.includes(:user)
   end
 
@@ -20,7 +18,7 @@ class ExportsController < ApplicationController
     @export = Current.user.exports.build(export_params)
 
     if @export.save
-      redirect_to exports_path, notice: t(".success")
+      redirect_to edit_export_path(@export), notice: t(".success")
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,9 +28,10 @@ class ExportsController < ApplicationController
   end
 
   def update
-    # Update export setup - don't run automatically
     if @export.update(export_params)
-      redirect_to exports_path, notice: t(".success")
+      respond_to do |format|
+        format.turbo_stream { redirect_to exports_path(format: :html), notice: t(".success") }
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -89,7 +88,7 @@ class ExportsController < ApplicationController
       head :not_found and return
     end
 
-    # Build a stable, deterministic filename, e.g., export-<id>.<ext>
+    # Build a stable, deterministic filename, e.g. export-<id>.<ext>
     filename_obj = @export.export_file.filename
     ext = filename_obj.extension.present? ? ".#{filename_obj.extension}" : ""
     stable_name = "export-#{@export.id}#{ext}"
@@ -108,10 +107,10 @@ class ExportsController < ApplicationController
   def xml_avito_example; end
 
   private
-  
+
   def set_export
     # @export = Current.user.exports.find(params[:id])
-    @export = Export.find(params[:id])
+    @export = Export.includes(:export_filter_rules).find(params[:id])
   end
 
   # Public finder for unauthenticated file access
@@ -119,8 +118,18 @@ class ExportsController < ApplicationController
     @export = Export.find(params[:id])
   end
 
-  # Use Rails 8 strong parameters pattern
   def export_params
-    params.expect(export: [:name, :format, :layout_template, :item_template, :test, :time, :interval_hours, file_headers: []])
+    base = params.require(:export).permit(
+      :name,
+      :format,
+      :layout_template,
+      :item_template,
+      :test,
+      :time,
+      :interval_hours,
+      file_headers: [],
+      export_filter_rules_attributes: [:id, :rule_key, :rule_condition, :rule_value, :property_id, :characteristic_id, :position, :_destroy]
+    )
+    base
   end
 end

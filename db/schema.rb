@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_14_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_15_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -246,6 +246,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_120000) do
     t.index ["manager_id"], name: "index_employees_on_manager_id"
     t.index ["position"], name: "index_employees_on_position", unique: true
     t.index ["user_id"], name: "index_employees_on_user_id"
+  end
+
+  create_table "export_filter_rules", force: :cascade do |t|
+    t.bigint "export_id", null: false
+    t.string "rule_key", null: false
+    t.string "rule_condition", null: false
+    t.text "rule_value"
+    t.bigint "property_id"
+    t.bigint "characteristic_id"
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["export_id", "position"], name: "index_export_filter_rules_on_export_id_and_position"
+    t.index ["export_id"], name: "index_export_filter_rules_on_export_id"
   end
 
   create_table "exports", force: :cascade do |t|
@@ -566,6 +580,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_120000) do
   add_foreign_key "employees", "departments"
   add_foreign_key "employees", "employees", column: "manager_id"
   add_foreign_key "employees", "users"
+  add_foreign_key "export_filter_rules", "exports"
   add_foreign_key "exports", "users"
   add_foreign_key "features", "characteristics"
   add_foreign_key "features", "properties"

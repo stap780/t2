@@ -1,0 +1,3 @@
+<%= turbo_stream.append dom_id(@export, :export_filter_rules) do %>
+  <%= render partial: "export_filter_rules/nested", locals: { export: @export, rule: @export_filter_rule } %>
+<% end %>

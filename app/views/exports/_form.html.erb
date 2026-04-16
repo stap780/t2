@@ -1,49 +1,39 @@
-<%= form_with(
-  model: export,
-  local: true,
-  class: "space-y-8",
-  data: { turbo: false, controller: "export-form" }
-) do |form| %>
+<%= form_with model: export, local: true, class: "space-y-8", data: { controller: "export-form" } do |form| %>
   <%= render "shared/errors", object: export %>
 
   <div class="grid grid-cols-1 gap-8">
-    <div class="flex flex-wrap gap-6">
+    <div class="flex flex-wrap gap-4">
       <!-- Export Name -->
       <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px]">
-        <%= form.label(
-          :name,
-          t("activerecord.attributes.export.name"),
+        <%= form.label( :name, t("activerecord.attributes.export.name"),
           class: "block text-sm font-semibold text-gray-800 mb-2"
         ) %>
-        <%= form.text_field(
-          :name,
-          placeholder: t("exports.form.name_placeholder"),
+        <%= form.text_field( :name, placeholder: t("exports.form.name_placeholder"),
           class: "block w-full px-3 py-2 border-1 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
         ) %>
-      </div>
-
-      <!-- Test Mode Toggle -->
-      <div class="flex flex-col justify-center w-full sm:w-auto flex-1 min-w-[210px] max-w-[210px]">
-        <div class="flex items-center">
-          <%= form.check_box(
-            :test,
-            class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"
-          ) %>
-          <div class="ml-3">
-            <%= form.label(
+        <!-- Test Mode Toggle -->
+        <div class="flex flex-col justify-center w-full sm:w-auto flex-1 min-w-[210px]">
+          <div class="flex items-center">
+            <%= form.check_box(
               :test,
-              t("exports.form.test_mode"),
-              class: "font-semibold text-gray-800"
+              class: "h-4 w-4 text-violet-600 focus:ring-violet-500 border-gray-300 rounded"
             ) %>
-            <p class="text-xs text-gray-600">
-              <%= t("exports.form.test_limit_html", count: Export::TEST_LIMIT).html_safe %>
-            </p>
+            <div class="ml-3">
+              <%= form.label(
+                :test,
+                t("exports.form.test_mode"),
+                class: "block text-sm font-semibold text-gray-800"
+              ) %>
+              <p class="text-xs text-gray-600">
+                <%= t("exports.form.test_limit_html", count: Export::TEST_LIMIT).html_safe %>
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Schedule: interval or daily time -->
-      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[300px]">
+      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[360px]">
         <%= form.label(
           :interval_hours,
           t("exports.form.interval_label"),
@@ -69,7 +59,7 @@
         ) %>
       </div>
       <!-- Export Time (15-minute intervals) - for daily run -->
-      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[300px]">
+      <div class="flex flex-col w-full sm:w-auto flex-1 min-w-[210px] max-w-[290px]">
         <%= form.label(
           :time,
           t("exports.form.scheduled_time"),
@@ -85,6 +75,8 @@
         ) %>
       </div>
     </div>
+
+    <%= render "export_filters", export: export if export.persisted?  %>
 
     <!-- Data Source Info -->
     <% unless export.has_data_source? %>
@@ -128,8 +120,7 @@
       class="space-y-3 mt-2 mb-2"
       id="field-selection"
       data-export-form-target="fieldSelection"
-      style="display: none;"
-    >
+      style="display: none;">
       <% all_fields = Export.available_fields %>
       <%= form.label(
         :file_headers,
@@ -189,8 +180,7 @@
     <div
       id="template-section"
       data-export-form-target="templateSection"
-      style="display: none;"
-    >
+      style="display: none;" >
       <div class="border-1 border-gray-200 rounded-xl overflow-hidden">
         <div class="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800">
           <span class="flex items-center">
@@ -386,6 +376,7 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <!-- Action Buttons -->
@@ -406,4 +397,5 @@
       ) %>
     </div>
   </div>
+
 <% end %>

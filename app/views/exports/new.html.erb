@@ -1,23 +1,24 @@
 <% content_for :title, t("exports.new.title") %>
 
-<div class="container mx-auto px-4">
-  <div class="mx-auto">
-    <!-- Header -->
-    <div class="mb-6">
-      <div class="flex items-center justify-between">
-        <%= link_to t("exports.new.back"), exports_path, class: "text-violet-600 hover:text-violet-700" %>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900"><%= t("exports.new.header") %></h1>
-        </div>
-      </div>
+<%= render "shared/offcanvas_inner", title: t("exports.new.header"), width: "28rem" do %>
+  <%= form_with model: @export, url: exports_path, data: { turbo_frame: "_top" }, class: "space-y-4" do |f| %>
+    <%= render "shared/errors", object: @export %>
+
+    <%= f.hidden_field :format, value: "csv" %>
+    <%= f.hidden_field :status, value: "pending" %>
+    <%= f.hidden_field :test, value: "1" %>
+
+    <div class="flex flex-col gap-2">
+      <%= f.label :name, t("activerecord.attributes.export.name"), class: "block text-sm font-semibold text-gray-800" %>
+      <%= f.text_field :name,
+        placeholder: t("exports.form.name_placeholder"),
+        class: "block w-full px-3 py-2 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 text-gray-900",
+        autofocus: true %>
     </div>
 
-    <!-- Form Card -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-      
-      <div class="px-6 py-6">
-        <%= render 'form', export: @export %>
-      </div>
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <%= link_to t("actions.cancel"), exports_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300", data: { turbo_frame: "_top" } %>
+      <%= f.submit t("actions.save"), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
     </div>
-  </div>
-</div>
+  <% end %>
+<% end %>

@@ -125,6 +125,11 @@ Rails.application.routes.draw do
     collection do
       get :xml_avito_example
     end
+    resources :export_filter_rules do
+      member do
+        get :characteristics
+      end
+    end
     member do
       get :download
       get :file
