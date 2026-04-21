@@ -8,9 +8,9 @@ class IncasesController < ApplicationController
   include PrintEtiketkas
 
   def index
-    if search_params.present?
-      puts "search_params: #{search_params}"
-    end
+    # if search_params.present?
+    #   puts "search_params: #{search_params}"
+    # end
     # Join items and variants if searching by items_barcode
     base_relation = Incase.includes([company: :okrug], :strah, :incase_status, :incase_tip, items: :variant)
     search_params_hash = (search_params || {}).dup
@@ -30,7 +30,10 @@ class IncasesController < ApplicationController
     @search = base_relation.ransack(processed_params)
     @search.sorts = "date desc" if @search.sorts.empty?
     @incases = @search.result(distinct: true).paginate(page: params[:page], per_page: 100)
-    @totalsum = @search.result(distinct: true).sum(:totalsum)
+    @totalsum = if any_ransack_predicate?(processed_params)
+                  @search.result(distinct: true).sum(:totalsum)
+                end
+    # @totalsum = @search.result(distinct: true).sum(:totalsum)
   end
 
   def show
@@ -222,6 +225,25 @@ class IncasesController < ApplicationController
   end
 
   private
+
+  # Есть ли в q хоть одно непустое условие (без учёта сортировки Ransack по ключу s)
+  def any_ransack_predicate?(q)
+    return false if q.blank?
+
+    h = q.respond_to?(:to_unsafe_h) ? q.to_unsafe_h : q.to_h
+    h.any? do |k, v|
+      next false if k.to_s == "s"
+
+      case v
+      when Array
+        v.any?(&:present?)
+      when Hash
+        any_ransack_predicate?(v)
+      else
+        v.present?
+      end
+    end
+  end
 
   def process_multiple_unumber_search(search_params_hash)
     process_multiple_field_search(search_params_hash, 'unumber_cont', 'unumber_in', 50)
