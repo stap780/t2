@@ -36,7 +36,7 @@
                     <% end %>
                   </div>
                   <%= select_tag "act_datas[#{company.id}][driver_id]",
-                      options_from_collection_for_select(User.drivers, :id, :email_address),
+                      options_from_collection_for_select(User.drivers, :id, :full_name),
                       {
                         include_blank: "Не назначать водителя",
                         class: "px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 bg-white min-w-[180px]",

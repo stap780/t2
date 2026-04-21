@@ -16,14 +16,10 @@
     <%= f.hidden_field :file, value: signed_id %>
     <%= f.hidden_field :position, value: image_position, "data-sortable-target": "hposition" %>
   <% else %>
-    <% img_def_url = blob.present? ? url_for(blob) : ''%>
-    <input value="<%= signed_id %>" 
-           autocomplete="off" 
-           type="hidden" 
+    <% img_def_url = blob.present? ? url_for(blob) : '' %>
+    <input value="<%= signed_id %>" autocomplete="off" type="hidden" 
            name="product[images_attributes][<%= blob.id%>][file]">
-    <input value="<%= image_position%>" 
-           autocomplete="off" 
-           type="hidden" 
+    <input value="<%= image_position%>" autocomplete="off" type="hidden" 
            name="product[images_attributes][<%= blob.id%>][position]" 
            data-sortable-target="hposition">
   <% end %>
@@ -57,17 +53,15 @@
   
   <!-- Чекбокс для массового удаления -->
   <div class="flex items-center justify-center mb-2">
-    <input type="checkbox" 
-           name="blob_signed_ids[]" 
-           checked 
-           value="<%=signed_id%>" 
+    <input type="checkbox" name="blob_signed_ids[]" 
+           checked value="<%=signed_id%>" 
            class="absolute opacity-0 pointer-events-none" 
            form="bulk_images_form">
   </div>
   
   <!-- Действия -->
   <div class="flex items-center justify-between mt-1">
-    <a href="<%= img_def_url %>" data-src="<%= img_def_url %>" class="lg-image-link text-blue-400 hover:text-blue-600 mr-2" data-turbo="false" >
+    <a href="<%= img_def_url %>" data-src="<%= img_def_url %>" class="lightbox-image-view-icon lg-image-link text-blue-400 hover:text-blue-600 mr-2" data-turbo="false" >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.92 3.053-3.858 6.002-9.542 7-5.685-.999-8.623-3.947-9.542-7z" />

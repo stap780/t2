@@ -271,10 +271,6 @@
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-600">
           <div>
-            <p>
-              <code class="bg-gray-100 px-2 py-1 rounded">export.data</code>
-              - <%= t("exports.form.obj_all_records") %>
-            </p>
             <p class="mt-1">
               <code class="bg-gray-100 px-2 py-1 rounded">product</code>
               - <%= t("exports.form.obj_product") %>
@@ -289,21 +285,9 @@
             </p>
           </div>
           <div>
-            <p>
-              <code class="bg-gray-100 px-2 py-1 rounded">export</code>
-              - <%= t("exports.form.obj_export") %>
-            </p>
-            <p class="mt-1">
-              <code class="bg-gray-100 px-2 py-1 rounded">current_time</code>
-              - <%= t("exports.form.obj_current_time") %>
-            </p>
             <p class="mt-1">
               <code class="bg-gray-100 px-2 py-1 rounded">product.images</code>
               - массив URL изображений
-            </p>
-            <p class="mt-1">
-              <code class="bg-gray-100 px-2 py-1 rounded">product.images_zap</code>
-              - массив URL изображений с водяным знаком
             </p>
             <p class="mt-1">
               <code class="bg-gray-100 px-2 py-1 rounded">product.images_with_ext</code>
@@ -345,28 +329,7 @@
               </code>
             </div>
 
-            <%# Features - фильтрация по конкретному свойству %>
-            <div class="flex items-center">
-              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
-                {% for feature in product.features %}{% if feature.property == 'Название' %}{{ feature.characteristic }}{% endif %}{% endfor %}
-              </code>
-            </div>
-
-            <%# Image fields %>
-            <% template_fields[:image_fields].each do |field| %>
-              <div class="flex items-center">
-                <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
-                  {{ product.<%= field %> }}
-                </code>
-              </div>
-            <% end %>
-
             <%# Image iteration %>
-            <div class="flex items-center">
-              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
-                {% for image in product.images_zap %}{{ image }}{% endfor %}
-              </code>
-            </div>
             <div class="flex items-center">
               <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
                 {% for image in product.images_with_ext %}{{ image }}{% endfor %}
@@ -385,16 +348,12 @@
       <p><%= t("exports.form.footer_hint") %></p>
     </div>
     <div class="flex items-center space-x-4">
-      <%= link_to(
-        t("actions.cancel"),
-        exports_path,
+      <%= link_to t("actions.cancel"), exports_path,
         class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300",
-        data: { turbo: false }
-      ) %>
-      <%= form.submit(
-        t("actions.save"),
+        data: { turbo: false } %>
+      <%= form.submit t("actions.save"),
         class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer"
-      ) %>
+      %>
     </div>
   </div>
 

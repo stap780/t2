@@ -28,6 +28,7 @@ class User < ApplicationRecord
 
   def full_name
     return email_address if name.blank? && surname.blank?
+    
     "#{name} #{surname}".strip
   end
 
