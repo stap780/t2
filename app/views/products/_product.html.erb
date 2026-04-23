@@ -22,14 +22,9 @@
   <div class="relative"><%= render 'products/inline/status', product: product %></div>
   <div class="flex flex-col relative">
     <div class="absolute top-0 right-0 flex gap-1">
-      <% if product.has_moysklad_binding? %>
-        <%= link_to "https://online.moysklad.ru/app/#good?global_codeFilter=#{product.variants.first.barcode},equals", target: "_blank", class: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer" do %>
-          МС
-        <% end %>
-      <% end %>
-      <% if product.has_insale_binding? %>
-        <%= link_to "https://dizauto.ru/admin2/collections/-1?q=#{product.variants.first.barcode}", target: "_blank", class: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 cursor-pointer" do %>
-          InS
+      <% product.integration_links.each do |link| %>
+        <%= link_to link.url, target: "_blank", class: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium cursor-pointer #{link.css}" do %>
+          <%= link.label %>
         <% end %>
       <% end %>
     </div>

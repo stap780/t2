@@ -174,6 +174,10 @@ class Product < ApplicationRecord
       variants.joins(:bindings).where(varbinds: { bindable_type: 'Insale' }).exists?
   end
 
+  def integration_links
+    ProductIntegrationLinks.new(self).call
+  end
+
   # Данные свойств для экспорта
   def properties_data 
     # this is for export csv/excel
