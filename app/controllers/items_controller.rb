@@ -66,6 +66,34 @@ class ItemsController < ApplicationController
     end
   end
 
+  def apply_free_text
+    turbo_frame_id = params[:turbo_frame_id]
+    free_title = params[:title].to_s.strip
+    return head :unprocessable_entity if free_title.blank?
+
+    item_id_str = turbo_frame_id.sub("item_", "")
+    item_id = item_id_str.to_i if item_id_str.match?(/^\d+$/) && item_id_str.to_i < 2_147_483_647
+    @item = item_id ? @incase.items.find_by(id: item_id) : nil
+    @item ||= @incase.items.build
+
+    @item.variant_id = nil
+    @item.title = free_title
+    @item.katnumber = nil
+    @item.price = 0.0
+    @item.sum = 0.0
+    @item.quantity = @item.quantity.presence || 1
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          turbo_frame_id,
+          partial: "items/item",
+          locals: { item: @item, incase: @incase, turbo_frame_id: turbo_frame_id }
+        )
+      end
+    end
+  end
+
   def update_variant_fields
     turbo_frame_id = params[:turbo_frame_id]
     variant_id = params[:variant_id]
@@ -92,7 +120,7 @@ class ItemsController < ApplicationController
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
-          turbo_stream.replace(turbo_frame_id, partial: "items/item", locals: { item: @item, incase: @incase })
+          turbo_stream.replace(turbo_frame_id, partial: "items/item", locals: { item: @item, incase: @incase, turbo_frame_id: turbo_frame_id })
         ]
       end
     end
@@ -102,13 +130,38 @@ class ItemsController < ApplicationController
     if params[:title].present?
       # var.full_title
       @search_results = Variant.ransack(sku_or_barcode_or_product_title_cont: params[:title]).result
-        .limit(20)
+        .limit(30)
         .map { |var| { title: var.item.present? ? var.item.title : var.full_title, id: var.id } }
         .reject(&:blank?)
       render json: @search_results, status: :ok
     else
       render json: [], status: :ok
     end
+  end
+
+  def suggest_variants
+    for_item_id = params[:for_item_id].to_s
+    target = "variant_suggest_#{for_item_id}"
+    search_query = params[:title].to_s
+
+    variants = if search_query.blank?
+      []
+    else
+      Variant.ransack(sku_or_barcode_or_product_title_cont: search_query).result
+        .includes(:items, :product)
+        .limit(30)
+    end
+
+    render turbo_stream: turbo_stream.update(
+      target,
+      partial: "items/variant_suggest_list",
+      locals: {
+        variants: variants,
+        incase: @incase,
+        for_item_id: for_item_id,
+        search_query: search_query
+      }
+    )
   end
 
   def destroy
@@ -138,22 +191,6 @@ class ItemsController < ApplicationController
 
   def update_status
     @item.update(item_status_id: params[:item_status_id])
-    # in model we have broadcast that makes turbo_stream response
-
-    # respond_to do |format|
-    #   format.turbo_stream do
-    #     flash.now[:success] = t('.success')
-    #     render turbo_stream: [
-    #       render_turbo_flash,
-    #       turbo_stream.replace(
-    #         dom_id(@incase, dom_id(@item, 'act_show')),
-    #         partial: "items/act_show",
-    #         locals: { item: @item, incase: @incase }
-    #       ),
-    #       turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
-    #     ]
-    #   end
-    # end
   end
 
   def bulk_update_status
@@ -180,20 +217,6 @@ class ItemsController < ApplicationController
   def update_condition
     @item.update(condition: params[:condition])
     @item.variant.product.update(status: 'pending') if @item.variant.product.status == 'draft'
-    # respond_to do |format|
-    #   format.turbo_stream do
-    #     flash.now[:success] = t('.success')
-    #     render turbo_stream: [
-    #       render_turbo_flash,
-    #       turbo_stream.replace(
-    #         dom_id(@incase, dom_id(@item, 'act_show')),
-    #         partial: "items/act_show",
-    #         locals: { item: @item, incase: @incase }
-    #       ),
-    #       turbo_stream.action(:scroll_to, dom_id(@incase, dom_id(@item, 'act_show')))
-    #     ]
-    #   end
-    # end
   end
 
   private

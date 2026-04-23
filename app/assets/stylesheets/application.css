@@ -51,3 +51,7 @@ details summary::marker {
 .sort_link.desc::after {
   content: "↓"; /* Unicode for down arrow: U+2193 */
 }
+
+#items .hw-combobox__main__wrapper {
+  width: 100%;
+}

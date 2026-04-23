@@ -37,7 +37,7 @@ class ImagesController < ApplicationController
   end
 
   def upload
-    params.require(:blob_signed_id)
+    # params.require(:blob_signed_id)
     signed_id = params['blob_signed_id']
     upload_blob = ActiveStorage::Blob.find_signed(signed_id)
     filename = upload_blob.filename
@@ -96,6 +96,6 @@ class ImagesController < ApplicationController
   end
 
   def image_params
-    params.require(:image).permit(:file, :position, :product_id)
+    params.require(:image).permit(:file, :position, :product_id, :blob_signed_id)
   end
 end

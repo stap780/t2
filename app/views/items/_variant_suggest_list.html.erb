@@ -1,0 +1,22 @@
+<%# locals: variants, incase, for_item_id, search_query %>
+<% if variants.blank? %>
+  <div class="px-2 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-md bg-white shadow-sm space-y-2">
+    <%= t("items.variant_suggest.no_results") %>
+    <% if search_query.present? %>
+      <% free_url = incase.persisted? ? apply_free_text_incase_item_path(incase, id: for_item_id, title: search_query, turbo_frame_id: "item_#{for_item_id}", format: :turbo_stream) : apply_free_text_item_path(id: for_item_id, title: search_query, turbo_frame_id: "item_#{for_item_id}", format: :turbo_stream) %>
+      <%= link_to t("items.variant_suggest.create"), free_url,
+          class: "block w-full text-center px-2 py-1 rounded bg-violet-600 text-white text-xs hover:bg-violet-700",
+          data: { turbo_prefetch: false } %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="max-h-48 overflow-y-auto border border-gray-200 rounded-md bg-white shadow-sm divide-y divide-gray-100">
+    <% variants.each do |variant| %>
+      <% label = variant.item.present? ? variant.item.title : variant.full_title %>
+      <% pick_url = incase.persisted? ? update_variant_fields_incase_item_path(incase, id: for_item_id, variant_id: variant.id, turbo_frame_id: "item_#{for_item_id}", format: :turbo_stream) : update_variant_fields_item_path(id: for_item_id, variant_id: variant.id, turbo_frame_id: "item_#{for_item_id}", format: :turbo_stream) %>
+      <%= link_to label, pick_url,
+          class: "block px-2 py-1.5 text-xs text-gray-800 hover:bg-violet-50 hover:text-violet-800 truncate",
+          data: { turbo_prefetch: false } %>
+    <% end %>
+  </div>
+<% end %>

@@ -24,7 +24,9 @@ class Item < ApplicationRecord
   
   after_initialize :set_default_new
   before_create :set_default_status
-  before_create :create_product_variant, if: -> { variant_id.blank? }
+  # Товар из убытка — только если позиция без варианта и меняется название
+  # (apply_free_text обнуляет variant_id, чтобы при сохранении incase создался Product)
+  before_save :create_product_variant, if: :should_autocreate_product_for_title_change?
   after_commit :recalculate_incase_status, if: :saved_change_to_item_status_id?
   after_destroy :recalculate_incase_status_after_destroy
 
@@ -100,6 +102,10 @@ class Item < ApplicationRecord
 
   def set_default_new
     self.quantity ||= 0 if new_record?
+  end
+
+  def should_autocreate_product_for_title_change?
+    variant_id.blank? && will_save_change_to_title?
   end
 
   def create_product_variant

@@ -249,6 +249,7 @@ Rails.application.routes.draw do
       end
       member do
         get :update_variant_fields
+        get :apply_free_text
         post :update_status
         post :update_condition
       end
@@ -270,9 +271,11 @@ Rails.application.routes.draw do
   resources :items, only: [:new, :destroy] do
     collection do
       post :search
+      get :suggest_variants
     end
     member do
       get :update_variant_fields
+      get :apply_free_text
     end
   end
 

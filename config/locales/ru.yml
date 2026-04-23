@@ -1058,6 +1058,9 @@ ru:
       success: "Состояние позиции успешно обновлено"
     destroy:
       success: "Позиция успешно удалена"
+    variant_suggest:
+      no_results: "Нет совпадений"
+      create: "Создать"
   incases/comments:
     create:
       success: "Комментарий успешно создан"

@@ -790,6 +790,9 @@ en:
       success: "Item successfully updated"
     destroy:
       success: "Item successfully deleted"
+    variant_suggest:
+      no_results: "No matches"
+      create: "Create"
   moysklads:
     index:
       title: "Moysklad"
