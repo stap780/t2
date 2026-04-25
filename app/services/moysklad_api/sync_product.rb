@@ -70,24 +70,41 @@ class MoyskladApi::SyncProduct
       "buyPrice" => build_buy_price
     }
 
+    min_price = build_min_price
+    payload["minPrice"] = min_price if min_price.present?
+
     payload["code"] = barcode_for_payload unless for_update
 
     payload
+  end
+
+  # Та же валюта, что у buyPrice (копейки)
+  def moysklad_rub_currency
+    {
+      "meta" => {
+        "href" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/309cadeb-35fc-11e6-7a69-9711001fa0ae",
+        "metadataHref" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata",
+        "type" => "currency",
+        "mediaType" => "application/json",
+        "uuidHref" => "https://online.moysklad.ru/app/#currency/edit?id=309cadeb-35fc-11e6-7a69-9711001fa0ae"
+      }
+    }
   end
 
   def build_buy_price
     cost_cents = (@variant.cost_price || 0) * 100
     {
       "value" => cost_cents.to_f.round(0),
-      "currency" => {
-        "meta" => {
-          "href" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/309cadeb-35fc-11e6-7a69-9711001fa0ae",
-          "metadataHref" => "https://api.moysklad.ru/api/remap/1.2/entity/currency/metadata",
-          "type" => "currency",
-          "mediaType" => "application/json",
-          "uuidHref" => "https://online.moysklad.ru/app/#currency/edit?id=309cadeb-35fc-11e6-7a69-9711001fa0ae"
-        }
-      }
+      "currency" => moysklad_rub_currency
+    }
+  end
+
+  def build_min_price
+    return nil if @variant.sprice.blank?
+
+    {
+      "value" => (@variant.sprice * 100).to_f.round(0),
+      "currency" => moysklad_rub_currency
     }
   end
 

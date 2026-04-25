@@ -27,9 +27,17 @@ class Varbind < ApplicationRecord
   end
 
   def self.int_ids
-    return [] unless defined?(Insale) && Insale.exists?
-    Insale.all.map { |i| ["InSale #{i.id}", i.id] } + Moysklad.all.map { |m| ["Moysklad #{m.id}", m.id] }
-    # Avito.all.map { |a| ["Avito #{a.id}", a.id] }
+    base = []
+    if defined?(Insale) && Insale.exists?
+      base += Insale.all.map { |i| ["InSale #{i.id}", i.id] }
+    end
+    if defined?(Moysklad) && Moysklad.exists?
+      base += Moysklad.all.map { |m| ["Moysklad #{m.id}", m.id] }
+    end
+    if defined?(Avito) && Avito.exists?
+      base += Avito.all.map { |a| ["Avito #{a.id} (#{a.title})", a.id] }
+    end
+    base
   end
 
   

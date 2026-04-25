@@ -136,7 +136,7 @@ class Export < ApplicationRecord
     product_fields = %w[id status tip title description created_at updated_at]
     
     # Variant fields (will be flattened as variant_1_barcode, variant_1_sku, etc.)
-    variant_fields = %w[barcode sku price quantity cost_price]
+    variant_fields = %w[barcode sku price sprice quantity cost_price]
     variant_fields_flat = variant_fields.map { |f| "variant_1_#{f}" }
     
     # Image fields
@@ -170,7 +170,7 @@ class Export < ApplicationRecord
   def self.available_product_fields_for_template
     {
       product_fields: %w[id status tip title description created_at updated_at],
-      variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.quantity variants.first.cost_price],
+      variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.sprice variants.first.quantity variants.first.cost_price],
       feature_fields: ['features (for iteration)'],
       image_fields: %w[images images_with_ext] #images_zap images_second images_thumb
     }

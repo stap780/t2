@@ -1,6 +1,6 @@
 class VariantsController < ApplicationController
   before_action :set_product
-  before_action :set_variant, only: %i[show edit update destroy print_etiketka edit_price_inline update_price_inline generate_barcode]
+  before_action :set_variant, only: %i[show edit update destroy print_etiketka edit_price_inline update_price_inline edit_sprice_inline update_sprice_inline generate_barcode]
   include ActionView::RecordIdentifier
 
   def index
@@ -79,7 +79,26 @@ class VariantsController < ApplicationController
       end
     end
   end
-  
+
+  def edit_sprice_inline; end
+
+  def update_sprice_inline
+    respond_to do |format|
+      if @variant.update(variant_params)
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(dom_id(@product, dom_id(@variant, :sprice)), partial: "products/inline/sprice", locals: { product: @product, variant: @variant })
+          ]
+        end
+      else
+        format.turbo_stream do
+          flash.now[:alert] = @variant.errors.full_messages.join(", ")
+          render turbo_stream: [render_turbo_flash], status: :unprocessable_entity
+        end
+      end
+    end
+  end
+
   def print_etiketka
     # Если этикетка уже существует, используем её
     if @variant.etiketka.attached?
@@ -154,7 +173,7 @@ class VariantsController < ApplicationController
   end
 
   def variant_params
-    params.require(:variant).permit(:product_id, :sku, :barcode, :quantity, :cost_price, :price)
+    params.require(:variant).permit(:product_id, :sku, :barcode, :quantity, :cost_price, :price, :sprice)
   end
 
 end

@@ -17,11 +17,12 @@ class Variant < ApplicationRecord
   
   after_initialize :set_default_new, if: :new_record?
   after_commit :create_barcode, on: :create
-  after_save :sync_to_moysklad_if_price_changed, if: :saved_change_to_price?
+  after_save :sync_to_moysklad_if_price_changed, if: -> { saved_change_to_price? || saved_change_to_sprice? }
   before_destroy :prevent_destroy_if_last
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :sprice, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :barcode, length: { minimum: 4, maximum: 13 }, allow_blank: true
   validates :barcode, uniqueness: { allow_blank: true }
 

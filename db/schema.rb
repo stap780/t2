@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_15_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_120000) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "avitos", force: :cascade do |t|
+    t.string "title"
+    t.string "api_id"
+    t.string "api_secret"
+    t.integer "profileid"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["api_id"], name: "index_avitos_on_api_id", unique: true
+    t.index ["api_secret"], name: "index_avitos_on_api_secret", unique: true
   end
 
   create_table "barcode_counters", force: :cascade do |t|
@@ -560,6 +571,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_15_120000) do
     t.decimal "cost_price", precision: 12, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "sprice", precision: 12, scale: 2
     t.index ["barcode"], name: "index_variants_on_barcode"
     t.index ["product_id"], name: "index_variants_on_product_id"
     t.index ["sku"], name: "index_variants_on_sku"

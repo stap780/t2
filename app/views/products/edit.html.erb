@@ -7,14 +7,7 @@
       class: "ml-auto inline-flex items-center px-3 py-1 border border-violet-500 text-sm font-medium text-violet-600 bg-white hover:bg-violet-50 hover:text-violet-700 rounded-md cursor-pointer transition", 
       data: { turbo_stream: true, turbo_confirm: "ВНИМАНИЕ! Это действие заполнит продукт данными из Detal и удалит все данные, кроме изображений. Вы уверены?"  } %>
     <%= link_to_history(auditable_type: "product", auditable_id: @product.id) unless @product.new_record? %>
-    <div class="ml-1 flex gap-1">
-      <% if @product.has_moysklad_binding? %>
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">МС</span>
-      <% end %>
-      <% if @product.has_insale_binding? %>
-        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">InS</span>
-      <% end %>
-    </div>
+    <%= render "products/integration_links", product: @product, wrapper_class: "ml-1 flex gap-1" %>
   </div>
   <%= render "form", product: @product %>
 </div>

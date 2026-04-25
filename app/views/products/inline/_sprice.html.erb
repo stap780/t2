@@ -1,0 +1,20 @@
+<%= turbo_frame_tag dom_id(product, dom_id(variant, :sprice)) do %>
+    <% if variant %>
+        <%# price_classes = variant.price_css_classes %>
+        <% price_classes = '' %>
+        <div class="<%= price_classes %> px-2 py-1 rounded">
+            <div class="flex flex-col gap-2">
+                <%= link_to edit_sprice_inline_product_variant_path(product, variant), 
+                    class: "text-sm text-blue-600 hover:text-blue-800", data: {turbo_prefetch: false} do %>
+                    <% if variant.sprice.present? %>
+                        <span class="font-medium"><%= number_with_precision(variant.sprice, precision: 0, delimiter: '') %></span>
+                    <% else %>
+                        <span class="font-medium">-</span>
+                    <% end %>
+                <% end %>
+            </div>
+        </div>
+    <% else %>
+        <div>-</div>
+    <% end %>
+<% end %>

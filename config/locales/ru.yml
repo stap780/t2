@@ -160,6 +160,7 @@ ru:
     settings: "Настройки"
     insales: "InSales"
     moysklads: "Moysklad"
+    avitos: "Avito"
     users: "Пользователи"
     staff_schedule: "График работы"
     staff_schedule_employees: "Сотрудники"
@@ -387,6 +388,7 @@ ru:
       variant_1_barcode: "Штрихкод"
       variant_1_sku: "Артикул"
       variant_1_price: "Цена"
+      variant_1_sprice: "Мин. цена"
       variant_1_quantity: "Количество"
       variant_1_cost_price: "Себестоимость"
       # Image fields
@@ -588,6 +590,34 @@ ru:
       check: "Проверить"
       add_webhook: "Добавить Webhook"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+  avitos:
+    index:
+      title: "Avito"
+      heading: "Интеграция с Avito"
+      new_avito: "Новая конфигурация Avito"
+      empty: "Пока нет конфигураций Avito."
+    new:
+      heading: "Новая конфигурация Avito"
+    edit:
+      heading: "Редактировать конфигурацию Avito"
+    create:
+      created: "Конфигурация Avito успешно создана."
+    update:
+      updated: "Конфигурация Avito успешно обновлена."
+    destroy:
+      destroyed: "Конфигурация Avito успешно удалена."
+    fetch_orders:
+      fetch_success: "Запрос к API выполнен; ответ записан в лог сервера."
+      fetch_error: "Ошибка запроса: %{message}"
+      fetch_no_token: "не удалось получить access_token (см. лог)"
+    form:
+      api_id: "Client ID (из кабинета Avito API)"
+      api_secret: "Client secret"
+      profileid: "ID профиля (user_id / profileid)"
+    avito:
+      client_id_label: "client_id"
+      fetch_orders: "Получить заказы"
+      delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
   moysklads:
     index:
       title: "Moysklad"
@@ -630,6 +660,7 @@ ru:
       without_images: "нет"
       status: "Статус"
       title_label: "Название"
+      sprice: "Мин. цена"
       price: "Цена"
       quantity: "Кол-во"
       created_at: "Дата создания"
@@ -690,6 +721,7 @@ ru:
       quantity: "Кол-во"
       cost_price: "Вх. цена"
       price: "Цена"
+      sprice: "Мин. цена"
       status:
         draft: "Черновик"
         pending: "В ожидании"
@@ -1317,6 +1349,7 @@ ru:
         company_id: "Компания по акту"
       variant:
         price: "Цена"
+        sprice: "Мин. цена"
         quantity: "Кол-во"
         sku: "Артикул"
         barcode: "Штрихкод"

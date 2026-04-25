@@ -120,7 +120,7 @@ class ProductsController < ApplicationController
     @new_product.title = "(COPY) #{@new_product.title} - #{Time.now.to_s}"
     new_features = @product.features.select(:property_id, :characteristic_id).map(&:attributes)
     @new_product.features_attributes = new_features
-    new_vars = @product.variants.select(:sku, :price).map(&:attributes)
+    new_vars = @product.variants.select(:sku, :price, :sprice).map(&:attributes)
     @new_product.variants_attributes = new_vars
     
     # Копируем изображения
@@ -338,7 +338,7 @@ class ProductsController < ApplicationController
   def set_product
     @product = Product.includes(
       images: [:file_attachment, :file_blob],
-      variants: [],
+      variants: :bindings,
       features: { property: :characteristics }
     ).find(params[:id])
   end
@@ -381,7 +381,7 @@ class ProductsController < ApplicationController
       :status, :tip, :title, :description,
       features_attributes: [:id, :property_id, :characteristic_id, :_destroy],
       images_attributes: [:id, :product_id, :position, :file, :_destroy],
-      variants_attributes: [:id, :product_id, :sku, :barcode, :quantity, :cost_price, :price, :_destroy]
+      variants_attributes: [:id, :product_id, :sku, :barcode, :quantity, :cost_price, :price, :sprice, :_destroy]
     )
   end
 

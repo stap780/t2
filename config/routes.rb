@@ -63,6 +63,8 @@ Rails.application.routes.draw do
         get :print_etiketka
         get :edit_price_inline
         patch :update_price_inline
+        get :edit_sprice_inline
+        patch :update_sprice_inline
         get :generate_barcode
       end
     end
@@ -162,6 +164,12 @@ Rails.application.routes.draw do
     member do
       get :check
       post :add_order_webhook
+    end
+  end
+
+  resources :avitos, only: %i[index new create edit update destroy] do
+    member do
+      get :fetch_orders
     end
   end
 
