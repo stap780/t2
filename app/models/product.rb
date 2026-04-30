@@ -27,7 +27,7 @@ class Product < ApplicationRecord
   after_update_commit { broadcast_replace_to 'products' }
   after_destroy_commit { broadcast_remove_to 'products' }
 
-  after_create :sync_product_data_to_detals
+  after_create_commit :pull_product_from_detals
   after_update :sync_product_data_to_detals
   before_destroy :check_variants_have_items, prepend: true
 
@@ -348,6 +348,27 @@ class Product < ApplicationRecord
     variant.update!(update_attrs) if variant
 
     [true, { product: self, variant: variant }]
+  end
+
+  def pull_product_from_detals
+    sku = variants.where.not(sku: [nil, '']).pick(:sku)
+    return if sku.blank?
+
+    detal = Detal.find_by(sku: sku)
+    return unless detal
+
+    self.title = detal.title if detal.title.present?
+
+    if detal.desc.present?
+      self.description = detal.desc
+    end
+
+    features.destroy_all
+    detal.features.each do |df|
+      features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
+    end
+
+    save!
   end
 
   def sync_product_data_to_detals
