@@ -1,5 +1,3 @@
-<% content_for :title, t("exports.new.title") %>
-
 <%= render "shared/offcanvas_inner", title: t("exports.new.header"), width: "28rem" do %>
   <%= form_with model: @export, url: exports_path, data: { turbo_frame: "_top" }, class: "space-y-4" do |f| %>
     <%= render "shared/errors", object: @export %>

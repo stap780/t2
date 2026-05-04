@@ -102,6 +102,13 @@ class Product < ApplicationRecord
     ["Статус", "status"],
   ].freeze
 
+  AUTOFILL_SKIP_PROPERTY_TITLES = [
+    'Категория товара',
+    'Гарантия',
+    'Видео',
+    'Старый ID'
+  ].freeze
+
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
     attribute_names + %w[acts_number]
@@ -363,8 +370,12 @@ class Product < ApplicationRecord
       self.description = detal.desc
     end
 
-    features.destroy_all
-    detal.features.each do |df|
+    skip_property_ids = Property.where(title: AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
+    features_scope = skip_property_ids.any? ? features.where.not(property_id: skip_property_ids) : features
+    features_scope.destroy_all
+
+    detal_features_scope = skip_property_ids.any? ? detal.features.where.not(property_id: skip_property_ids) : detal.features
+    detal_features_scope.find_each do |df|
       features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
     end
 

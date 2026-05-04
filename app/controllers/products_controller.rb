@@ -259,13 +259,15 @@ class ProductsController < ApplicationController
     if detal.present?
       @product.title = detal.title
       @product.description = detal.desc
-      # Удаляем существующие features
-      @product.features.destroy_all
-      # Дополняем Detal отсутствующими параметрами со значением fake
+      skip_property_ids = Property.where(title: Product::AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
+      features_scope = skip_property_ids.any? ? @product.features.where.not(property_id: skip_property_ids) : @product.features
+      features_scope.destroy_all
+      # Дополняем Detal отсутствующими параметрами со значением fake (кроме свойств из AUTOFILL_SKIP_PROPERTY_TITLES)
       refill_missing_params_in_detal(detal)
-      # Копируем все features из Detal в Product
-      new_features = detal.features.reload.select(:property_id, :characteristic_id).map(&:attributes)
-      @product.features_attributes = new_features
+      detal_features_scope = skip_property_ids.any? ? detal.features.reload.where.not(property_id: skip_property_ids) : detal.features.reload
+      detal_features_scope.find_each do |df|
+        @product.features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
+      end
       @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
       respond_to do |format|
         format.turbo_stream do
@@ -388,6 +390,7 @@ class ProductsController < ApplicationController
   def refill_missing_params_in_detal(detal)
     existing_titles = detal.features.joins(:property).pluck('properties.title')
     missing = REFILL_REQUIRED_PARAMS - existing_titles
+    missing.reject! { |t| Product::AUTOFILL_SKIP_PROPERTY_TITLES.include?(t) }
 
     missing.each do |prop_title|
       property = Property.find_or_create_by!(title: prop_title)
