@@ -259,15 +259,16 @@ class ProductsController < ApplicationController
     if detal.present?
       @product.title = detal.title
       @product.description = detal.desc
-      skip_property_ids = Property.where(title: Product::AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
-      features_scope = skip_property_ids.any? ? @product.features.where.not(property_id: skip_property_ids) : @product.features
+      local_property_ids = @product.product_local_property_ids
+      features_scope = local_property_ids.any? ? @product.features.where.not(property_id: local_property_ids) : @product.features
       features_scope.destroy_all
-      # Дополняем Detal отсутствующими параметрами со значением fake (кроме свойств из AUTOFILL_SKIP_PROPERTY_TITLES)
+      # Дополняем Detal отсутствующими общими параметрами со значением fake
       refill_missing_params_in_detal(detal)
-      detal_features_scope = skip_property_ids.any? ? detal.features.reload.where.not(property_id: skip_property_ids) : detal.features.reload
+      detal_features_scope = local_property_ids.any? ? detal.features.reload.where.not(property_id: local_property_ids) : detal.features.reload
       detal_features_scope.find_each do |df|
         @product.features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
       end
+      @product.ensure_product_local_fake_features
       @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
       respond_to do |format|
         format.turbo_stream do

@@ -108,6 +108,7 @@ class Product < ApplicationRecord
     'Видео',
     'Старый ID'
   ].freeze
+  PRODUCT_LOCAL_FEATURE_DEFAULT_VALUE = 'fake'
 
   # Ransack для поиска
   def self.ransackable_attributes(auth_object = nil)
@@ -370,15 +371,16 @@ class Product < ApplicationRecord
       self.description = detal.desc
     end
 
-    skip_property_ids = Property.where(title: AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
-    features_scope = skip_property_ids.any? ? features.where.not(property_id: skip_property_ids) : features
+    local_property_ids = product_local_property_ids
+    features_scope = local_property_ids.any? ? features.where.not(property_id: local_property_ids) : features
     features_scope.destroy_all
 
-    detal_features_scope = skip_property_ids.any? ? detal.features.where.not(property_id: skip_property_ids) : detal.features
+    detal_features_scope = local_property_ids.any? ? detal.features.where.not(property_id: local_property_ids) : detal.features
     detal_features_scope.find_each do |df|
       features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
     end
 
+    ensure_product_local_fake_features
     save!
   end
 
@@ -393,7 +395,8 @@ class Product < ApplicationRecord
 
     new_title = title
     new_desc = description.present? ? description.to_plain_text : nil
-    product_features = features.reload.to_a
+    local_property_ids = product_local_property_ids
+    product_features = features.reload.where.not(property_id: local_property_ids).to_a
 
     Detal.where(sku: skus).find_each do |detal|
       attrs = {}
@@ -407,6 +410,20 @@ class Product < ApplicationRecord
       product_features.each do |pf|
         detal.features.create!(property_id: pf.property_id, characteristic_id: pf.characteristic_id)
       end
+    end
+  end
+
+  def product_local_property_ids
+    Property.where(title: AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
+  end
+
+  def ensure_product_local_fake_features
+    AUTOFILL_SKIP_PROPERTY_TITLES.each do |property_title|
+      property = Property.find_or_create_by!(title: property_title)
+      feature = features.find_or_initialize_by(property: property)
+      next if feature.characteristic_id.present?
+
+      feature.characteristic = property.characteristics.find_or_create_by!(title: PRODUCT_LOCAL_FEATURE_DEFAULT_VALUE)
     end
   end
 
