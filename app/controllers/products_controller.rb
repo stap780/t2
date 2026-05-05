@@ -270,6 +270,7 @@ class ProductsController < ApplicationController
       end
       @product.ensure_product_local_fake_features
       @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
+      @product.features.reload
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: [
