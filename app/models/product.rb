@@ -265,6 +265,20 @@ class Product < ApplicationRecord
     zip_buffer.read
   end
 
+  def product_local_property_ids
+    Property.where(title: AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
+  end
+
+  def ensure_product_local_fake_features
+    AUTOFILL_SKIP_PROPERTY_TITLES.each do |property_title|
+      property = Property.find_or_create_by!(title: property_title)
+      feature = features.find_or_initialize_by(property: property)
+      next if feature.characteristic_id.present?
+
+      feature.characteristic = property.characteristics.find_or_create_by!(title: PRODUCT_LOCAL_FEATURE_DEFAULT_VALUE)
+    end
+  end
+
   private
 
   def check_variants_have_items
@@ -410,20 +424,6 @@ class Product < ApplicationRecord
       product_features.each do |pf|
         detal.features.create!(property_id: pf.property_id, characteristic_id: pf.characteristic_id)
       end
-    end
-  end
-
-  def product_local_property_ids
-    Property.where(title: AUTOFILL_SKIP_PROPERTY_TITLES).pluck(:id)
-  end
-
-  def ensure_product_local_fake_features
-    AUTOFILL_SKIP_PROPERTY_TITLES.each do |property_title|
-      property = Property.find_or_create_by!(title: property_title)
-      feature = features.find_or_initialize_by(property: property)
-      next if feature.characteristic_id.present?
-
-      feature.characteristic = property.characteristics.find_or_create_by!(title: PRODUCT_LOCAL_FEATURE_DEFAULT_VALUE)
     end
   end
 
