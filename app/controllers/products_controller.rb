@@ -387,20 +387,6 @@ class ProductsController < ApplicationController
     )
   end
 
-  def refill_missing_params_in_detal(detal)
-    existing_titles = detal.features.joins(:property).pluck('properties.title')
-    missing = REFILL_REQUIRED_PARAMS - existing_titles
-    missing.reject! { |t| Product::AUTOFILL_SKIP_PROPERTY_TITLES.include?(t) }
-
-    missing.each do |prop_title|
-      property = Property.find_or_create_by!(title: prop_title)
-      characteristic = property.characteristics.find_or_create_by!(title: REFILL_DEFAULT_VALUE)
-      detal.features.find_or_create_by!(property: property) do |f|
-        f.characteristic = characteristic
-      end
-    end
-  end
-
   # Вложенные атрибуты: помечаем общие features на удаление и добавляем строки с Detal.
   # Продукт в БД обновляется только после сабмита формы.
   def build_product_refill_features_attributes(product, detal)
@@ -425,6 +411,26 @@ class ProductsController < ApplicationController
 
     detal_rows.each do |df|
       attrs[i.to_s] = { property_id: df.property_id, characteristic_id: df.characteristic_id }
+      i += 1
+    end
+
+    # Дополняем продукт обязательными параметрами со значением fake, если их нет в Detal.
+    # Важно: Detal не меняем, fake создаём только в форме продукта.
+    detal_property_ids = detal_rows.map(&:property_id).uniq
+    titles_by_id = if detal_property_ids.any?
+      Property.where(id: detal_property_ids).pluck(:id, :title).to_h
+    else
+      {}
+    end
+    existing_titles = titles_by_id.values
+
+    missing = REFILL_REQUIRED_PARAMS - existing_titles
+    missing.reject! { |t| Product::AUTOFILL_SKIP_PROPERTY_TITLES.include?(t) }
+
+    missing.each do |prop_title|
+      property = Property.find_or_create_by!(title: prop_title)
+      characteristic = property.characteristics.find_or_create_by!(title: REFILL_DEFAULT_VALUE)
+      attrs[i.to_s] = { property_id: property.id, characteristic_id: characteristic.id }
       i += 1
     end
 

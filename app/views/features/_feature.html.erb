@@ -19,10 +19,13 @@
         } } %>
       
       <%= turbo_frame_tag "characteristic_#{turbo_id_for(feature)}" do %>
-        <%= ff.collection_select :characteristic_id, 
-            (feature.property&.characteristics || []), :id, :title, 
-            { prompt: t("features.select_characteristic"), selected: feature.characteristic_id }, 
-            { 
+        <%= ff.select :characteristic_id,
+            options_for_select(
+              (feature.property_id.present? ? Characteristic.collection_for_select(feature.property_id, feature.characteristic_id, 30) : []),
+              feature.characteristic_id
+            ),
+            { prompt: t("features.select_characteristic") },
+            {
               class: "w-full min-w-0 px-2 py-1 border rounded-md",
               id: "feature_#{turbo_id_for(feature)}_characteristic_id",
               data: {
