@@ -257,20 +257,18 @@ class ProductsController < ApplicationController
     end
 
     if detal.present?
-      @product.title = detal.title
-      @product.description = detal.desc
-      local_property_ids = @product.product_local_property_ids
-      features_scope = local_property_ids.any? ? @product.features.where.not(property_id: local_property_ids) : @product.features
-      features_scope.destroy_all
-      # Дополняем Detal отсутствующими общими параметрами со значением fake
-      refill_missing_params_in_detal(detal)
-      detal_features_scope = local_property_ids.any? ? detal.features.reload.where.not(property_id: local_property_ids) : detal.features.reload
-      detal_features_scope.find_each do |df|
-        @product.features.build(property_id: df.property_id, characteristic_id: df.characteristic_id)
-      end
+      @product.features.destroy_all
+
+      features_attrs = build_product_refill_features_attributes(@product, detal)
+      @product.assign_attributes(
+        title: detal.title,
+        description: detal.desc,
+        features_attributes: features_attrs
+      )
       @product.ensure_product_local_fake_features
-      @product.save! # сохраняем, иначе во вьюхе product.features.order(...) грузит из БД и новые features не видны
-      @product.features.reload
+
+      flash.now[:notice] = "Данные из Detal добавлены."
+
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: [
@@ -401,6 +399,36 @@ class ProductsController < ApplicationController
         f.characteristic = characteristic
       end
     end
+  end
+
+  # Вложенные атрибуты: помечаем общие features на удаление и добавляем строки с Detal.
+  # Продукт в БД обновляется только после сабмита формы.
+  def build_product_refill_features_attributes(product, detal)
+    local_ids = product.product_local_property_ids
+    detal_relation =
+      if local_ids.any?
+        detal.features.where.not(property_id: local_ids)
+      else
+        detal.features
+      end
+    detal_rows = detal_relation.order(:property_id).to_a
+
+    attrs = {}
+    i = 0
+
+    product.features.each do |f|
+      next if local_ids.include?(f.property_id)
+
+      attrs[i.to_s] = { id: f.id, _destroy: '1' }
+      i += 1
+    end
+
+    detal_rows.each do |df|
+      attrs[i.to_s] = { property_id: df.property_id, characteristic_id: df.characteristic_id }
+      i += 1
+    end
+
+    attrs
   end
 
 end

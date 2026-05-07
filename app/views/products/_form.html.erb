@@ -73,13 +73,19 @@
             class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" %>
         </div>      
           <%= turbo_frame_tag dom_id(product, 'features') do %>
+            <% product.features.select(&:marked_for_destruction?).each do |feature| %>
+              <%= fields_for "product[features_attributes][#{turbo_id_for(feature)}]", feature do |ff| %>
+                <%= ff.hidden_field :id %>
+                <%= ff.hidden_field :_destroy, value: '1' %>
+              <% end %>
+            <% end %>
             <div class="grid gap-4 p-2 hover:bg-gray-50" style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
               <div>Название</div>
               <div>Значение</div>
               <div></div>
             </div>
 
-            <% product.features.each do |feature| %>  
+            <% product.features.reject(&:marked_for_destruction?).each do |feature| %>
               <%= render "features/feature", feature: feature, product: product %>
             <% end %>
           <% end %>
@@ -123,8 +129,10 @@
                   data-action="change->image#uploadFile" 
                   data-image-target="filesInput" 
                   accept='image/*' class="hidden" />
-            <button type="button" 
+            <button type="button"
                     class="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white text-sm font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                    title="Ctrl+Alt+U (⌘+⌥+U на Mac)"
+                    data-product-edit-shortcuts-target="upload"
                     data-action="click->image#triggerFileInput">
               <span>Загрузить</span>
             </button>
