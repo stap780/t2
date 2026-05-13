@@ -218,6 +218,52 @@ class ProductsController < ApplicationController
     end
   end
 
+  def bulk_features_edit
+    if params[:product_ids]
+      @products = Product.where(id: params[:product_ids]).includes(:features).order(:id)
+      respond_to do |format|
+        format.turbo_stream
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream do
+          flash.now[:notice] = 'Выберите позиции'
+          render turbo_stream: [
+            render_turbo_flash
+          ]
+        end
+      end
+    end
+  end
+
+  def bulk_features_update
+    result = Product::BulkFeaturesApply.new(
+      product_ids: params[:product_ids],
+      features_attributes: permitted_bulk_features_attributes
+    ).call
+
+    respond_to do |format|
+      format.turbo_stream do
+        if result.ok
+          flash.now[:success] = t("products.bulk_features_update.success", count: result.updated_count)
+          render turbo_stream: turbo_close_offcanvas_flash
+        else
+          case result.failure
+          when :missing_products
+            flash.now[:notice] = t("products.bulk_features_update.missing_products")
+          when :no_changes
+            flash.now[:alert] = t("products.bulk_features_update.no_changes")
+          when :invalid_pair
+            flash.now[:alert] = t("products.bulk_features_update.invalid_pair")
+          when :save_error
+            flash.now[:alert] = result.error_message.presence || t("products.bulk_features_update.save_error")
+          end
+          render turbo_stream: [render_turbo_flash]
+        end
+      end
+    end
+  end
+
   def destroy
     check_destroy = @product.destroy ? true : false
     if check_destroy == true
@@ -257,7 +303,10 @@ class ProductsController < ApplicationController
     end
 
     if detal.present?
-      @product.features.destroy_all
+      # Удаляем только "общие" параметры. Локальные (Гарантия/Видео/Категория/Старый ID) сохраняем как есть.
+      local_property_ids = @product.product_local_property_ids
+      features_scope = local_property_ids.any? ? @product.features.where.not(property_id: local_property_ids) : @product.features
+      features_scope.destroy_all
 
       features_attrs = build_product_refill_features_attributes(@product, detal)
       @product.assign_attributes(
@@ -376,6 +425,12 @@ class ProductsController < ApplicationController
         end
       end
     end
+  end
+
+  def permitted_bulk_features_attributes
+    return nil if params[:product].blank?
+
+    params.require(:product).permit(features_attributes: [:id, :property_id, :characteristic_id, :_destroy])[:features_attributes]
   end
 
   def product_params

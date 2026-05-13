@@ -48,6 +48,12 @@ module ApplicationHelper
           </svg>'.html_safe
   end
 
+  def dropdown_icon
+    '<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>'.html_safe
+  end
+
   def generate_barcode_icon
     '<svg class="w-4 h-4 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <rect x="2" y="6" width="2" height="12" fill="currentColor"/>
@@ -64,6 +70,31 @@ module ApplicationHelper
         <path d="M12 9v3m0 0l2-2m-2 2l-2-2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </g>
     </svg>'.html_safe
+  end
+
+  def bulk_features_icon
+    '<svg class="w-4 h-4 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+    </svg>'.html_safe
+  end
+
+  def filter_icon
+    '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a2 2 0 01-.553 1.382l-6.553 7.276V19a1 1 0 01-1.447.894l-2-1A1 1 0 019 18v-5.342L2.553 7.382A2 2 0 012 6V4z"/>
+    </svg>'.html_safe
+  end
+
+  def link_to_filter(path, **options)
+    if options[:class]
+      options[:class]
+    else
+      options[:class] = "inline-flex items-center px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+    end
+    options[:title] ||= t('products.index.filter')
+    button_text = options[:text]
+    link_to path, options do
+      filter_icon + content_tag(:span, button_text, class: "ml-1")
+    end
   end
 
   def link_to_generate_barcode(path, **options)

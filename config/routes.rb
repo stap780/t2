@@ -42,6 +42,8 @@ Rails.application.routes.draw do
       get :search
       post :price_edit
       post :price_update
+      post :bulk_features_edit
+      post :bulk_features_update
       post :download
       post :bulk_delete
       post :bulk_print_etiketkas, format: :pdf

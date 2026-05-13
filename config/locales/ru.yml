@@ -666,7 +666,7 @@ ru:
       created_at: "Дата создания"
       created_from: "создан от"
       created_to: "создан до"
-      history_filter: "Фильтр по истории"
+      history_filter: "Ист."
       history_attribute: "Атрибут"
       history_any_attribute: "Любой атрибут"
       history_action: "Действие"
@@ -716,6 +716,9 @@ ru:
       select_type: "Выберите тип"
       cancel: "Отмена"
       price_update: "Цена"
+      bulk_features: "Параметры"
+      bulk_features_value: "Значение"
+      bulk_features_hint: "Параметры ниже — у первого выбранного товара. После «Сохранить» такие же пары параметр → значение будут выставлены у всех отмеченных товаров."
       sku: "Артикул"
       barcode: "Штрихкод"
       quantity: "Кол-во"
@@ -732,6 +735,13 @@ ru:
         product: "Товар"
         service: "Услуга"
         kit: "Комплект"
+    bulk_features_update:
+      success: "Параметр обновлён у %{count} товаров."
+      missing_products: "Выберите позиции"
+      select_property: "Выберите параметр и значение"
+      no_changes: "Нет ни одной строки с заполненным параметром и значением"
+      invalid_pair: "Значение не относится к выбранному параметру"
+      save_error: "Не удалось сохранить параметр"
     create:
       success: "Товар создан"
     update:

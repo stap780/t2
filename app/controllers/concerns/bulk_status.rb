@@ -43,5 +43,6 @@ module BulkStatus
       end
     end
   end
+  
 end
 

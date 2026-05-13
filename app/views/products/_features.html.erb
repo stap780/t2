@@ -1,0 +1,18 @@
+<div class="mb-2 flex items-center justify-between">
+    <legend class="text-sm font-medium text-gray-700"><%= t("features.title") %></legend>
+    <% path_options = { product_id: product.id.presence || "", featureable_type: "Product" } %>
+    <% path = product.new_record? ? new_feature_path(path_options) : new_product_feature_path(product) %>
+    <%= link_to t("features.add_feature"), path, data: { turbo_stream: "true" },
+      class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400" %>
+  </div>      
+  <%= turbo_frame_tag dom_id(product, 'features') do %>
+    <div class="grid gap-4 p-2 hover:bg-gray-50" style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
+      <div>Название</div>
+      <div>Значение</div>
+      <div></div>
+    </div>
+
+    <% product.features.each do |feature| %>
+      <%= render "features/feature", feature: feature, product: product %>
+    <% end %>
+  <% end %>

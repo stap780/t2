@@ -16,10 +16,10 @@
   <div class="flex space-x-2">
     <%= form_with url: detals_path, method: :post, id: :bulk_action_form, local: false do |f| %>
       <!-- Download Excel Buttons -->
-      <%= render 'shared/download_excel_buttons', f: f, object: Detal.new %>
+      <%= render 'shared/buttons/download_excel', f: f, object: Detal.new %>
       
       <!-- Bulk Delete Buttons -->
-      <%= render 'shared/bulk_delete_buttons', f: f, object: Detal.new %>
+      <%= render 'shared/buttons/bulk_delete', f: f, object: Detal.new %>
     <% end %>
     
     <%= link_to t("detals.index.new"), new_detal_path, class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>

@@ -1,0 +1,13 @@
+<% display_product = products.first %>
+<%= form_with url: bulk_features_update_products_path, method: :post, data: { turbo_frame: "_top" }, html: { class: "space-y-4" } do %>
+  <p class="text-sm text-gray-500 mb-4"><%= t("products.form.bulk_features_hint") %></p>
+  <% products.each do |pr| %>
+    <%= hidden_field_tag "product_ids[]", pr.id %>
+  <% end %>
+
+  <%= render "features", product: display_product %>
+
+  <div class="flex mt-4">
+    <%= submit_tag t("actions.save"), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
+  </div>
+<% end %>

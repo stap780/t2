@@ -33,8 +33,8 @@
           </div>
         </div>
       </div>      
-      <%= render 'shared/download_excel_buttons', f: f, object: Incase.new %>
-      <%= render 'shared/bulk_delete_buttons', f: f, object: Incase.new %>
+      <%= render 'shared/buttons/download_excel', f: f, object: Incase.new %>
+      <%= render 'shared/buttons/bulk_delete', f: f, object: Incase.new %>
       <%= render 'send_incase' %>
     <% end %>
     
