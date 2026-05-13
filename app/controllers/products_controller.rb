@@ -220,7 +220,7 @@ class ProductsController < ApplicationController
 
   def bulk_features_edit
     if params[:product_ids]
-      @products = Product.where(id: params[:product_ids]).includes(:features).order(:id)
+      @products = Product.where(id: params[:product_ids]).includes(:features) #.order(:id)
       respond_to do |format|
         format.turbo_stream
       end
