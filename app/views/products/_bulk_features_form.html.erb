@@ -1,5 +1,5 @@
 <%= form_with url: bulk_features_update_products_path, method: :post, data: { turbo_frame: "_top" }, html: { class: "space-y-4" } do %>
-  <p class="text-sm text-gray-500 mb-4"><%= t("products.form.bulk_features_hint") %></p>
+  <p class="text-sm text-gray-500 mb-4"><%# t("products.form.bulk_features_hint") %></p>
   <% products.each do |pr| %>
     <%= hidden_field_tag "product_ids[]", pr.id %>
   <% end %>
