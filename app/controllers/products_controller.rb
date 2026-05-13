@@ -221,6 +221,14 @@ class ProductsController < ApplicationController
   def bulk_features_edit
     if params[:product_ids]
       @products = Product.where(id: params[:product_ids]).includes(:features) #.order(:id)
+      template = @products.first
+      @bulk_features_display_product = Product.new
+      template&.features&.each do |f|
+        @bulk_features_display_product.features.build(
+          property_id: f.property_id,
+          characteristic_id: f.characteristic_id
+        )
+      end
       respond_to do |format|
         format.turbo_stream
       end

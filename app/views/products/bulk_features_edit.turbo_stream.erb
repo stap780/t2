@@ -1,6 +1,6 @@
 <%= turbo_stream.update "offcanvas" do %>
   <%= render "shared/offcanvas_inner", title: t("products.form.bulk_features"), width: "43rem" do %>
-    <%= render "products/bulk_features_form", products: @products %>
+    <%= render "products/bulk_features_form", products: @products, display_product: @bulk_features_display_product %>
   <% end %>
 <% end %>
 <%= turbo_stream.set_unchecked(targets: '.checkboxes') %>
