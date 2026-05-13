@@ -315,6 +315,7 @@ class ProductsController < ApplicationController
       local_property_ids = @product.product_local_property_ids
       features_scope = local_property_ids.any? ? @product.features.where.not(property_id: local_property_ids) : @product.features
       features_scope.destroy_all
+      @product.reload
 
       features_attrs = build_product_refill_features_attributes(@product, detal)
       @product.assign_attributes(
@@ -450,8 +451,8 @@ class ProductsController < ApplicationController
     )
   end
 
-  # Вложенные атрибуты: помечаем общие features на удаление и добавляем строки с Detal.
-  # Продукт в БД обновляется только после сабмита формы.
+  # Хэш для assign_attributes(features_attributes: …) после refill: только новые строки с Detal
+  # и недостающие обязательные параметры. Общие features уже удалены в refill через destroy_all.
   def build_product_refill_features_attributes(product, detal)
     local_ids = product.product_local_property_ids
     detal_relation =
@@ -464,13 +465,6 @@ class ProductsController < ApplicationController
 
     attrs = {}
     i = 0
-
-    product.features.each do |f|
-      next if local_ids.include?(f.property_id)
-
-      attrs[i.to_s] = { id: f.id, _destroy: '1' }
-      i += 1
-    end
 
     detal_rows.each do |df|
       attrs[i.to_s] = { property_id: df.property_id, characteristic_id: df.characteristic_id }
