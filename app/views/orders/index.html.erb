@@ -1,0 +1,54 @@
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <h1 class="text-xl font-semibold">
+    <%= t(".heading") %>
+    <small class="text-sm font-normal text-gray-500"><%= @orders.total_entries %></small>
+  </h1>
+
+  <%= search_form_for @search, url: orders_path, method: :get,
+      html: { class: "flex flex-wrap items-center gap-2" } do |f| %>
+    <%= f.select :source_eq,
+        options_for_select(
+          [[t(".all_sources"), ""]] + Order::SOURCES.map { |s| [t("orders.sources.#{s}", default: s), s] },
+          @search.source_eq
+        ),
+        {},
+        class: "px-2 py-1 border border-gray-300 rounded-md text-sm" %>
+    <%= f.search_field :number_cont,
+        placeholder: t("activerecord.attributes.order.number"),
+        class: "px-2 py-1 border border-gray-300 rounded-md text-sm",
+        style: "min-width: 140px;" %>
+    <%= f.search_field :client_name_or_client_surname_or_client_email_cont,
+        placeholder: t(".search_client"),
+        class: "px-2 py-1 border border-gray-300 rounded-md text-sm",
+        style: "min-width: 200px;" %>
+    <%= f.submit t(".search"), class: "px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 text-sm" %>
+    <%= link_to orders_path(search_cancel: true),
+        class: "px-3 py-1 bg-gray-100 rounded-md hover:bg-gray-200 text-sm inline-flex items-center",
+        title: t(".clear") do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-lg shadow divide-y overflow-x-auto">
+  <div class="grid grid-cols-[70px_100px_120px_1fr_100px_120px_140px] gap-3 px-4 py-3 font-medium text-gray-700 text-sm min-w-[900px]">
+    <div>#</div>
+    <div><%= t("activerecord.attributes.order.source") %></div>
+    <div><%= t("activerecord.attributes.order.number") %></div>
+    <div><%= t("activerecord.attributes.order.client_id") %></div>
+    <div><%= t("activerecord.attributes.order.order_status_id") %></div>
+    <div class="text-right"><%= t("activerecord.attributes.order.total_sum") %></div>
+    <div><%= t(".synced") %></div>
+  </div>
+
+  <%= turbo_frame_tag "orders" do %>
+    <% if @orders.any? %>
+      <%= render @orders %>
+      <%= render "shared/paginate", f: @orders %>
+    <% else %>
+      <p class="p-8 text-center text-gray-500"><%= t(".empty") %></p>
+    <% end %>
+  <% end %>
+</div>

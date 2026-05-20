@@ -96,6 +96,15 @@
               <% end %>
             </div>
           </details>
+
+          <%= link_to orders_path(search_cancel: true),
+              class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/orders')}" do %>
+            <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <%= t("nav.orders") %>
+          <% end %>
+
           <!-- Acts -->
           <%= link_to acts_path,
               class: "group flex items-center py-2 text-sm font-medium rounded-lg text-white hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-75' if request.path.start_with?('/acts')}" do %>
@@ -190,7 +199,7 @@
 
           <!-- Settings (collapsible) -->
           <div class="mt-2">
-            <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/avitos') || request.path.start_with?('/users') || request.path.start_with?('/incase_statuses') || request.path.start_with?('/incase_tips') || request.path.start_with?('/item_statuses') %>>
+            <details class="group" <%= 'open' if request.path.start_with?('/insales') || request.path.start_with?('/moysklads') || request.path.start_with?('/avitos') || request.path.start_with?('/users') || request.path.start_with?('/incase_statuses') || request.path.start_with?('/incase_tips') || request.path.start_with?('/item_statuses') || request.path.start_with?('/order_statuses') || request.path.start_with?('/moysklad_order_status_mappings') || request.path.start_with?('/avito_order_status_mappings') || request.path.start_with?('/insales_order_status_mappings') %>>
               <summary class="flex items-center py-2 rounded-lg cursor-pointer hover:bg-violet-500 hover:bg-opacity-75 transition duration-150 ease-in-out">
                 <div class="flex items-center text-sm font-medium text-violet-100">
                   <svg class="mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -252,6 +261,34 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                   <%= t("nav.item_statuses", default: "Статусы позиций") %>
+                <% end %>
+                <%= link_to order_statuses_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/order_statuses')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                  </svg>
+                  <%= t("nav.order_statuses", default: "Статусы заказов") %>
+                <% end %>
+                <%= link_to moysklad_order_status_mappings_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/moysklad_order_status_mappings')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01" />
+                  </svg>
+                  <%= t("nav.moysklad_order_status_mappings") %>
+                <% end %>
+                <%= link_to avito_order_status_mappings_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/avito_order_status_mappings')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01" />
+                  </svg>
+                  <%= t("nav.avito_order_status_mappings") %>
+                <% end %>
+                <%= link_to insales_order_status_mappings_path,
+                    class: "group flex items-center pl-3 pr-3 py-1.5 text-sm font-medium rounded-lg text-violet-100 hover:text-white hover:bg-violet-500 hover:bg-opacity-50 transition duration-150 ease-in-out #{'bg-violet-500 bg-opacity-50 text-white' if request.path.start_with?('/insales_order_status_mappings')}" do %>
+                  <svg class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12M8 12h12M8 17h12M4 7h.01M4 12h.01M4 17h.01" />
+                  </svg>
+                  <%= t("nav.insales_order_status_mappings") %>
                 <% end %>
               </div>
             </details>

@@ -74,10 +74,10 @@ class MoyskladsController < ApplicationController
 
   # POST /moysklads/:id/add_order_webhook
   def add_order_webhook
-    success, messages = MoyskladApi::Webhook.add(moysklad: @moysklad)
+    success, messages = MoyskladApi::Webhook.add_order_webhooks(moysklad: @moysklad)
 
     if success
-      flash[:notice] = t(".webhook_success", message: messages.is_a?(Array) ? messages.join(", ") : messages)
+      flash[:notice] = t(".webhook_success", message: Array(messages).join(", "))
     else
       flash[:alert] = t(".webhook_error", messages: messages.join(", "))
     end
@@ -113,7 +113,10 @@ class MoyskladsController < ApplicationController
   end
 
   def moysklad_params
-    params.require(:moysklad).permit(:api_key, :api_password)
+    params.require(:moysklad).permit(
+      :api_key, :api_password,
+      :organization_href, :agent_href, :store_href
+    )
   end
 end
 

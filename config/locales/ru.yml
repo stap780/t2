@@ -20,6 +20,11 @@ ru:
     formats:
       month_year: "%B %Y"
       long: "%d %B %Y г."
+  time:
+    formats:
+      default: "%d.%m.%Y %H:%M"
+      short: "%d.%m.%Y %H:%M"
+      long: "%d %B %Y, %H:%M"
   edit: "Редактировать"
   delete: "Удалить"
   print_barcode: "Печать штрихкода"
@@ -149,6 +154,7 @@ ru:
     email_deliveries: "Отправка писем"
     products: "Товары"
     detals: "Детали"
+    orders: "Заказы"
     incases: "Убытки"
     incase_imports: "Импорт"
     incase_dubls: "Дубли"
@@ -169,6 +175,10 @@ ru:
     incase_statuses: "Статусы убытков"
     incase_tips: "Типы убытков"
     item_statuses: "Статусы позиций"
+    order_statuses: "Статусы заказов"
+    moysklad_order_status_mappings: "Маппинг статусов МС"
+    avito_order_status_mappings: "Маппинг статусов Авито"
+    insales_order_status_mappings: "Маппинг статусов InSales"
     okrugs: "Округа"
     acts: "Акты"
   datetime:
@@ -586,10 +596,45 @@ ru:
     add_order_webhook:
       webhook_success: "Webhook успешно добавлен: %{message}"
       webhook_error: "Не удалось добавить webhook: %{messages}"
+    add_order_update_webhook:
+      webhook_success: "Webhook обновления заказа добавлен: %{message}"
+      webhook_error: "Не удалось добавить webhook: %{messages}"
     insale:
       check: "Проверить"
-      add_webhook: "Добавить Webhook"
+      add_webhook: "Webhook заказа (create)"
+      add_order_webhook: "Webhook заказа (create)"
+      add_order_update_webhook: "Webhook заказа (update)"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+  orders:
+    sources:
+      avito: "Авито"
+      insales: "InSales"
+      moysklad: "МойСклад"
+    index:
+      heading: "Реестр заказов"
+      all_sources: "Все источники"
+      search: "Найти"
+      search_client: "Клиент (имя, email)"
+      clear: "Сбросить фильтр"
+      synced: "Синхронизация"
+      empty: "Заказов пока нет."
+    show:
+      heading: "Заказ %{number}"
+      created_at: "Создан: %{time}"
+      synced_at: "Синхронизирован: %{time}"
+      items_heading: "Позиции"
+      line_sum: "Сумма"
+      no_items: "Нет позиций"
+      client_heading: "Клиент"
+      client_name: "Имя"
+      integrations_heading: "Внешние системы"
+      no_external_ids: "Нет привязок к внешним системам"
+      export_to_moysklad: "Выгрузить в МойСклад"
+      export_confirm: "Создать заказ покупателя в МойСклад?"
+    export_to_moysklad:
+      success: "Заказ выгружен в МойСклад"
+      error: "Ошибка выгрузки: %{message}"
+      no_moysklad: "Нет настроенной интеграции МойСклад"
   avitos:
     index:
       title: "Avito"
@@ -607,7 +652,8 @@ ru:
     destroy:
       destroyed: "Конфигурация Avito успешно удалена."
     fetch_orders:
-      fetch_success: "Запрос к API выполнен; ответ записан в лог сервера."
+      fetch_success: "Импортировано: %{imported}, обновлено: %{updated}, пропущено: %{skipped}, создано в МС: %{moysklad_created}."
+      fetch_partial: "Частично: новых %{imported}, в МС %{moysklad_created}. Ошибки: %{errors}"
       fetch_error: "Ошибка запроса: %{message}"
       fetch_no_token: "не удалось получить access_token (см. лог)"
     form:
@@ -640,6 +686,9 @@ ru:
     add_order_webhook:
       webhook_success: "Webhook успешно добавлен: %{message}"
       webhook_error: "Не удалось добавить webhook: %{messages}"
+    form:
+      order_export_heading: "Выгрузка заказов в МойСклад"
+      store_href_optional: "Склад (необязательно)"
     moysklad:
       check: "Проверить"
       add_webhook: "Добавить Webhook"
@@ -1069,6 +1118,78 @@ ru:
     destroy:
       success: "Тип успешно удален"
     check_presence_in_incases: "Невозможно удалить тип. Существуют заявки с этим типом."
+  order_statuses:
+    index:
+      title: "Статусы заказов"
+      heading: "Статусы заказов"
+      new: "Новый статус"
+      sort: "Порядок"
+      drag_to_sort: "Перетащить для сортировки"
+    form:
+      code_hint: "Код задаётся автоматически при создании и не меняется."
+    new:
+      title: "Новый статус заказа"
+    edit:
+      title: "Редактировать статус заказа"
+    create:
+      success: "Статус заказа успешно создан"
+    update:
+      success: "Статус заказа успешно обновлён"
+    destroy:
+      success: "Статус заказа успешно удалён"
+  moysklad_order_status_mappings:
+    index:
+      heading: "Маппинг: МойСклад → статус заказа"
+      hint: "Состояние заказа в МС (meta href) сопоставляется с внутренним статусом."
+      new: "Добавить"
+    new:
+      title: "Новый маппинг МС"
+    edit:
+      title: "Редактировать маппинг МС"
+    form:
+      state_href_hint: "Полный href состояния из API МойСклад (customerorder metadata states)."
+    create:
+      success: "Маппинг МС сохранён"
+    update:
+      success: "Маппинг МС обновлён"
+    destroy:
+      success: "Маппинг МС удалён"
+  avito_order_status_mappings:
+    index:
+      heading: "Маппинг: статус заказа → Авито"
+      hint: "При смене внутреннего статуса в Авито уходит указанный код статуса API."
+      new: "Добавить"
+    new:
+      title: "Новый маппинг Авито"
+    edit:
+      title: "Редактировать маппинг Авито"
+    form:
+      avito_status_hint: "Переход для applyTransition API: confirm, reject, perform или receive (см. документацию Order Management)."
+    create:
+      success: "Маппинг Авито сохранён"
+    update:
+      success: "Маппинг Авито обновлён"
+    destroy:
+      success: "Маппинг Авито удалён"
+  insales_order_status_mappings:
+    index:
+      heading: "Маппинг: InSales → статус заказа"
+      hint: "Ключ статуса заказа в магазине сопоставляется с внутренним статусом."
+      new: "Добавить"
+      any_shop: "любой магазин"
+    new:
+      title: "Новый маппинг InSales"
+    edit:
+      title: "Редактировать маппинг InSales"
+    form:
+      any_shop: "Любой магазин (общее правило)"
+      insales_status_hint: "Ключ — permalink из custom_status (например new, delivered) или fulfillment_status."
+    create:
+      success: "Маппинг InSales сохранён"
+    update:
+      success: "Маппинг InSales обновлён"
+    destroy:
+      success: "Маппинг InSales удалён"
   item_statuses:
     index:
       title: "Статусы позиций"
@@ -1423,6 +1544,50 @@ ru:
         phone: "Телефон"
         email: "Email"
         insid: "ID InSales"
+      order_status:
+        code: "Код"
+        title: "Название"
+        color: "Цвет"
+        position: "Порядок"
+        is_terminal: "Финальный"
+      order:
+        source: "Источник"
+        number: "Номер"
+        total_sum: "Сумма"
+        currency: "Валюта"
+        comment: "Комментарий"
+        client_id: "Клиент"
+        order_status_id: "Статус"
+        moysklad_order_id: "ID заказа МС"
+        moysklad_external_code: "Внешний код МС"
+        avito_order_id: "ID заказа Авито"
+        avito_marketplace_id: "Marketplace ID Авито"
+        insales_order_id: "ID заказа InSales"
+      order_item:
+        title: "Название"
+        sku: "Артикул"
+        quantity: "Кол-во"
+        price: "Цена"
+      moysklad:
+        organization_href: "Организация (href)"
+        agent_href: "Контрагент (href)"
+        store_href: "Склад (href)"
+      moysklad_order_status_mapping:
+        moysklad_state_href: "Состояние МС (href)"
+        moysklad_state_name: "Название в МС"
+        order_status: "Внутренний статус"
+        order_status_id: "Внутренний статус"
+      avito_order_status_mapping:
+        avito_status: "Статус Авито"
+        order_status: "Внутренний статус"
+        order_status_id: "Внутренний статус"
+      insales_order_status_mapping:
+        insale: "Магазин"
+        insale_id: "Магазин"
+        insales_status_key: "Ключ статуса InSales"
+        insales_status_title: "Название в InSales"
+        order_status: "Внутренний статус"
+        order_status_id: "Внутренний статус"
     errors:
       format: "%{attribute} %{message}"
       models:

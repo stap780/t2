@@ -129,6 +129,22 @@ item_statuses.each do |status_data|
   status.save!
 end
 
+# OrderStatus (внутренние статусы заказов)
+[
+  { code: "new", title: "Новый", position: 1, is_terminal: false },
+  { code: "confirmed", title: "Подтверждён", position: 2, is_terminal: false },
+  { code: "paid", title: "Оплачен", position: 3, is_terminal: false },
+  { code: "assembly", title: "Сборка", position: 4, is_terminal: false },
+  { code: "shipped", title: "Отправлен", position: 5, is_terminal: false },
+  { code: "delivered", title: "Доставлен", position: 6, is_terminal: true },
+  { code: "cancelled", title: "Отменён", position: 7, is_terminal: true }
+].each do |row|
+  OrderStatus.find_or_initialize_by(code: row[:code]).tap do |status|
+    status.assign_attributes(row.except(:code))
+    status.save!
+  end
+end
+
 # Виды дня (ShiftCode) — график работы и отпусков
 [
   { code: "Al", label: "Рабочая смена", position: 1, color: "#22c55e", vacation: false, day_off: false },

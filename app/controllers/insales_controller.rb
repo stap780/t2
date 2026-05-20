@@ -1,7 +1,7 @@
 class InsalesController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_insale, only: %i[ show edit update destroy check add_order_webhook ]
+  before_action :set_insale, only: %i[ show edit update destroy check add_order_webhook add_order_update_webhook ]
 
   # GET /insales
   def index
@@ -93,19 +93,27 @@ class InsalesController < ApplicationController
 
   # POST /insales/:id/add_order_webhook
   def add_order_webhook
-    success, messages = Insale.add_order_webhook(rec: @insale)
-    
+    render_webhook_result(@insale.add_order_webhook)
+  end
+
+  # POST /insales/:id/add_order_update_webhook
+  def add_order_update_webhook
+    render_webhook_result(@insale.add_order_update_webhook)
+  end
+
+  private
+
+  def render_webhook_result(success, messages)
+    message_text = messages.is_a?(Array) ? messages.join(", ") : messages.to_s
     if success
-      flash[:notice] = t('.webhook_success', message: messages.join(', '))
+      flash[:notice] = t(".webhook_success", message: message_text)
     else
-      flash[:alert] = t('.webhook_error', messages: messages.join(', '))
+      flash[:alert] = t(".webhook_error", messages: message_text)
     end
 
     respond_to do |format|
       format.html { redirect_to insales_path }
-      format.turbo_stream do
-        render turbo_stream: [render_turbo_flash]
-      end
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
 

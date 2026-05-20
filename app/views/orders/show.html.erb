@@ -1,0 +1,171 @@
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-xl font-semibold flex items-center gap-2 flex-wrap">
+      <%= t(".heading", number: order_display_number(@order)) %>
+      <%= order_source_badge(@order) %>
+      <%= order_status_badge(@order) %>
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">
+      <%= t(".created_at", time: l(@order.created_at)) %>
+      <% if @order.synced_at.present? %>
+        · <%= t(".synced_at", time: l(@order.synced_at)) %>
+      <% end %>
+    </p>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <%= link_to t("actions.back"), orders_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" %>
+    <% if !@order.moysklad_linked? && @order.source != "moysklad" %>
+      <%= button_to t(".export_to_moysklad"), export_to_moysklad_order_path(@order),
+          method: :post,
+          class: "px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm",
+          data: { turbo_confirm: t(".export_confirm") } %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  <div class="lg:col-span-2 space-y-4">
+    <div class="bg-white rounded-lg shadow p-5">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3"><%= t(".items_heading") %></h2>
+      <% if @order_items.any? %>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-gray-500 border-b">
+              <th class="pb-2 pr-2"><%= t("activerecord.attributes.order_item.title") %></th>
+              <th class="pb-2 pr-2"><%= t("activerecord.attributes.order_item.sku") %></th>
+              <th class="pb-2 pr-2 text-right"><%= t("activerecord.attributes.order_item.quantity") %></th>
+              <th class="pb-2 pr-2 text-right"><%= t("activerecord.attributes.order_item.price") %></th>
+              <th class="pb-2 text-right"><%= t(".line_sum") %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @order_items.each do |item| %>
+              <tr class="border-b border-gray-100">
+                <td class="py-2 pr-2">
+                  <% if item.variant&.product %>
+                    <%= link_to item.title.presence || item.variant.product.title,
+                        edit_product_path(item.variant.product),
+                        class: "text-violet-700 hover:text-violet-900",
+                        data: { turbo: false } %>
+                  <% else %>
+                    <%= item.title.presence || "—" %>
+                  <% end %>
+                </td>
+                <td class="py-2 pr-2 font-mono text-xs text-gray-600"><%= item.sku.presence || "—" %></td>
+                <td class="py-2 pr-2 text-right"><%= item.quantity %></td>
+                <td class="py-2 pr-2 text-right"><%= number_to_currency(item.price || 0, unit: currency_unit(@order.currency), format: "%n %u") %></td>
+                <td class="py-2 text-right font-medium"><%= number_to_currency(item.line_sum, unit: currency_unit(@order.currency), format: "%n %u") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="pt-3 text-right text-gray-600"><%= t("activerecord.attributes.order.total_sum") %></td>
+              <td class="pt-3 text-right font-semibold"><%= format_order_money(@order) %></td>
+            </tr>
+          </tfoot>
+        </table>
+      <% else %>
+        <p class="text-gray-500"><%= t(".no_items") %></p>
+      <% end %>
+    </div>
+
+    <% if @order.comment.present? %>
+      <div class="bg-white rounded-lg shadow p-5">
+        <h2 class="text-sm font-semibold text-gray-700 mb-2"><%= t("activerecord.attributes.order.comment") %></h2>
+        <p class="text-sm text-gray-800 whitespace-pre-wrap"><%= @order.comment %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="space-y-4">
+    <div class="bg-white rounded-lg shadow p-5">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3"><%= t(".client_heading") %></h2>
+      <% if @order.client %>
+        <dl class="space-y-2 text-sm">
+          <div>
+            <dt class="text-gray-500"><%= t(".client_name") %></dt>
+            <dd>
+              <%= link_to order_client_name(@order), client_path(@order.client),
+                  class: "text-blue-600 hover:text-blue-800",
+                  data: { turbo: false } %>
+            </dd>
+          </div>
+          <% if @order.client.email.present? %>
+            <div>
+              <dt class="text-gray-500"><%= t("activerecord.attributes.client.email") %></dt>
+              <dd><%= @order.client.email %></dd>
+            </div>
+          <% end %>
+          <% if @order.client.phone.present? %>
+            <div>
+              <dt class="text-gray-500"><%= t("activerecord.attributes.client.phone") %></dt>
+              <dd><%= @order.client.phone %></dd>
+            </div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="text-gray-500 text-sm">—</p>
+      <% end %>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-5">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3"><%= t(".integrations_heading") %></h2>
+      <dl class="space-y-3 text-sm">
+        <% if @order.moysklad_linked? %>
+          <div>
+            <dt class="text-gray-500"><%= t("activerecord.attributes.order.moysklad_order_id") %></dt>
+            <dd class="font-mono text-xs break-all">
+              <%= link_to @order.moysklad_order_id, moysklad_order_url(@order),
+                  target: "_blank", rel: "noopener", class: "text-emerald-700 hover:text-emerald-900" %>
+            </dd>
+            <% if @order.moysklad_external_code.present? %>
+              <dd class="text-xs text-gray-500 mt-1">
+                <%= t("activerecord.attributes.order.moysklad_external_code") %>: <%= @order.moysklad_external_code %>
+              </dd>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @order.avito_order_id.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t("activerecord.attributes.order.avito_order_id") %></dt>
+            <dd class="font-mono text-xs"><%= @order.avito_order_id %></dd>
+            <% if @order.avito_marketplace_id.present? %>
+              <dd class="text-xs text-gray-500 mt-1">
+                marketplaceId: <%= @order.avito_marketplace_id %>
+              </dd>
+            <% end %>
+            <% if @order.avito_status_sent.present? %>
+              <dd class="text-xs text-gray-500 mt-1">
+                Avito transition: <%= @order.avito_status_sent %>
+              </dd>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if @order.insales_order_id.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t("activerecord.attributes.order.insales_order_id") %></dt>
+            <dd class="font-mono text-xs">
+              <% url = insales_order_url(@order) %>
+              <% if url %>
+                <%= link_to @order.insales_order_id, url, target: "_blank", rel: "noopener",
+                    class: "text-blue-700 hover:text-blue-900" %>
+              <% else %>
+                <%= @order.insales_order_id %>
+              <% end %>
+            </dd>
+            <% if @order.insale %>
+              <dd class="text-xs text-gray-500 mt-1"><%= @order.insale.api_link %></dd>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% unless @order.moysklad_linked? || @order.avito_order_id.present? || @order.insales_order_id.present? %>
+          <p class="text-gray-500"><%= t(".no_external_ids") %></p>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+</div>

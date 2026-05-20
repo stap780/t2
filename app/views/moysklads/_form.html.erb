@@ -17,6 +17,26 @@
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
+
+    <p class="text-sm font-semibold text-gray-800 pt-2"><%= t("moysklads.form.order_export_heading") %></p>
+
+    <div class="space-y-2">
+      <%= form.label :organization_href, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :organization_href,
+          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :agent_href, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :agent_href,
+          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
+    </div>
+
+    <div class="space-y-2">
+      <%= form.label :store_href, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :store_href,
+          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
+    </div>
   </div>
 
   <!-- Action Buttons -->

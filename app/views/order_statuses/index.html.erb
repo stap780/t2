@@ -1,0 +1,22 @@
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-xl font-semibold"><%= t(".heading") %></h1>
+  <div class="flex space-x-2">
+    <%= link_to t(".new"), new_order_status_path,
+        class: "inline-flex items-center px-3 py-1 bg-violet-600 text-white rounded-md hover:bg-violet-700",
+        data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+  </div>
+</div>
+<%= turbo_stream_from "order_statuses" %>
+<div class="bg-white rounded-lg shadow divide-y overflow-x-auto">
+  <div class="grid grid-cols-[80px_120px_1fr_80px_100px_200px] gap-4 p-4 font-medium text-gray-700 text-sm min-w-[800px]">
+    <div><%= t(".sort") %></div>
+    <div><%= t("activerecord.attributes.order_status.code") %></div>
+    <div><%= t("activerecord.attributes.order_status.title") %></div>
+    <div><%= t("activerecord.attributes.order_status.is_terminal") %></div>
+    <div><%= t("activerecord.attributes.order_status.color") %></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "order_statuses", class: "divide-y", data: { controller: "sortable" } do %>
+    <%= render @order_statuses %>
+  <% end %>
+</div>

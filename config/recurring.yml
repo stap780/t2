@@ -46,3 +46,7 @@ production:
   insales_images_sync:
     class: InsalesImagesSyncJob
     schedule: at 20:45 every day  # Синхронизация изображений InSales
+
+  avito_orders_sync:
+    class: AvitoOrdersSyncJob
+    schedule: every 5 minutes  # Заказы Авито → реестр → МойСклад

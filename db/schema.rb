@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_19_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "avito_order_status_mappings", force: :cascade do |t|
+    t.bigint "order_status_id", null: false
+    t.string "avito_status", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_status_id"], name: "index_avito_order_status_mappings_on_order_status_id", unique: true
   end
 
   create_table "avitos", force: :cascade do |t|
@@ -442,6 +450,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "insales_order_status_mappings", force: :cascade do |t|
+    t.bigint "insale_id"
+    t.string "insales_status_key", null: false
+    t.string "insales_status_title"
+    t.bigint "order_status_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["insale_id", "insales_status_key"], name: "index_insales_order_status_mappings_on_insale_and_key", unique: true
+    t.index ["insale_id"], name: "index_insales_order_status_mappings_on_insale_id"
+    t.index ["order_status_id"], name: "index_insales_order_status_mappings_on_order_status_id"
+  end
+
   create_table "item_statuses", force: :cascade do |t|
     t.string "title"
     t.string "color"
@@ -469,11 +489,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
     t.index ["variant_id"], name: "index_items_on_variant_id"
   end
 
+  create_table "moysklad_order_status_mappings", force: :cascade do |t|
+    t.string "moysklad_state_href", null: false
+    t.string "moysklad_state_name"
+    t.bigint "order_status_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["moysklad_state_href"], name: "index_moysklad_order_status_mappings_on_moysklad_state_href", unique: true
+    t.index ["order_status_id"], name: "index_moysklad_order_status_mappings_on_order_status_id"
+  end
+
   create_table "moysklads", force: :cascade do |t|
     t.string "api_key"
     t.string "api_password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "organization_href"
+    t.string "agent_href"
+    t.string "store_href"
   end
 
   create_table "okrugs", force: :cascade do |t|
@@ -482,6 +515,64 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["title"], name: "index_okrugs_on_title", unique: true
+  end
+
+  create_table "order_items", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "variant_id"
+    t.integer "quantity", default: 1, null: false
+    t.decimal "price", precision: 12, scale: 2
+    t.integer "vat", default: 0, null: false
+    t.string "title"
+    t.string "sku"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+    t.index ["variant_id"], name: "index_order_items_on_variant_id"
+  end
+
+  create_table "order_statuses", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "title", null: false
+    t.string "color"
+    t.integer "position", default: 1, null: false
+    t.boolean "is_terminal", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_order_statuses_on_code", unique: true
+    t.index ["position"], name: "index_order_statuses_on_position"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "client_id"
+    t.bigint "order_status_id"
+    t.string "source", null: false
+    t.string "number"
+    t.decimal "total_sum", precision: 12, scale: 2
+    t.string "currency", default: "RUB", null: false
+    t.text "comment"
+    t.string "moysklad_order_id"
+    t.string "moysklad_external_code"
+    t.string "last_moysklad_state_href"
+    t.bigint "avito_id"
+    t.string "avito_order_id"
+    t.string "avito_status_sent"
+    t.bigint "insale_id"
+    t.string "insales_order_id"
+    t.datetime "synced_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "avito_marketplace_id"
+    t.index ["avito_id", "avito_marketplace_id"], name: "index_orders_on_avito_id_and_marketplace_id", unique: true, where: "(avito_marketplace_id IS NOT NULL)"
+    t.index ["avito_id", "avito_order_id"], name: "index_orders_on_avito_id_and_avito_order_id", unique: true, where: "(avito_order_id IS NOT NULL)"
+    t.index ["avito_id"], name: "index_orders_on_avito_id"
+    t.index ["client_id"], name: "index_orders_on_client_id"
+    t.index ["insale_id", "insales_order_id"], name: "index_orders_on_insale_id_and_insales_order_id", unique: true, where: "(insales_order_id IS NOT NULL)"
+    t.index ["insale_id"], name: "index_orders_on_insale_id"
+    t.index ["moysklad_order_id"], name: "index_orders_on_moysklad_order_id", unique: true, where: "(moysklad_order_id IS NOT NULL)"
+    t.index ["number"], name: "index_orders_on_number"
+    t.index ["order_status_id"], name: "index_orders_on_order_status_id"
+    t.index ["source"], name: "index_orders_on_source"
   end
 
   create_table "products", force: :cascade do |t|
@@ -585,6 +676,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
   add_foreign_key "acts", "companies", column: "strah_id"
   add_foreign_key "acts", "okrugs"
   add_foreign_key "acts", "users", column: "driver_id"
+  add_foreign_key "avito_order_status_mappings", "order_statuses"
   add_foreign_key "characteristics", "properties"
   add_foreign_key "client_companies", "clients"
   add_foreign_key "client_companies", "companies"
@@ -604,8 +696,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_25_120000) do
   add_foreign_key "incase_item_dubls", "incase_dubls"
   add_foreign_key "incases", "companies"
   add_foreign_key "incases", "companies", column: "strah_id"
+  add_foreign_key "insales_order_status_mappings", "insales"
+  add_foreign_key "insales_order_status_mappings", "order_statuses"
   add_foreign_key "items", "incases"
   add_foreign_key "items", "variants"
+  add_foreign_key "moysklad_order_status_mappings", "order_statuses"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "variants"
+  add_foreign_key "orders", "avitos"
+  add_foreign_key "orders", "clients"
+  add_foreign_key "orders", "insales"
+  add_foreign_key "orders", "order_statuses"
   add_foreign_key "schedule_days", "employees"
   add_foreign_key "schedule_days", "shift_codes"
   add_foreign_key "sessions", "users"

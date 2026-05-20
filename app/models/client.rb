@@ -4,6 +4,7 @@ class Client < ApplicationRecord
 
   has_many :client_companies
   has_many :companies, through: :client_companies
+  has_many :orders, dependent: :nullify
   
   validates :name, presence: true
   validates :email, presence: true

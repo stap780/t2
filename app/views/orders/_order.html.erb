@@ -1,0 +1,24 @@
+<%= turbo_frame_tag dom_id(order),
+    class: "grid grid-cols-[70px_100px_120px_1fr_100px_120px_140px] gap-3 px-4 py-3 border-t hover:bg-gray-50 text-sm min-w-[900px] items-center" do %>
+  <div class="text-gray-500"><%= order.id %></div>
+  <div><%= order_source_badge(order) %></div>
+  <div>
+    <%= link_to order_display_number(order), order_path(order),
+        class: "text-violet-700 hover:text-violet-900 font-medium",
+        data: { turbo: false } %>
+  </div>
+  <div class="truncate">
+    <% if order.client %>
+      <%= link_to order_client_name(order), client_path(order.client),
+          class: "text-blue-600 hover:text-blue-800",
+          data: { turbo: false } %>
+    <% else %>
+      <span class="text-gray-400">—</span>
+    <% end %>
+  </div>
+  <div><%= order_status_badge(order) %></div>
+  <div class="text-right font-medium"><%= format_order_money(order) %></div>
+  <div class="text-gray-500 text-xs">
+    <%= order.synced_at ? l(order.synced_at) : "—" %>
+  </div>
+<% end %>

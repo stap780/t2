@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Avito < ApplicationRecord
+  has_many :orders, dependent: :nullify
+
   validates :title, presence: true
   validates :api_id, presence: true, uniqueness: true
   validates :api_secret, presence: true, uniqueness: true

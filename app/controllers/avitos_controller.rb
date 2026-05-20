@@ -3,10 +3,6 @@
 class AvitosController < ApplicationController
   include ActionView::RecordIdentifier
 
-  AVITO_API_BASE = "https://api.avito.ru"
-  # Как в dizauto: order-management (версия API уточняется в доке Авито при смене)
-  ORDERS_PATH = "/order-management/1/orders"
-
   before_action :set_avito, only: %i[show edit update destroy fetch_orders]
 
   def index
@@ -43,6 +39,7 @@ class AvitosController < ApplicationController
   def update
     respond_to do |format|
       if @avito.update(avito_params)
+        AvitoApi::Auth.new(@avito).clear_cache!
         format.html { redirect_to avitos_path, notice: t(".updated") }
         format.turbo_stream do
           flash[:notice] = t(".updated")
@@ -72,9 +69,28 @@ class AvitosController < ApplicationController
     end
   end
 
-  # GET /avitos/:id/fetch_orders — тянем заказы с API, только лог в Rails.logger
+  # GET /avitos/:id/fetch_orders — импорт заказов в реестр и выгрузка в МС
   def fetch_orders
-    fetch_and_log_avito_orders(@avito)
+    stats = AvitoApi::Orders::SyncAccount.call(avito: @avito)
+
+    if stats.errors.include?("no_avito_token")
+      flash[:alert] = t(".fetch_error", message: t(".fetch_no_token"))
+    elsif stats.errors.any?
+      flash[:alert] = t(
+        ".fetch_partial",
+        imported: stats.imported,
+        moysklad_created: stats.moysklad_created,
+        errors: stats.errors.first(3).join("; ")
+      )
+    else
+      flash[:notice] = t(
+        ".fetch_success",
+        imported: stats.imported,
+        updated: stats.updated,
+        skipped: stats.skipped,
+        moysklad_created: stats.moysklad_created
+      )
+    end
 
     respond_to do |format|
       format.html { redirect_to avitos_path }
@@ -90,60 +106,5 @@ class AvitosController < ApplicationController
 
   def avito_params
     params.require(:avito).permit(:title, :api_id, :api_secret, :profileid)
-  end
-
-  def fetch_and_log_avito_orders(avito)
-    token = request_avito_access_token(avito)
-    if token.blank?
-      flash[:alert] = t(".fetch_error", message: t(".fetch_no_token"))
-      return
-    end
-
-    url = "#{AVITO_API_BASE}#{ORDERS_PATH}"
-    response = RestClient.get(
-      url,
-      { Authorization: "Bearer #{token}", "Content-Type" => "application/json" }
-    )
-    Rails.logger.info(
-      "[Avito##{avito.id}] orders_response status=#{response.code} body=#{response.body}"
-    )
-    flash[:notice] = t(".fetch_success")
-  rescue RestClient::ExceptionWithResponse => e
-    body = e.http_body
-    code = e.http_code
-    Rails.logger.error "[Avito##{avito.id}] orders_response error status=#{code} body=#{body}"
-    flash[:alert] = t(".fetch_error", message: "#{code}: #{truncate_for_flash(body)}")
-  rescue JSON::ParserError, SocketError, StandardError => e
-    Rails.logger.error "[Avito##{avito.id}] fetch_orders #{e.class}: #{e.message}"
-    flash[:alert] = t(".fetch_error", message: e.message)
-  end
-
-  def request_avito_access_token(avito)
-    response = RestClient.post(
-      "#{AVITO_API_BASE}/token",
-      {
-        client_id: avito.api_id,
-        client_secret: avito.api_secret,
-        grant_type: "client_credentials"
-      },
-      { "Content-Type" => "application/x-www-form-urlencoded" }
-    )
-    Rails.logger.info(
-      "[Avito##{avito.id}] token_response status=#{response.code} body=#{response.body}"
-    )
-    JSON.parse(response.body)["access_token"]
-  rescue RestClient::ExceptionWithResponse => e
-    Rails.logger.error(
-      "[Avito##{avito.id}] token error status=#{e.http_code} body=#{e.http_body}"
-    )
-    nil
-  rescue JSON::ParserError, StandardError => e
-    Rails.logger.error "[Avito##{avito.id}] token #{e.class}: #{e.message}"
-    nil
-  end
-
-  def truncate_for_flash(str, n = 200)
-    s = str.to_s
-    s.length > n ? "#{s[0, n]}…" : s
   end
 end

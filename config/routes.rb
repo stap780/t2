@@ -159,6 +159,7 @@ Rails.application.routes.draw do
     member do
       get :check
       post :add_order_webhook
+      post :add_order_update_webhook
     end
   end
 
@@ -216,6 +217,19 @@ Rails.application.routes.draw do
   end
 
   resources :item_statuses
+  resources :orders, only: %i[index show] do
+    member do
+      post :export_to_moysklad
+    end
+  end
+  resources :order_statuses do
+    member do
+      patch :sort
+    end
+  end
+  resources :moysklad_order_status_mappings, except: [:show]
+  resources :avito_order_status_mappings, except: [:show]
+  resources :insales_order_status_mappings, except: [:show]
 
   resources :okrugs do
     member do
@@ -291,8 +305,8 @@ Rails.application.routes.draw do
 
   # API webhooks and external endpoints (bypass allow_browser)
   namespace :api do
-    post 'insales/order', to: 'insales#order'
-    post 'moysklads/order', to: 'moysklads#order'
+    post "insales/:id/order", to: "insales#order", as: :insale_order
+    post "moysklads/order", to: "moysklads#order"
   end
   
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

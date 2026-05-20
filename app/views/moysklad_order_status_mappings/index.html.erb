@@ -1,0 +1,22 @@
+<div class="flex items-center justify-between mb-4">
+  <div>
+    <h1 class="text-xl font-semibold"><%= t(".heading") %></h1>
+    <p class="text-sm text-gray-500 mt-1"><%= t(".hint") %></p>
+  </div>
+  <%= link_to t(".new"),
+      new_moysklad_order_status_mapping_path,
+      class: "inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700",
+      data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+</div>
+<div class="bg-white rounded-lg shadow divide-y">
+  <div class="grid grid-cols-[50px_1fr_200px_200px_120px] gap-4 p-4 font-medium text-gray-700">
+    <div>#</div>
+    <div><%= t("activerecord.attributes.moysklad_order_status_mapping.moysklad_state_href") %></div>
+    <div><%= t("activerecord.attributes.moysklad_order_status_mapping.moysklad_state_name") %></div>
+    <div><%= t("activerecord.attributes.moysklad_order_status_mapping.order_status") %></div>
+    <div></div>
+  </div>
+  <%= turbo_frame_tag "moysklad_order_status_mappings" do %>
+    <%= render partial: "mapping", collection: @mappings, as: :mapping %>
+  <% end %>
+</div>

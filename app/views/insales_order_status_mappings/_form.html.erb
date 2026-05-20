@@ -1,0 +1,26 @@
+<%= form_with model: mapping, local: true, class: 'space-y-4' do |f| %>
+  <%= render 'shared/errors', object: mapping %>
+  <fieldset>
+    <%= f.label :insale_id, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+    <%= f.select :insale_id,
+        options_for_select([[t('insales_order_status_mappings.form.any_shop'), '']] + Insale.order(:id).map { |i| ["##{i.id} #{i.api_link}", i.id] }, mapping.insale_id),
+        {}, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
+  </fieldset>
+  <fieldset>
+    <%= f.label :insales_status_key, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+    <%= f.text_field :insales_status_key, class: 'w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm' %>
+    <p class="text-xs text-gray-500 mt-1"><%= t('insales_order_status_mappings.form.insales_status_hint') %></p>
+  </fieldset>
+  <fieldset>
+    <%= f.label :insales_status_title, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+    <%= f.text_field :insales_status_title, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
+  </fieldset>
+  <fieldset>
+    <%= f.label :order_status_id, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+    <%= f.select :order_status_id, order_status_options_for_select(mapping.order_status_id),
+        {}, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
+  </fieldset>
+  <div class="flex justify-end">
+    <%= f.submit t('actions.save'), class: 'px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700' %>
+  </div>
+<% end %>
