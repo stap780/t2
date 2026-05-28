@@ -1,0 +1,39 @@
+<%= form_with model: [insale, mapping], local: true, class: "space-y-4" do |f| %>
+  <%= render "shared/errors", object: mapping %>
+
+  <fieldset>
+    <%= f.label :source_key, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.select :source_key,
+        options_for_select(
+          OrderFieldSourceKeys::SOURCE_KEYS.map { |k, label| [label, k] },
+          mapping.source_key
+        ),
+        { include_blank: true },
+        class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+  </fieldset>
+
+  <fieldset>
+    <%= f.label :insales_field_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <% if @insales_fields.present? %>
+      <%= f.select :insales_field_id,
+          options_for_select(
+            @insales_fields.map { |row| ["#{row[:title]} (#{row[:handle].presence || row[:id]})", row[:id]] },
+            mapping.insales_field_id
+          ),
+          { include_blank: true },
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+    <% else %>
+      <%= f.number_field :insales_field_id,
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+      <%= f.text_field :insales_field_handle,
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md mt-2 font-mono text-sm",
+          placeholder: "handle" %>
+      <p class="text-xs text-amber-600 mt-1"><%= t("insales_order_field_mappings.form.fields_api_unavailable") %></p>
+    <% end %>
+    <p class="text-xs text-gray-500 mt-1"><%= t("insales_order_field_mappings.form.field_hint") %></p>
+  </fieldset>
+
+  <div class="flex justify-end">
+    <%= f.submit t("actions.save"), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+  </div>
+<% end %>

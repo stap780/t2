@@ -1,18 +1,14 @@
 # frozen_string_literal: true
 
 class InsalesOrderStatusMapping < ApplicationRecord
-  belongs_to :insale, optional: true
+  FINANCIAL_STATUSES = %w[pending paid].freeze
+
+  belongs_to :insale
   belongs_to :order_status
 
-  before_validation :normalize_insale_id
-
-  validates :insales_status_key, presence: true
-  validates :insales_status_key, uniqueness: { scope: :insale_id }
+  validates :insales_custom_status_permalink, presence: true
+  validates :insales_financial_status, presence: true, inclusion: { in: FINANCIAL_STATUSES }
+  validates :insales_custom_status_permalink,
+            uniqueness: { scope: %i[insale_id insales_financial_status] }
   validates :order_status_id, presence: true
-
-  private
-
-  def normalize_insale_id
-    self.insale_id = nil if insale_id.blank?
-  end
 end

@@ -1,0 +1,29 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="flex items-center justify-between p-4 border-b border-gray-200">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900"><%= t("moysklads.show.field_mappings_heading") %></h2>
+      <p class="text-sm text-gray-500 mt-1"><%= t("moysklads.show.field_mappings_hint") %></p>
+    </div>
+    <% if api_ok %>
+      <%= link_to t("moysklad_order_status_mappings.index.new"),
+          new_moysklad_moysklad_order_field_mapping_path(moysklad),
+          class: "inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700",
+          data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-[50px_1fr_1fr_120px] gap-4 p-4 font-medium text-gray-700 border-b">
+    <div>#</div>
+    <div><%= t("activerecord.attributes.moysklad_order_field_mapping.source_key") %></div>
+    <div><%= t("activerecord.attributes.moysklad_order_field_mapping.ms_attribute_name") %></div>
+    <div></div>
+  </div>
+
+  <%= turbo_frame_tag "moysklad_order_field_mappings" do %>
+    <% if mappings.any? %>
+      <%= render partial: "moysklad_order_field_mappings/mapping", collection: mappings, as: :mapping, locals: { moysklad: moysklad } %>
+    <% else %>
+      <p class="p-4 text-sm text-gray-500"><%= t("moysklads.show.no_field_mappings") %></p>
+    <% end %>
+  <% end %>
+</div>

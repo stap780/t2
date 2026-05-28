@@ -11,6 +11,8 @@ class Order < ApplicationRecord
   belongs_to :insale, optional: true
 
   has_many :order_items, dependent: :destroy
+  has_many :comments, as: :commentable, dependent: :destroy
+  has_one_attached :avito_label
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
   validates :source, presence: true, inclusion: { in: SOURCES }
@@ -34,6 +36,10 @@ class Order < ApplicationRecord
     avito_order_id.present? || source == "avito"
   end
 
+  def avito?
+    source == "avito" && avito_id.present?
+  end
+
   def insales_channel?
     insales_order_id.present? || source == "insales"
   end
@@ -44,5 +50,21 @@ class Order < ApplicationRecord
 
   def items_total
     order_items.sum { |i| i.line_sum }
+  end
+
+  def comments_description(separator: "\n\n")
+    comments.order(created_at: :asc).map(&:body).map(&:presence).compact.join(separator)
+  end
+
+  def upsert_prefixed_note(content, prefix:)
+    return if content.blank?
+
+    body = content.start_with?(prefix) ? content : "#{prefix}#{content}"
+    note = comments.find { |c| c.body.start_with?(prefix) }
+    if note
+      note.update!(body: body) if note.body != body
+    else
+      comments.create!(body: body)
+    end
   end
 end

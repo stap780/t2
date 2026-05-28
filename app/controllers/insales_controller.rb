@@ -1,7 +1,7 @@
 class InsalesController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_insale, only: %i[ show edit update destroy check add_order_webhook add_order_update_webhook ]
+  before_action :set_insale, only: %i[ show edit update destroy check fetch_orders add_order_webhook add_order_update_webhook ]
 
   # GET /insales
   def index
@@ -10,6 +10,12 @@ class InsalesController < ApplicationController
 
   # GET /insales/1
   def show
+    @api_ok, @api_errors = @insale.api_work?
+    @status_mappings = @insale.insales_order_status_mappings
+                               .includes(:order_status)
+                               .order(:insales_custom_status_permalink, :insales_financial_status)
+    @field_mappings = @insale.insales_order_field_mappings.order(:id)
+    @insales_fields = @api_ok ? Insales::ReferenceData.order_fields(@insale) : []
   end
 
   # GET /insales/new
@@ -84,10 +90,39 @@ class InsalesController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to insales_path }
+      # format.html { redirect_to insales_path }
       format.turbo_stream do
         render turbo_stream: [render_turbo_flash]
       end
+    end
+  end
+
+  # GET /insales/:id/fetch_orders — импорт заказов в реестр и выгрузка в МС
+  def fetch_orders
+    stats = Insales::Orders::SyncAccount.call(insale: @insale)
+
+    if stats.errors.include?("api_not_working")
+      flash[:alert] = t(".fetch_error", message: t(".fetch_api_not_working"))
+    elsif stats.errors.any?
+      flash[:alert] = t(
+        ".fetch_partial",
+        imported: stats.imported,
+        moysklad_created: stats.moysklad_created,
+        errors: stats.errors.first(3).join("; ")
+      )
+    else
+      flash[:notice] = t(
+        ".fetch_success",
+        imported: stats.imported,
+        updated: stats.updated,
+        skipped: stats.skipped,
+        moysklad_created: stats.moysklad_created
+      )
+    end
+
+    respond_to do |format|
+      format.html { redirect_to insales_path }
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
 

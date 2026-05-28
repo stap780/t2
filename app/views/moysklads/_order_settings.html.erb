@@ -1,0 +1,71 @@
+<section class="bg-white rounded-lg shadow border border-gray-200 p-6">
+  <h2 class="text-lg font-semibold text-gray-900"><%= t("moysklads.show.order_settings_heading") %></h2>
+  <p class="text-sm text-gray-500 mt-1 mb-4"><%= t("moysklads.show.order_settings_hint") %></p>
+
+  <% unless api_ok %>
+    <p class="text-sm text-amber-700 bg-amber-50 rounded-md p-3"><%= t("moysklads.show.order_settings_api_required") %></p>
+  <% else %>
+    <%= form_with model: moysklad, url: order_settings_moysklad_path(moysklad), method: :patch, class: "space-y-4" do |f| %>
+      <%= render "shared/errors", object: moysklad %>
+
+      <fieldset>
+        <%= f.label :organization_href, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :organization_href,
+            options_for_select(
+              organizations.map { |o| [o[:name], o[:href]] },
+              moysklad.organization_href
+            ),
+            { include_blank: t("moysklads.show.select_organization") },
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+      </fieldset>
+
+      <fieldset>
+        <%= f.label :store_href, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.select :store_href,
+            options_for_select(
+              stores.map { |s| [s[:name], s[:href]] },
+              moysklad.store_href
+            ),
+            { include_blank: t("moysklads.show.store_optional") },
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+      </fieldset>
+
+      <fieldset>
+        <%= f.label :default_ad_source_href, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <% if ms_ad_source_entities.present? %>
+          <%= f.select :default_ad_source_href,
+              options_for_select(
+                ms_ad_source_entities.map { |e| [e[:name], e[:href]] },
+                moysklad.default_ad_source_href
+              ),
+              { include_blank: t("moysklads.show.default_ad_source_optional") },
+              required: true,
+              class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+        <% else %>
+          <p class="text-sm text-amber-700 bg-amber-50 rounded-md p-3"><%= t("moysklads.show.ad_source_attribute_missing") %></p>
+        <% end %>
+        <p class="text-xs text-gray-500 mt-1"><%= t("moysklads.show.default_ad_source_hint") %></p>
+      </fieldset>
+
+      <fieldset>
+        <%= f.label :order_number_prefix, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :order_number_prefix,
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md",
+            placeholder: t("moysklads.show.order_number_prefix_placeholder") %>
+        <p class="text-xs text-gray-500 mt-1"><%= t("moysklads.show.order_number_prefix_hint") %></p>
+      </fieldset>
+
+      <fieldset>
+        <%= f.label :orders_integration_start_at, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.datetime_local_field :orders_integration_start_at,
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md",
+            include_seconds: false %>
+        <p class="text-xs text-gray-500 mt-1"><%= t("moysklads.show.orders_integration_start_at_hint") %></p>
+      </fieldset>
+
+      <div class="flex justify-end pt-2">
+        <%= f.submit t("actions.save"), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
+      </div>
+    <% end %>
+  <% end %>
+</section>

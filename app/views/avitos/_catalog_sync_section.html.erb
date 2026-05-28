@@ -1,0 +1,18 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="flex flex-wrap items-center justify-between gap-4 p-4 border-b border-gray-200">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900"><%= t("avitos.show.catalog_sync_heading") %></h2>
+      <p class="text-sm text-gray-500 mt-1"><%= t("avitos.show.catalog_sync_hint") %></p>
+    </div>
+    <%= link_to sync_catalog_avito_path(avito), data: { turbo_stream: true },
+        class: "inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700" do %>
+      <%= t("avitos.avito.sync_catalog") %>
+    <% end if api_ok %>
+  </div>
+
+  <div class="p-4">
+    <p class="text-sm text-gray-700">
+      <%= t("avitos.show.catalog_synced_count", count: synced_count) %>
+    </p>
+  </div>
+</div>

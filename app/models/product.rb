@@ -29,7 +29,7 @@ class Product < ApplicationRecord
 
   after_create_commit :pull_product_from_detals
   after_update :sync_product_data_to_detals
-  before_destroy :check_variants_have_items, prepend: true
+  before_destroy :check_variants_destroy_blockers, prepend: true
 
   validates :title, presence: true
 
@@ -71,6 +71,43 @@ class Product < ApplicationRecord
     where.not(id: joins(variants: :bindings).where(varbinds: { bindable_type: 'Moysklad' }).select(:id))
   }
 
+  def self.with_avito_scope_name(avito_id)
+    :"with_avito_#{avito_id}"
+  end
+
+  def self.without_avito_scope_name(avito_id)
+    :"without_avito_#{avito_id}"
+  end
+
+  def self.avito_filter_scope_names
+    return [] unless Avito.table_exists?
+
+    Avito.pluck(:id).flat_map do |avito_id|
+      define_avito_filter_scopes!(avito_id)
+      [with_avito_scope_name(avito_id), without_avito_scope_name(avito_id)]
+    end
+  end
+
+  def self.define_avito_filter_scopes!(avito_id)
+    with_name = with_avito_scope_name(avito_id)
+    unless respond_to?(with_name)
+      scope with_name, -> {
+        where(id: joins(:bindings)
+          .where(varbinds: { bindable_type: "Avito", bindable_id: avito_id })
+          .select(:id))
+      }
+    end
+
+    without_name = without_avito_scope_name(avito_id)
+    return if respond_to?(without_name)
+
+    scope without_name, -> {
+      where.not(id: joins(:bindings)
+        .where(varbinds: { bindable_type: "Avito", bindable_id: avito_id })
+        .select(:id))
+    }
+  end
+
   # Scopes для фильтрации по опасным/предупреждающим ценам
   scope :danger_true, -> { 
     joins(:variants)
@@ -94,6 +131,10 @@ class Product < ApplicationRecord
   # Константы для статусов и типов
   STATUS = %w[draft pending in_progress active archived].freeze
   TIP = %w[product service kit].freeze
+  VARIANT_DESTROY_BLOCKERS = [
+    [Item, :variants_have_items],
+    [OrderItem, :variants_have_order_items]
+  ].freeze
 
   # Ключи audited_changes для фильтра по истории (прямые и связанные аудиты товара)
   AUDIT_CHANGE_KEYS = [
@@ -120,7 +161,8 @@ class Product < ApplicationRecord
   end
 
   def self.ransackable_scopes(auth_object = nil)
-    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad without_insale without_moysklad danger_true warning_true]
+    %i[no_quantity yes_quantity all_quantity no_price yes_price with_images without_images with_insale with_moysklad without_insale without_moysklad danger_true warning_true] +
+      avito_filter_scope_names
   end
 
   # Ransacker для фильтрации по номеру акта через variants -> items -> acts
@@ -281,38 +323,39 @@ class Product < ApplicationRecord
 
   private
 
-  def check_variants_have_items
-    # Проверяем, есть ли позиции убытка (Item), которые ссылаются на Variant этого Product
+  def check_variants_destroy_blockers
     variant_ids = variants.pluck(:id)
     return if variant_ids.empty?
-    
-    items_count = Item.where(variant_id: variant_ids).count
-    if items_count > 0
-      errors.add(:base, I18n.t('activerecord.errors.models.product.variants_have_items', count: items_count))
+
+    VARIANT_DESTROY_BLOCKERS.each do |model, i18n_key|
+      count = model.where(variant_id: variant_ids).count
+      next if count.zero?
+
+      errors.add(:base, I18n.t("activerecord.errors.models.product.#{i18n_key}", count: count))
       throw(:abort)
     end
   end
 
-  def check_variants_have_relations
-    if variants.size.positive?
-      variants.each do |var|
-        if var.respond_to?(:relation?)
-          success, models = var.relation?
-          if success
-            models.each do |model|
-              text = "Cannot delete. You have #{I18n.t(model)} with it."
-              errors.add(:base, text)
-            end
-          end
-        end
-      end
-    end
+  # def check_variants_have_relations
+  #   if variants.size.positive?
+  #     variants.each do |var|
+  #       if var.respond_to?(:relation?)
+  #         success, models = var.relation?
+  #         if success
+  #           models.each do |model|
+  #             text = "Cannot delete. You have #{I18n.t(model)} with it."
+  #             errors.add(:base, text)
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
 
-    return unless errors.present?
+  #   return unless errors.present?
 
-    errors.add(:base, 'Cannot delete product')
-    throw(:abort)
-  end
+  #   errors.add(:base, 'Cannot delete product')
+  #   throw(:abort)
+  # end
 
   # Синхронизация с InSales API
   def insale_api_update

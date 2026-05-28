@@ -1,0 +1,53 @@
+<% content_for :title, t("avitos.show.title") %>
+
+<div class="container mx-auto px-0 max-w-5xl">
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center space-x-4">
+      <%= link_to_back avitos_path %>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900"><%= @avito.title %></h1>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to fetch_orders_avito_path(@avito),
+        class: "inline-flex items-center px-3 py-1 border border-amber-300 shadow-sm text-xs font-medium rounded text-amber-900 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition duration-150 ease-in-out",
+        data: { turbo: false } do %>
+    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+    <%= t("avitos.avito.fetch_orders") %>
+  <% end %>
+      <%= link_to edit_avito_path(@avito),
+        class: "inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+        data: { turbo_frame: :offcanvas } do %>
+    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+  <% end %>
+    </div>
+  </div>
+
+  <% if @api_ok %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-50 text-green-700">
+      <%= t("avitos.show.api_ok") %>
+    </p>
+  <% else %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-700">
+      <%= t("avitos.show.api_error") %>
+    </p>
+  <% end %>
+
+  <section id="avitos_statuses" class="mt-8 mb-12 scroll-mt-4">
+    <%= render "avitos/status_mappings_section",
+        avito: @avito,
+        mappings: @status_mappings,
+        api_ok: @api_ok %>
+  </section>
+
+  <section id="avitos_catalog" class="mb-12 scroll-mt-4">
+    <%= render "avitos/catalog_sync_section",
+        avito: @avito,
+        synced_count: @catalog_synced_count,
+        api_ok: @api_ok %>
+  </section>
+</div>

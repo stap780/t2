@@ -1,17 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  surname: MyString
-  name: MyString
-  middlename: MyString
-  phone: MyString
-  email: MyString
-  insid: 1
+  surname: One
+  name: Client One
+  phone: "79001111111"
+  email: client_one@example.com
 
 two:
-  surname: MyString
-  name: MyString
-  middlename: MyString
-  phone: MyString
-  email: MyString
-  insid: 1
+  surname: Two
+  name: Client Two
+  phone: "79002222222"
+  email: client_two@example.com

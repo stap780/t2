@@ -1,3 +1,5 @@
-<%= render 'shared/offcanvas_inner', title: t('.title'), width: '32rem' do %>
-  <%= render 'form', mapping: @mapping %>
+<%= render "shared/offcanvas_inner", title: t(".title"), width: "32rem" do %>
+  <div id="<%= dom_id(@mapping, :form) %>">
+    <%= render "form", mapping: @mapping %>
+  </div>
 <% end %>

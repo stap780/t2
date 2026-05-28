@@ -1,3 +1,5 @@
-<%= render 'shared/offcanvas_inner', title: t('.title'), width: '28rem' do %>
-  <%= render 'form', mapping: @mapping %>
+<%= render "shared/offcanvas_inner", title: t(".title"), width: "28rem" do %>
+  <div id="new_avito_order_status_mapping_form">
+    <%= render "form", mapping: @mapping, avito: @avito %>
+  </div>
 <% end %>

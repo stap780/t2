@@ -4,7 +4,7 @@ require "rest-client"
 
 module MoyskladApi
   module Orders
-    # Создание customerorder в МойСклад из записи Order (после импорта с Авито).
+    # Создание customerorder в МойСклад из записи Order (Avito / InSales).
     class CreateFromAppOrder
       def self.call(order:, moysklad:)
         new(order:, moysklad:).call
@@ -22,18 +22,30 @@ module MoyskladApi
         return { success: false, error: "no_moysklad_positions" } if positions.empty?
 
         org_href = @moysklad.organization_href
-        agent_href = @moysklad.agent_href
-        return { success: false, error: "moysklad_not_configured" } if org_href.blank? || agent_href.blank?
+        return { success: false, error: "moysklad_not_configured" } if org_href.blank?
+
+        return { success: false, error: "no_client_for_agent" } unless @order.client
+
+        agent_result = Counterparty::FindOrCreateFromClient.call(moysklad: @moysklad, client: @order.client)
+        return agent_result unless agent_result[:success]
+
+        if @moysklad.default_ad_source_href.blank?
+          return { success: false, error: "default_ad_source_not_configured" }
+        end
 
         payload = {
-          "name" => order_name,
           "externalCode" => @order.id.to_s,
-          "description" => @order.comment.to_s.truncate(4000),
+          "description" => @order.comments_description.truncate(4000),
           "organization" => meta(org_href),
-          "agent" => meta(agent_href),
+          "agent" => meta(agent_result[:href]),
           "positions" => positions
         }
+        name = order_name
+        payload["name"] = name if name.present?
         payload["store"] = meta(@moysklad.store_href) if @moysklad.store_href.present?
+
+        attributes = BuildCustomAttributes.call(order: @order, moysklad: @moysklad)
+        payload["attributes"] = attributes if attributes.any?
 
         response = RestClient.post(
           "#{Api::API_BASE}/entity/customerorder",
@@ -64,13 +76,8 @@ module MoyskladApi
       private
 
       def order_name
-        return @order.number if @order.number.present?
-
-        if @order.insales_order_id.present?
-          "InSales-#{@order.insales_order_id}"
-        else
-          "Avito-#{@order.avito_order_id}"
-        end
+        prefix = @moysklad.order_number_prefix.to_s.strip
+        prefix.present? ? prefix : ""
       end
 
       def build_positions
@@ -83,7 +90,6 @@ module MoyskladApi
           {
             "quantity" => item.quantity,
             "price" => ((item.price || 0) * 100).round(0),
-            "reserve" => item.quantity,
             "assortment" => {
               "meta" => {
                 "href" => "#{Api::API_BASE}/entity/product/#{moy_bind.value}",

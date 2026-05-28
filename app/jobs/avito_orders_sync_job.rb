@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AvitoOrdersSyncJob < ApplicationJob
-  queue_as :default
+  queue_as :avito_orders_sync
 
   def perform(avito_id = nil)
     scope = avito_id.present? ? Avito.where(id: avito_id) : Avito.all

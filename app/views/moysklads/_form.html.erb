@@ -2,52 +2,28 @@
   <%= render 'shared/errors', object: moysklad %>
 
   <div class="grid grid-cols-1 gap-6">
-    <!-- API Key -->
     <div class="space-y-2">
       <%= form.label :api_key, class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :api_key, 
+      <%= form.text_field :api_key,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
 
-    <!-- API Password -->
     <div class="space-y-2">
       <%= form.label :api_password, class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :api_password, 
+      <%= form.text_field :api_password,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
 
-    <p class="text-sm font-semibold text-gray-800 pt-2"><%= t("moysklads.form.order_export_heading") %></p>
-
-    <div class="space-y-2">
-      <%= form.label :organization_href, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :organization_href,
-          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
-    </div>
-
-    <div class="space-y-2">
-      <%= form.label :agent_href, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :agent_href,
-          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
-    </div>
-
-    <div class="space-y-2">
-      <%= form.label :store_href, class: "block text-sm font-medium text-gray-700" %>
-      <%= form.text_field :store_href,
-          class: "block w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-xs" %>
-    </div>
+    <p class="text-sm text-gray-500"><%= t("moysklads.form.credentials_hint") %></p>
   </div>
 
-  <!-- Action Buttons -->
   <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-    <button type="button" 
-            data-action="click->offcanvas#close"
-            class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out">
+    <button type="button" data-action="click->offcanvas#close"
+      class="inline-flex items-center px-4 py-2 border-1 border-gray-300 font-semibold rounded-lg text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out cursor-pointer">
       <%= t("actions.cancel") %>
     </button>
-    <%= form.submit data: { disable_with: t("helpers.submit.saving", default: "Saving...") },
-      class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
+    <%= form.submit t('actions.save'), data: { disable_with: t("helpers.submit.saving") }, class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
   </div>
 <% end %>
-

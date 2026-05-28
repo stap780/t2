@@ -22,12 +22,20 @@ module AvitoApi
           return @stats
         end
 
-        orders_payload = List.call(avito: @avito, params: @params)
+        orders_payload = List.call(avito: @avito, params: list_params)
+        orders_payload = orders_payload.first(1) if Rails.env.development?
         orders_payload.each { |payload| process_one(payload) }
         @stats
       end
 
       private
+
+      def list_params
+        params = @params.compact.dup
+        date_from = OrdersIntegration::Cutover.avito_date_from_param
+        params[:dateFrom] ||= date_from if date_from.present?
+        params
+      end
 
       def process_one(payload)
         result = Import.call(avito: @avito, payload: payload)
@@ -48,7 +56,19 @@ module AvitoApi
           @stats.updated += 1
         end
 
+        enqueue_label_download(result.order, payload)
         push_to_moysklad(result.order)
+      end
+
+      def enqueue_label_download(order, payload)
+        return unless pvz_delivery?(payload)
+        return if order.avito_label.attached?
+
+        AvitoOrdersDownloadLabelJob.perform_later(order.id, payload)
+      end
+
+      def pvz_delivery?(payload)
+        payload.dig("delivery", "serviceType") == "pvz"
       end
 
       def push_to_moysklad(order)

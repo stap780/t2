@@ -146,6 +146,24 @@ module ApplicationHelper
         </svg>'.html_safe
   end
 
+  def check_icon
+    '<svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>'.html_safe
+  end
+
+  def link_to_check(path, label: nil, turbo_stream: true, **options)
+    label ||= t("actions.check", default: "Проверить")
+    options[:class] ||= "inline-flex items-center px-3 py-1 border border-blue-300 shadow-sm text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+    options[:title] ||= label
+    options[:data] = (options[:data] || {}).dup
+    options[:data][:turbo_stream] = true if turbo_stream
+
+    link_to path, options do
+      safe_join([check_icon, label])
+    end
+  end
+
   def link_to_show(path, **options)
     if options[:class]
       options[:class]

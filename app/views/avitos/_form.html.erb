@@ -1,43 +1,41 @@
-<%= form_with model: avito, class: "space-y-6" do |form| %>
+<%= form_with model: avito, class: "space-y-6" do |f| %>
   <%= render "shared/errors", object: avito %>
 
   <div class="grid grid-cols-1 gap-6">
     <div class="space-y-2">
-      <%= form.label :title, class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :title,
+      <%= f.label :title, class: "block text-sm font-semibold text-gray-800" %>
+      <%= f.text_field :title,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
       %>
     </div>
 
     <div class="space-y-2">
-      <%= form.label :api_id, t("avitos.form.api_id", default: "Client ID (api_id)"), class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :api_id,
+      <%= f.label :api_id, t("avitos.form.api_id"), class: "block text-sm font-semibold text-gray-800" %>
+      <%= f.text_field :api_id,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
       %>
     </div>
 
     <div class="space-y-2">
-      <%= form.label :api_secret, t("avitos.form.api_secret", default: "Client secret"), class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.text_field :api_secret,
+      <%= f.label :api_secret, t("avitos.form.api_secret"), class: "block text-sm font-semibold text-gray-800" %>
+      <%= f.text_field :api_secret,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
       %>
     </div>
 
     <div class="space-y-2">
-      <%= form.label :profileid, t("avitos.form.profileid", default: "Profile ID (user_id в API)"), class: "block text-sm font-semibold text-gray-800" %>
-      <%= form.number_field :profileid,
+      <%= f.label :profileid, t("avitos.form.profileid"), class: "block text-sm font-semibold text-gray-800" %>
+      <%= f.number_field :profileid,
           class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900"
       %>
     </div>
   </div>
 
   <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-    <button type="button"
-            data-action="click->offcanvas#close"
-            class="inline-flex items-center px-6 py-3 border-2 border-gray-300 text-sm font-semibold rounded-lg text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out">
+    <button type="button" data-action="click->offcanvas#close"
+            class="inline-flex items-center px-4 py-2 border-1 border-gray-300 font-semibold rounded-lg text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200 ease-in-out cursor-pointer">
       <%= t("actions.cancel") %>
     </button>
-    <%= form.submit data: { disable_with: t("helpers.submit.saving", default: "Saving...") },
-      class: "inline-flex items-center px-6 py-3 border border-transparent text-sm font-semibold rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200 ease-in-out" %>
+    <%= f.submit t('actions.save'), data: { disable_with: t("helpers.submit.saving") }, class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 cursor-pointer" %>
   </div>
 <% end %>

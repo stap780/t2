@@ -5,6 +5,10 @@ class Client < ApplicationRecord
   has_many :client_companies
   has_many :companies, through: :client_companies
   has_many :orders, dependent: :nullify
+
+  def self.find_by_external_id(bindable:, value:)
+    Varbind.find_by(bindable: bindable, value: value.to_s, record_type: name)&.record
+  end
   
   validates :name, presence: true
   validates :email, presence: true
@@ -34,10 +38,11 @@ class Client < ApplicationRecord
   private
 
   def check_relations_present
-    if companies.count.positive?
-      errors.add(:base, "Cannot delete Client. You have #{I18n.t('companies')} with it.")
+    if companies.count.positive? || orders.count.positive?
+      errors.add(:base, "Cannot delete Client. You have #{I18n.t('companies')} or #{I18n.t('orders')} with it.")
     end
 
     throw(:abort) if errors.present?
   end
+
 end

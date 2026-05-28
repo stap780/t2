@@ -1,21 +1,24 @@
 # frozen_string_literal: true
 
 class InsalesOrderStatusMappingsController < ApplicationController
-  before_action :set_mapping, only: %i[edit update destroy]
   include ActionView::RecordIdentifier
 
+  before_action :set_insale
+  before_action :set_mapping, only: %i[edit update destroy]
+  before_action :set_custom_statuses, only: %i[new edit create update]
+
   def index
-    @mappings = InsalesOrderStatusMapping.includes(:order_status, :insale).order(:id)
+    redirect_to insale_path(@insale, anchor: "insales_statuses")
   end
 
   def new
-    @mapping = InsalesOrderStatusMapping.new
+    @mapping = @insale.insales_order_status_mappings.build
   end
 
   def edit; end
 
   def create
-    @mapping = InsalesOrderStatusMapping.new(mapping_params)
+    @mapping = @insale.insales_order_status_mappings.build(mapping_params)
 
     respond_to do |format|
       if @mapping.save
@@ -23,14 +26,21 @@ class InsalesOrderStatusMappingsController < ApplicationController
         format.turbo_stream do
           render turbo_stream: turbo_close_offcanvas_flash + [
             turbo_stream.append(
-              "insales_order_status_mappings",
+              dom_id(@insale, :insales_order_status_mappings),
               partial: "insales_order_status_mappings/mapping",
-              locals: { mapping: @mapping }
+              locals: { mapping: @mapping, insale: @insale }
             )
           ]
         end
-        format.html { redirect_to insales_order_status_mappings_path, notice: t(".success") }
+        format.html { redirect_to insale_path(@insale, anchor: "insales_statuses"), notice: t(".success") }
       else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            :new_insales_order_status_mapping_form,
+            partial: "insales_order_status_mappings/form",
+            locals: { mapping: @mapping }
+          ), status: :unprocessable_entity
+        end
         format.html { render :new, status: :unprocessable_entity }
       end
     end
@@ -45,12 +55,19 @@ class InsalesOrderStatusMappingsController < ApplicationController
             turbo_stream.replace(
               dom_id(@mapping),
               partial: "insales_order_status_mappings/mapping",
-              locals: { mapping: @mapping }
+              locals: { mapping: @mapping, insale: @insale }
             )
           ]
         end
-        format.html { redirect_to insales_order_status_mappings_path, notice: t(".success") }
+        format.html { redirect_to insale_path(@insale, anchor: "insales_statuses"), notice: t(".success") }
       else
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            dom_id(@mapping, :form),
+            partial: "insales_order_status_mappings/form",
+            locals: { mapping: @mapping }
+          ), status: :unprocessable_entity
+        end
         format.html { render :edit, status: :unprocessable_entity }
       end
     end
@@ -66,19 +83,31 @@ class InsalesOrderStatusMappingsController < ApplicationController
           render_turbo_flash
         ]
       end
-      format.html { redirect_to insales_order_status_mappings_path, notice: t(".success") }
+      format.html { redirect_to insale_path(@insale, anchor: "insales_statuses"), notice: t(".success") }
     end
   end
 
   private
 
+  def set_insale
+    @insale = Insale.find(params[:insale_id])
+  end
+
   def set_mapping
-    @mapping = InsalesOrderStatusMapping.find(params[:id])
+    @mapping = @insale.insales_order_status_mappings.find(params[:id])
+  end
+
+  def set_custom_statuses
+    @insale.api_init
+    @custom_statuses = InsalesApi::CustomStatus.find(:all)
+  rescue StandardError => e
+    Rails.logger.warn "[InsalesOrderStatusMappings] CustomStatus fetch failed: #{e.message}"
+    @custom_statuses = []
   end
 
   def mapping_params
     params.require(:insales_order_status_mapping).permit(
-      :insale_id, :insales_status_key, :insales_status_title, :order_status_id
+      :insales_custom_status_permalink, :insales_financial_status, :order_status_id
     )
   end
 end

@@ -1,15 +1,71 @@
-<% content_for :title, "Showing insale" %>
+<% content_for :title, t("insales.show.title") %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+<div class="container mx-auto px-0 max-w-5xl">
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center space-x-4">
+      <%= link_to_back insales_path %>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900"><%= t("insales.show.heading") %></h1>
+        <p class="text-sm text-gray-500 mt-1"><%= @insale.api_link %></p>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to_check check_insale_path(@insale), label: t("insales.insale.check") %>
+      <%= link_to fetch_orders_insale_path(@insale),
+        class: "inline-flex items-center px-1 py-1 border border-amber-300 shadow-sm text-xs font-medium rounded text-amber-900 bg-amber-50 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition duration-150 ease-in-out",
+        data: { turbo: false } do %>
+    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+    <%= t("insales.insale.fetch_orders") %>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing insale</h1>
+  <%= button_to add_order_webhook_insale_path(@insale), method: :post,
+        class: "inline-flex items-center px-1 py-1 border border-violet-300 shadow-sm text-xs font-medium rounded text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out" do %>
+    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+    </svg>
+    <%= t("insales.insale.add_order_webhook") %>
+  <% end %>
 
-  <%= render @insale %>
+  <%= button_to add_order_update_webhook_insale_path(@insale), method: :post,
+        class: "inline-flex items-center px-1 py-1 border border-violet-300 shadow-sm text-xs font-medium rounded text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out" do %>
+    <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+    <%= t("insales.insale.add_order_update_webhook") %>
+  <% end %>
+  <%= link_to edit_insale_path(@insale), 
+    class: "inline-flex items-center px-1 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+    data: { turbo_frame: :offcanvas } do %>
+<svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+</svg>
+<% end %>
+    </div>
+  </div>
 
-  <%= link_to "Edit this insale", edit_insale_path(@insale), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to insales", insales_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this insale", @insale, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  <% if @api_ok %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-50 text-green-700">
+      <%= t("insales.show.api_ok") %>
+    </p>
+  <% else %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-700">
+      <%= t("insales.show.api_error", messages: Array(@api_errors).join(", ")) %>
+    </p>
+  <% end %>
+
+  <section id="insales_statuses" class="mt-8 scroll-mt-4">
+    <%= render "insales/status_mappings_section",
+        insale: @insale,
+        mappings: @status_mappings,
+        api_ok: @api_ok %>
+  </section>
+
+  <section id="field_mappings" class="mt-8 mb-12 scroll-mt-4">
+    <%= render "insales/field_mappings_section",
+        insale: @insale,
+        mappings: @field_mappings,
+        api_ok: @api_ok %>
+  </section>
 </div>

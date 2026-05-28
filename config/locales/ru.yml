@@ -181,6 +181,158 @@ ru:
     insales_order_status_mappings: "Маппинг статусов InSales"
     okrugs: "Округа"
     acts: "Акты"
+    documentation: "Документация"
+    documentation_avito: "Avito"
+    documentation_insales: "InSales"
+    documentation_moysklad: "МойСклад"
+  documentation:
+    index:
+      title: "Документация по интеграциям"
+      lead: "Краткое руководство для сотрудников: как связаны товары и заказы с Avito, InSales и МойСклад, что происходит автоматически и где смотреть настройки."
+      cards:
+        avito:
+          title: "Avito"
+          summary: "Кабинеты, привязки объявлений, заказы и каталог."
+        insales:
+          title: "InSales"
+          summary: "Привязки вариантов, цены, остатки и заказы."
+        moysklad:
+          title: "МойСклад"
+          summary: "Товары, остатки, выгрузка и приём заказов."
+      sections:
+        overview:
+          title: "Общая схема"
+          paragraphs:
+            - "Приложение — единый реестр товаров и заказов. Внешние системы подключаются через интеграции в разделе «Настройки»."
+            - "Заказы из Avito, InSales и МойСклад не передаются друг другу напрямую: сначала они попадают в реестр заказов приложения, и уже оттуда выгружаются или обновляются во внешних системах."
+            - "Связь товаров с внешними системами хранится в привязках (varbind) и синхронизируется отдельно от заказов — через каталог и фоновые задачи."
+            - "Важно: для корректной работы заказов во всех интеграциях нужен маппинг статусов — сопоставление статуса во внешней системе со статусом в реестре. Без настроенного маппинга изменения статуса могут не доходить до Avito, InSales или МойСклад. Настройка — в «Настройки» → соответствующая интеграция."
+            - "В списке товаров цветные метки (МС, InS, Avito) показывают, что товар уже связан. По клику открывается карточка во внешней системе."
+        products:
+          title: "Товары и метки"
+          items:
+            - "МойСклад и InSales — привязка на уровне варианта товара; для ссылки нужен штрихкод варианта."
+            - "Avito — привязка на уровне товара (Product); в значении хранится avitoId объявления, штрихкод для метки не обязателен."
+            - "Несколько кабинетов Avito поддерживаются: у одного товара может быть несколько привязок, метка показывает название кабинета."
+            - "В фильтре товаров для каждого кабинета Avito можно отобрать «С привязкой» / «Без привязки»."
+        orders:
+          title: "Заказы"
+          paragraphs:
+            - "Заказы из Avito, InSales и МойСклад попадают в общий реестр «Заказы». При изменении статуса в МойСклад приложение может отправить статус обратно в Avito или InSales — если настроен маппинг."
+            - "Выгрузку заказа в МойСклад можно запустить вручную с карточки заказа; для Avito и InSales выгрузка часто происходит автоматически при импорте."
+            - "Дата включения интеграции заказов (в настройках МойСклад) отсекает старые заказы при первичном подключении: заказы, созданные раньше этой даты, не импортируются, если их ещё нет в реестре. Уже связанные заказы продолжают обновляться."
+        schedule:
+          title: "Автоматические задачи (ориентир)"
+          items:
+            - "Avito — каталог: ежедневно в 00:10; заказы: каждые 3 минуты."
+            - "InSales — привязки: 20:10; цены и остатки: 20:30; изображения: 20:45."
+            - "МойСклад — остатки: каждые 3 часа; массовое создание товаров: 8:00 и 20:00."
+      diagrams:
+        orders:
+          title: "Заказы: реестр как центр"
+          caption: "Каналы продаж не обмениваются заказами напрямую — между ними всегда реестр заказов в приложении."
+          note: "Avito и InSales не связаны друг с другом. Связь идёт только через реестр."
+          nodes:
+            avito: "Avito"
+            insales: "InSales"
+            moysklad: "МойСклад"
+            registry: "Реестр заказов"
+          arrows:
+            import: "импорт / webhook"
+            webhook: "webhook"
+            export: "выгрузка заказа"
+            status: "статус"
+        products:
+          title: "Товары: отдельно от заказов"
+          caption: "Остатки, цены, привязки и каталог синхронизируются через каталог товаров, а не через заказы."
+          note: "Заказ может ссылаться на товар по привязке, но обмен каталогом идёт по отдельным каналам."
+          nodes:
+            catalog: "Каталог товаров"
+            avito: "Avito"
+            insales: "InSales"
+            moysklad: "МойСклад"
+          links:
+            moysklad: "varbind, остатки"
+            insales: "varbind, цены, фото"
+            avito: "varbind, каталог"
+    avito:
+      title: "Интеграция Avito"
+      lead: "Несколько кабинетов, привязка объявлений к товарам и автоматический обмен заказами."
+      sections:
+        setup:
+          title: "Настройка"
+          paragraphs:
+            - "Кабинеты Avito добавляются в «Настройки → Avito». Для каждого указываются API-ключи и название кабинета — оно отображается в метках товаров."
+          items:
+            - "На странице кабинета можно вручную запустить синхронизацию каталога и загрузку заказов."
+            - "Маппинг статусов заказов настраивается отдельно для каждого кабинета."
+        bindings:
+          title: "Привязки товаров"
+          paragraphs:
+            - "Привязка создаётся на карточке товара (не варианта). В поле значения хранится avitoId — идентификатор объявления на Avito."
+            - "Ночная синхронизация каталога (00:10) подтягивает avitoId из отчёта автозагрузки и обновляет привязки."
+          items:
+            - "Метка в списке товаров ведёт на страницу объявления: avito.ru/{avitoId}."
+            - "Если кабинет переименован или удалён, метка может показывать резервное имя «Av.{номер}»."
+        orders:
+          title: "Заказы"
+          items:
+            - "Новые заказы с Avito опрашиваются каждые 3 минуты и попадают в реестр заказов."
+            - "При необходимости заказ можно выгрузить в МойСклад с карточки заказа."
+            - "Действует общая дата включения интеграции заказов из настроек МойСклад."
+        filter:
+          title: "Фильтр в каталоге"
+          paragraphs:
+            - "В фильтре товаров для каждого подключённого кабинета Avito доступны переключатели «С привязкой» и «Без привязки». Можно комбинировать несколько кабинетов."
+    insales:
+      title: "Интеграция InSales"
+      lead: "Синхронизация вариантов, цен, остатков и заказов с магазином на InSales."
+      sections:
+        setup:
+          title: "Настройка"
+          paragraphs:
+            - "Подключение — в «Настройки → InSales»: домен магазина, ключи API, проверка соединения."
+          items:
+            - "Webhook'и для заказов можно добавить с карточки интеграции."
+            - "Маппинг статусов и полей заказа настраивается в соответствующих разделах."
+        bindings:
+          title: "Привязки товаров"
+          paragraphs:
+            - "Привязка создаётся на уровне варианта товара. Для отображения ссылки «InS» в списке товаров у варианта должен быть заполнен штрихкод."
+          items:
+            - "Ночная задача в 20:10 синхронизирует varbind — связи variant ↔ товар InSales."
+            - "В 20:30 обновляются цены и остатки; в 20:45 — изображения."
+        orders:
+          title: "Заказы"
+          items:
+            - "Заказы приходят по webhook или при ручной загрузке с карточки InSales."
+            - "Из карточки заказа можно отправить данные обратно в InSales."
+            - "Старые заказы отсекаются датой включения интеграции (настройки МойСклад), если их ещё нет в реестре."
+    moysklad:
+      title: "Интеграция МойСклад"
+      lead: "Складской учёт: остатки, создание товаров и приём заказов из других каналов."
+      sections:
+        setup:
+          title: "Настройка"
+          paragraphs:
+            - "Подключение — в «Настройки → Moysklad»: логин, пароль или токен, проверка API."
+          items:
+            - "Webhook заказов регистрируется с карточки интеграции."
+            - "Организация, склад и маппинг полей заказа задаются в настройках выгрузки заказов."
+        bindings:
+          title: "Привязки и товары"
+          paragraphs:
+            - "Привязка варианта к товару МойСклад хранится в varbind. Ссылка «МС» в списке товаров работает по штрихкоду варианта."
+          items:
+            - "Остатки из МойСклад подтягиваются автоматически каждые 3 часа."
+            - "Массовое создание отсутствующих товаров в МойСклад — в 8:00 и 20:00 (для товаров с привязкой или по правилам импорта)."
+            - "С карточки товара можно вручную запустить синхронизацию с МойСклад."
+        orders:
+          title: "Заказы"
+          items:
+            - "Входящие заказы из МойСклад обрабатываются через webhook."
+            - "Заказы из Avito и InSales можно выгрузить в МойСклад с карточки заказа."
+            - "Поле «Дата включения интеграции заказов» задаёт момент, с которого новые заказы из всех каналов начинают попадать в реестр. Ранее созданные заказы без связи не импортируются."
   datetime:
     distance_in_words:
       half_a_minute: "меньше минуты"
@@ -491,6 +643,7 @@ ru:
     back: "Назад"
     create: "Создать"
     delete: "Удалить"
+    check: "Проверить"
     delete_confirm: "Вы уверены?"
     generate_barcode: "Будет создан новый штрихкод. Старый удалится. Вы уверены!?"
     binds: "Связи"
@@ -599,12 +752,31 @@ ru:
     add_order_update_webhook:
       webhook_success: "Webhook обновления заказа добавлен: %{message}"
       webhook_error: "Не удалось добавить webhook: %{messages}"
+    fetch_orders:
+      fetch_success: "Импортировано: %{imported}, обновлено: %{updated}, пропущено: %{skipped}, создано в МС: %{moysklad_created}."
+      fetch_partial: "Частично: новых %{imported}, в МС %{moysklad_created}. Ошибки: %{errors}"
+      fetch_error: "Ошибка запроса: %{message}"
+      fetch_api_not_working: "API InSales недоступен (см. «Проверить»)"
     insale:
       check: "Проверить"
+      fetch_orders: "Получить заказы"
       add_webhook: "Webhook заказа (create)"
       add_order_webhook: "Webhook заказа (create)"
       add_order_update_webhook: "Webhook заказа (update)"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+    show:
+      title: "InSales"
+      heading: "Интеграция InSales"
+      settings: "Настройки"
+      edit_credentials: "Редактировать ключи"
+      api_ok: "API доступен"
+      api_error: "API недоступен: %{messages}"
+      status_mappings_heading: "Маппинг статусов"
+      status_mappings_hint: "Custom status InSales → внутренние статусы t2 (и обратно в InSales из МС)."
+      no_status_mappings: "Маппинги статусов пока не заданы."
+      field_mappings_heading: "Дополнительные поля заказа"
+      field_mappings_hint: "Строковые поля заказа t2 → доп. поля заказа InSales (fields_values)."
+      no_field_mappings: "Маппинги полей пока не заданы."
   orders:
     sources:
       avito: "Авито"
@@ -625,16 +797,58 @@ ru:
       items_heading: "Позиции"
       line_sum: "Сумма"
       no_items: "Нет позиций"
+      notes_heading: "Заметки"
       client_heading: "Клиент"
       client_name: "Имя"
+      order_details_heading: "Детали заказа"
       integrations_heading: "Внешние системы"
       no_external_ids: "Нет привязок к внешним системам"
       export_to_moysklad: "Выгрузить в МойСклад"
       export_confirm: "Создать заказ покупателя в МойСклад?"
+      sync_from_moysklad: "Обновить из МойСклад"
+      sync_from_moysklad_confirm: "Загрузить актуальные данные заказа из МойСклад?"
+      push_to_insales: "Отправить в InSales"
+      push_to_insales_confirm: "Обновить заказ в InSales (статус и доп. поля)?"
+      download_avito_label: "Скачать этикетку"
+      refresh_avito_label: "Обновить этикетку"
+      open_avito_label: "Открыть этикетку"
+      download_avito_label_confirm: "Скачать этикетку доставки из Avito?"
+      refresh_avito_label_confirm: "Обновить этикетку из Avito?"
+    download_avito_label:
+      success: "Этикетка Avito сохранена"
+      not_pvz: "Этикетка Avito доступна только для заказов с доставкой в ПВЗ"
+      order_not_found: "Заказ не найден среди активных в Avito API. Отменённые и закрытые заказы мы не проверяем"
+      already_attached: "Этикетка уже сохранена — используйте «Обновить»"
+      no_token: "Не удалось получить access_token Avito"
+      task_create_failed: "Avito не создал задачу на генерацию этикетки"
+      label_not_ready: "Этикетка ещё не готова — попробуйте позже"
+      error: "Ошибка: %{message}"
     export_to_moysklad:
       success: "Заказ выгружен в МойСклад"
       error: "Ошибка выгрузки: %{message}"
       no_moysklad: "Нет настроенной интеграции МойСклад"
+      default_ad_source_not_configured: "Не задан «Источник рекламы по умолчанию» в настройках МойСклад — сохраните его перед выгрузкой"
+    sync_from_moysklad:
+      success: "Данные заказа обновлены из МойСклад"
+      error: "Ошибка синхронизации: %{message}"
+      no_moysklad: "Нет настроенной интеграции МойСклад"
+      not_linked_to_moysklad: "Заказ не связан с МойСклад"
+      moysklad_order_not_found: "Заказ не найден в МойСклад"
+    push_to_insales:
+      success: "Данные заказа отправлены в InSales"
+      error: "Ошибка отправки: %{message}"
+      not_insales_order: "Это не заказ InSales"
+      insales_order_id_missing: "Нет ID заказа InSales"
+      nothing_to_push: "Нечего отправить — настройте маппинг статусов или доп. полей InSales"
+  avito_api:
+    errors:
+      no_avito_token: "не удалось получить access_token (см. лог)"
+      no_matched_items: "не найден товар для позиций заказа — проверьте привязки avitoId"
+      missing_avito_order_id: "в ответе Avito отсутствует id заказа"
+      no_autoload_report: "нет успешного отчёта автозагрузки"
+      blank_avito_id: "пустой avitoId"
+      blank_product: "товар не указан"
+      moysklad_order: "заказ #%{order_id} в МС: %{message}"
   avitos:
     index:
       title: "Avito"
@@ -656,14 +870,37 @@ ru:
       fetch_partial: "Частично: новых %{imported}, в МС %{moysklad_created}. Ошибки: %{errors}"
       fetch_error: "Ошибка запроса: %{message}"
       fetch_no_token: "не удалось получить access_token (см. лог)"
+    sync_catalog:
+      sync_success: "Каталог: новых связей %{linked}, уже было %{existing}, товар не найден %{not_found}, пропущено %{skipped}."
+      sync_partial: "Частично: связей %{linked}, конфликтов %{conflicts}, не найдено %{not_found}. Ошибки: %{errors}"
+      sync_error: "Ошибка синхронизации каталога: %{message}"
+      sync_no_token: "не удалось получить access_token (см. лог)"
     form:
       api_id: "Client ID (из кабинета Avito API)"
       api_secret: "Client secret"
-      profileid: "ID профиля (user_id / profileid)"
+      profileid: "ID профиля (требуется для управления объявлениями)"
     avito:
       client_id_label: "client_id"
       fetch_orders: "Получить заказы"
+      sync_catalog: "Синхронизировать каталог"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+    show:
+      title: "Avito"
+      settings: "Настройки"
+      edit_credentials: "Редактировать ключи"
+      api_ok: "API доступен"
+      api_error: "API недоступен — проверьте client_id и client secret"
+      status_mappings_heading: "Маппинг статусов"
+      status_mappings_hint: "Внутренний статус t2 → transition applyTransition (confirm, reject, perform, receive)."
+      no_status_mappings: "Маппинги статусов пока не заданы."
+      catalog_sync_heading: "Синх каталог"
+      catalog_sync_hint: "Связь товаров t2 с объявлениями Avito (Varbind по avitoId) из отчёта автозагрузки."
+      catalog_synced_count:
+        zero: "Синхронизировано товаров: %{count}"
+        one: "Синхронизировано товаров: %{count}"
+        few: "Синхронизировано товаров: %{count}"
+        many: "Синхронизировано товаров: %{count}"
+        other: "Синхронизировано товаров: %{count}"
   moysklads:
     index:
       title: "Moysklad"
@@ -686,13 +923,59 @@ ru:
     add_order_webhook:
       webhook_success: "Webhook успешно добавлен: %{message}"
       webhook_error: "Не удалось добавить webhook: %{messages}"
+    show:
+      title: "Настройки МойСклад"
+      heading: "Интеграция МойСклад — заказы"
+      subtitle: "Организация, склад, маппинг статусов и дополнительные поля заказа. Синхронизация товаров не настраивается здесь."
+      edit_credentials: "API-ключи"
+      back: "К списку"
+      api_ok: "Подключение к API работает"
+      api_error: "Ошибка API: %{messages}"
+      order_settings_heading: "Выгрузка заказов"
+      order_settings_hint: "Организация-продавец и склад подставляются при создании заказа в МС. Контрагент берётся из клиента заказа."
+      order_settings_api_required: "Сначала проверьте API-ключи и подключение."
+      select_organization: "Выберите организацию"
+      store_optional: "Склад (необязательно)"
+      default_ad_source_optional: "Выберите значение"
+      default_ad_source_hint: "Обязательно для выгрузки заказов в МС. Менеджер может изменить вручную в карточке заказа."
+      default_ad_source_missing: "Задайте «Источник рекламы по умолчанию» ниже — без него выгрузка заказов в МС не пройдёт."
+      ad_source_attribute_missing: "В МС не найдено доп. поле «Источник рекламы» (customentity)."
+      order_number_prefix_placeholder: "T2"
+      order_number_prefix_hint: "Если указан, используется как имя заказа в МС. Если пусто — имя не передаётся, номер назначит МойСклад."
+      orders_integration_start_at_hint: "Заказы из МС, Авито и InSales, созданные раньше этой даты, не попадут в реестр, если их там ещё нет. Уже связанные заказы продолжают синхронизироваться."
+      webhooks_heading: "Webhooks заказов"
+      webhooks_hint: "CREATE и UPDATE — входящая синхронизация статусов из МойСклад."
+      status_mappings_heading: "Маппинг статусов"
+      status_mappings_hint: "Состояния заказа в МС → внутренние статусы t2."
+      field_mappings_heading: "Дополнительные поля заказа"
+      field_mappings_hint: "Строковые поля заказа t2 → доп. атрибуты customerorder в МС."
+      no_status_mappings: "Маппинги статусов пока не заданы."
+      no_field_mappings: "Маппинги полей пока не заданы."
+    order_settings:
+      updated: "Настройки выгрузки заказов сохранены"
     form:
-      order_export_heading: "Выгрузка заказов в МойСклад"
-      store_href_optional: "Склад (необязательно)"
+      credentials_hint: "Организация, склад и маппинги настраиваются на странице интеграции после сохранения ключей."
     moysklad:
       check: "Проверить"
+      check_title: "Проверить подключение к API МойСклад"
+      settings: "Настройки"
       add_webhook: "Добавить Webhook"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
+  moysklad_order_field_mappings:
+    index:
+      new: "Добавить поле"
+    new:
+      title: "Маппинг поля заказа"
+    edit:
+      title: "Редактировать маппинг поля"
+    form:
+      attribute_href_hint: "Href атрибута из metadata customerorder в API МойСклад."
+    create:
+      success: "Маппинг поля сохранён"
+    update:
+      success: "Маппинг поля обновлён"
+    destroy:
+      success: "Маппинг поля удалён"
   products:
     index:
       title: "Товары"
@@ -1157,14 +1440,19 @@ ru:
   avito_order_status_mappings:
     index:
       heading: "Маппинг: статус заказа → Авито"
-      hint: "При смене внутреннего статуса в Авито уходит указанный код статуса API."
+      hint: "При смене внутреннего статуса в Авито уходит transition applyTransition."
       new: "Добавить"
     new:
       title: "Новый маппинг Авито"
     edit:
       title: "Редактировать маппинг Авито"
     form:
-      avito_status_hint: "Переход для applyTransition API: confirm, reject, perform или receive (см. документацию Order Management)."
+      avito_status_hint: "Статусы для POST /order-management/1/order/applyTransition"
+    transitions:
+      confirm: "подтверждение заказа"
+      reject: "отмена заказа"
+      perform: "подтверждение отправки заказа (RDBS)"
+      receive: "подтверждение доставки заказа (RDBS, CNC)"
     create:
       success: "Маппинг Авито сохранён"
     update:
@@ -1172,24 +1460,44 @@ ru:
     destroy:
       success: "Маппинг Авито удалён"
   insales_order_status_mappings:
+    menu: "Маппинг статусов"
+    financial_statuses:
+      pending: "Не оплачен"
+      paid: "Оплачен"
     index:
-      heading: "Маппинг: InSales → статус заказа"
-      hint: "Ключ статуса заказа в магазине сопоставляется с внутренним статусом."
+      heading: "Маппинг статусов InSales → заказ"
       new: "Добавить"
-      any_shop: "любой магазин"
+      custom_status: "Custom status (permalink)"
+      financial_status: "Статус оплаты"
     new:
       title: "Новый маппинг InSales"
     edit:
       title: "Редактировать маппинг InSales"
     form:
-      any_shop: "Любой магазин (общее правило)"
-      insales_status_hint: "Ключ — permalink из custom_status (например new, delivered) или fulfillment_status."
+      custom_status_hint: "permalink из custom_status заказа InSales"
+      custom_status_api_unavailable: "API недоступен — введите permalink вручную"
     create:
       success: "Маппинг InSales сохранён"
     update:
       success: "Маппинг InSales обновлён"
     destroy:
       success: "Маппинг InSales удалён"
+  insales_order_field_mappings:
+    index:
+      new: "Добавить поле"
+    new:
+      title: "Маппинг поля заказа InSales"
+    edit:
+      title: "Редактировать маппинг поля InSales"
+    form:
+      field_hint: "Поле заказа InSales (destiny=3) из GET /admin/fields.json."
+      fields_api_unavailable: "API недоступен — укажите field_id и handle вручную."
+    create:
+      success: "Маппинг поля InSales сохранён"
+    update:
+      success: "Маппинг поля InSales обновлён"
+    destroy:
+      success: "Маппинг поля InSales удалён"
   item_statuses:
     index:
       title: "Статусы позиций"
@@ -1555,13 +1863,14 @@ ru:
         number: "Номер"
         total_sum: "Сумма"
         currency: "Валюта"
-        comment: "Комментарий"
+        comment: "Заметки"
         client_id: "Клиент"
         order_status_id: "Статус"
         moysklad_order_id: "ID заказа МС"
         moysklad_external_code: "Внешний код МС"
         avito_order_id: "ID заказа Авито"
-        avito_marketplace_id: "Marketplace ID Авито"
+        avito_marketplace_id: "Номер заказа Avito"
+        tracking_number: "Трек / номер отправки"
         insales_order_id: "ID заказа InSales"
       order_item:
         title: "Название"
@@ -1569,25 +1878,37 @@ ru:
         quantity: "Кол-во"
         price: "Цена"
       moysklad:
-        organization_href: "Организация (href)"
-        agent_href: "Контрагент (href)"
-        store_href: "Склад (href)"
+        organization_href: "Организация"
+        store_href: "Склад"
+        order_number_prefix: "Префикс номера заказа"
+        orders_integration_start_at: "Дата включения интеграции заказов"
+        default_ad_source_href: "Источник рекламы по умолчанию"
+        default_ad_source_name: "Источник рекламы (название в МС)"
       moysklad_order_status_mapping:
         moysklad_state_href: "Состояние МС (href)"
         moysklad_state_name: "Название в МС"
         order_status: "Внутренний статус"
         order_status_id: "Внутренний статус"
+      moysklad_order_field_mapping:
+        source_key: "Поле в t2"
+        ms_attribute_href: "Атрибут МС (href)"
+        ms_attribute_name: "Атрибут в МС"
       avito_order_status_mapping:
-        avito_status: "Статус Авито"
+        avito_status: "Системный статус Авито (applyTransition)"
         order_status: "Внутренний статус"
         order_status_id: "Внутренний статус"
       insales_order_status_mapping:
         insale: "Магазин"
         insale_id: "Магазин"
-        insales_status_key: "Ключ статуса InSales"
-        insales_status_title: "Название в InSales"
+        insales_custom_status_permalink: "Custom status (permalink)"
+        insales_financial_status: "Статус оплаты"
         order_status: "Внутренний статус"
         order_status_id: "Внутренний статус"
+      insales_order_field_mapping:
+        source_key: "Поле в t2"
+        insales_field_id: "ID поля InSales"
+        insales_field_handle: "Handle поля InSales"
+        insales_field_title: "Поле в InSales"
     errors:
       format: "%{attribute} %{message}"
       models:
@@ -1627,6 +1948,11 @@ ru:
             few: "Невозможно удалить товар. %{count} позиции убытка ссылаются на варианты этого товара."
             many: "Невозможно удалить товар. %{count} позиций убытка ссылаются на варианты этого товара."
             other: "Невозможно удалить товар. %{count} позиций убытка ссылаются на варианты этого товара."
+          variants_have_order_items:
+            one: "Невозможно удалить товар. 1 позиция заказа ссылается на варианты этого товара."
+            few: "Невозможно удалить товар. %{count} позиции заказа ссылаются на варианты этого товара."
+            many: "Невозможно удалить товар. %{count} позиций заказа ссылаются на варианты этого товара."
+            other: "Невозможно удалить товар. %{count} позиций заказа ссылаются на варианты этого товара."
         property: {}
         characteristic: {}
         feature: {}

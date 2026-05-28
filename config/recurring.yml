@@ -49,4 +49,8 @@ production:
 
   avito_orders_sync:
     class: AvitoOrdersSyncJob
-    schedule: every 5 minutes  # Заказы Авито → реестр → МойСклад
+    schedule: every 3 minutes  # Заказы Авито → реестр → МойСклад
+
+  avito_catalog_sync:
+    class: AvitoCatalogSyncJob
+    schedule: at 00:10 every day  # Varbind Product ↔ avitoId из отчёта автозагрузки

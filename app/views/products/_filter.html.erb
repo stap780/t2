@@ -160,6 +160,31 @@
                 </div>
             </div>
         </div>
+        <% Avito.order(:id).each do |avito| %>
+            <% with_scope = Product.with_avito_scope_name(avito.id) %>
+            <% without_scope = Product.without_avito_scope_name(avito.id) %>
+            <div class="filter-avito-select md:col-span-2" data-controller="checkbox">
+                <div class="block text-sm font-medium text-gray-700 mb-1"><%= avito.title %></div>
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box with_scope, {
+                                checked: params.dig('q', with_scope.to_s) == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label with_scope, 'С привязкой', class: 'text-sm text-gray-700' %>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <%= f.check_box without_scope, {
+                                checked: params.dig('q', without_scope.to_s) == '1',
+                                class: 'rounded border-gray-300 text-blue-600 shadow-sm focus:ring focus:ring-blue-200',
+                                data: { checkbox_target: "btn", action: "change->checkbox#toggleOne" }
+                            } %>
+                        <%= f.label without_scope, 'Без привязки', class: 'text-sm text-gray-700' %>
+                    </div>
+                </div>
+            </div>
+        <% end %>
     </div>
 
     <div class="flex gap-2 mt-4">

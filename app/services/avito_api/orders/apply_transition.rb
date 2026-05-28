@@ -10,7 +10,7 @@ module AvitoApi
     # transition: confirm | reject | perform | receive
     class ApplyTransition
       PATH = "/order-management/1/order/applyTransition".freeze
-      ALLOWED_TRANSITIONS = %w[confirm reject perform receive].freeze
+      ALLOWED_TRANSITIONS = AvitoOrderStatusMapping::TRANSITIONS
 
       def self.call(order:)
         new(order:).call
@@ -26,7 +26,7 @@ module AvitoApi
         avito = @order.avito
         return { success: false, error: "avito_account_missing" } unless avito
 
-        mapping = AvitoOrderStatusMapping.find_by(order_status_id: @order.order_status_id)
+        mapping = avito.avito_order_status_mappings.find_by(order_status_id: @order.order_status_id)
         return { success: false, skipped: true, error: "no_avito_status_mapping" } unless mapping
 
         transition = mapping.avito_status.to_s

@@ -1,0 +1,57 @@
+<% page_key = local_assigns.fetch(:page) %>
+<% content_for :title, t("documentation.#{page_key}.title") %>
+
+<div class="space-y-6 max-w-4xl">
+  <div class="bg-white shadow rounded-lg px-4 py-5 sm:p-6">
+    <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">
+      <%= t("documentation.#{page_key}.title") %>
+    </h1>
+    <% if (lead = t("documentation.#{page_key}.lead", default: nil)).present? %>
+      <p class="mt-3 text-gray-600 leading-relaxed"><%= lead %></p>
+    <% end %>
+  </div>
+
+  <% if page_key == :index %>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <%= link_to documentation_avito_path,
+          class: "bg-white shadow rounded-lg px-4 py-5 hover:ring-2 hover:ring-violet-500 transition" do %>
+        <h2 class="text-lg font-semibold text-gray-900"><%= t("documentation.index.cards.avito.title") %></h2>
+        <p class="mt-2 text-sm text-gray-600"><%= t("documentation.index.cards.avito.summary") %></p>
+      <% end %>
+      <%= link_to documentation_insales_path,
+          class: "bg-white shadow rounded-lg px-4 py-5 hover:ring-2 hover:ring-violet-500 transition" do %>
+        <h2 class="text-lg font-semibold text-gray-900"><%= t("documentation.index.cards.insales.title") %></h2>
+        <p class="mt-2 text-sm text-gray-600"><%= t("documentation.index.cards.insales.summary") %></p>
+      <% end %>
+      <%= link_to documentation_moysklad_path,
+          class: "bg-white shadow rounded-lg px-4 py-5 hover:ring-2 hover:ring-violet-500 transition" do %>
+        <h2 class="text-lg font-semibold text-gray-900"><%= t("documentation.index.cards.moysklad.title") %></h2>
+        <p class="mt-2 text-sm text-gray-600"><%= t("documentation.index.cards.moysklad.summary") %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% documentation_section_entries(page_key).each do |section_key, section| %>
+    <div class="bg-white shadow rounded-lg px-4 py-5 sm:p-6">
+      <% if section[:title].present? %>
+        <h2 class="text-lg font-semibold text-gray-900"><%= section[:title] %></h2>
+      <% end %>
+
+      <% Array(section[:paragraphs]).each do |paragraph| %>
+        <p class="mt-3 text-gray-700 leading-relaxed"><%= paragraph %></p>
+      <% end %>
+
+      <% if Array(section[:items]).any? %>
+        <ul class="mt-3 list-disc list-inside space-y-2 text-gray-700">
+          <% section[:items].each do |item| %>
+            <li><%= item %></li>
+          <% end %>
+        </ul>
+      <% end %>
+
+      <% if page_key == :index && section_key.to_s == "overview" %>
+        <%= render "documentation/diagrams" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

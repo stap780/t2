@@ -2,6 +2,7 @@
 
 class Avito < ApplicationRecord
   has_many :orders, dependent: :nullify
+  has_many :avito_order_status_mappings, dependent: :destroy
 
   validates :title, presence: true
   validates :api_id, presence: true, uniqueness: true
@@ -11,8 +12,7 @@ class Avito < ApplicationRecord
     attribute_names
   end
 
-  # Для ссылок из ProductIntegrationLinks (поиск по штрихкоду в ЛК)
-  def product_list_url(q)
-    "https://www.avito.ru/profile/pro/items?searchText=#{q}"
+  def catalog_product_bindings_count
+    Varbind.where(bindable: self, record_type: "Product").count
   end
 end

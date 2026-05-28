@@ -9,6 +9,7 @@ export default class extends Controller {
 
   toggle(e) {
   }
+
   toggleOne(e) {
     // console.log(e);
     var chks = this.btnTargets;

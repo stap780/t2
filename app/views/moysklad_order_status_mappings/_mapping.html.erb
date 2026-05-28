@@ -1,9 +1,8 @@
-<%= turbo_frame_tag dom_id(mapping), class: "grid grid-cols-[50px_1fr_200px_200px_120px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
+<%= turbo_frame_tag dom_id(mapping), class: "grid grid-cols-[50px_1fr_1fr_120px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
   <div><%= mapping.id %></div>
-  <div class="font-mono text-xs break-all text-gray-700" title="<%= mapping.moysklad_state_href %>">
-    <%= mapping.moysklad_state_href %>
+  <div title="<%= mapping.moysklad_state_href %>">
+    <%= mapping.moysklad_state_name.presence || mapping.moysklad_state_href %>
   </div>
-  <div><%= mapping.moysklad_state_name %></div>
   <div><%= mapping.order_status&.title %></div>
   <div class="flex justify-end space-x-2">
     <%= link_to_edit edit_moysklad_order_status_mapping_path(mapping), data: { turbo_frame: 'offcanvas', turbo_prefetch: false } %>

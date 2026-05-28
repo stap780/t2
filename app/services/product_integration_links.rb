@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # Ссылки на внешние витрины (МойСклад, InSales, Avito) для строки списка товаров.
-# Только привязки первого варианта. При index с includes(variants: :bindings) — без N+1 по varbinds.
+# МС/InSales — varbind первого варианта; Avito — varbind на Product (avitoId в value).
+# При index с includes(:bindings, variants: :bindings) — без N+1.
 #
 #   ProductIntegrationLinks.new(product).call
 class ProductIntegrationLinks
@@ -12,27 +13,31 @@ class ProductIntegrationLinks
   end
 
   def call
-    v = @product.variants.first
-    return [] unless v
+    links = []
+    variant = @product.variants.first
 
-    barcode = v.barcode.to_s
-    return [] if barcode.blank?
-
-    state = scan_variant_bindings(v)
-    avito_by_id = load_avito_by_id(state[:avito_ids])
-
-    [].tap do |links|
-      links << moysklad_link(barcode) if state[:moysklad]
-      links << insale_link(barcode) if state[:insale]
-      state[:avito_ids].sort.each { |id| links << avito_link(id, barcode, avito_by_id[id]) }
+    if variant
+      barcode = variant.barcode.to_s
+      if barcode.present?
+        state = scan_variant_bindings(variant)
+        links << moysklad_link(barcode) if state[:moysklad]
+        links << insale_link(barcode) if state[:insale]
+      end
     end
+
+    avito_bindings = scan_product_avito_bindings
+    avito_by_id = load_avito_by_id(avito_bindings.keys)
+    avito_bindings.sort.each do |bindable_id, avito_item_id|
+      links << avito_link(bindable_id, avito_item_id, avito_by_id[bindable_id])
+    end
+
+    links
   end
 
   private
 
   def scan_variant_bindings(variant)
     moysklad_id = Moysklad.first&.id
-    avito_ids = Set.new
     moysklad = false
     insale = false
 
@@ -42,22 +47,25 @@ class ProductIntegrationLinks
         moysklad = true if moysklad_id && vb.bindable_id == moysklad_id
       when "Insale"
         insale = true
-      when "Avito"
-        avito_ids << vb.bindable_id
       end
     end
 
-    { moysklad: moysklad, insale: insale, avito_ids: avito_ids }
+    { moysklad: moysklad, insale: insale }
+  end
+
+  def scan_product_avito_bindings
+    @product.bindings.each_with_object({}) do |vb, acc|
+      next unless vb.bindable_type == "Avito"
+      next if vb.value.blank?
+
+      acc[vb.bindable_id] = vb.value
+    end
   end
 
   def load_avito_by_id(avito_ids)
-    return {} if avito_ids.empty? || !avito_model_configured?
+    return {} if avito_ids.empty?
 
     Avito.where(id: avito_ids.to_a).index_by(&:id)
-  end
-
-  def avito_model_configured?
-    defined?(::Avito) && Avito < ApplicationRecord
   end
 
   def moysklad_link(barcode)
@@ -76,11 +84,11 @@ class ProductIntegrationLinks
     )
   end
 
-  def avito_link(bindable_id, barcode, avito = nil)
+  def avito_link(bindable_id, avito_item_id, avito = nil)
     Link.new(
       key: "avito-#{bindable_id}",
       label: avito_label(bindable_id, avito),
-      url: avito_url(bindable_id, barcode, avito),
+      url: avito_item_url(avito_item_id),
       css: "bg-amber-100 text-amber-900"
     )
   end
@@ -98,11 +106,7 @@ class ProductIntegrationLinks
     t.presence || "Av.#{bindable_id}"
   end
 
-  def avito_url(_bindable_id, barcode, avito = nil)
-    q = URI.encode_www_form_component(barcode)
-    if avito&.respond_to?(:product_list_url)
-      return avito.product_list_url(q)
-    end
-    "https://www.avito.ru/profile/pro/items?searchText=#{q}"
+  def avito_item_url(avito_item_id)
+    "https://www.avito.ru/#{avito_item_id}"
   end
 end

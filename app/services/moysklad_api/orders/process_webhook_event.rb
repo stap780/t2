@@ -18,7 +18,7 @@ module MoyskladApi
         href = @event.dig("meta", "href")
         return if href.blank?
 
-        order_json = MoyskladApi::Order.fetch(@moysklad, href)
+        order_json = MoyskladApi::CustomerOrder.fetch(@moysklad, href)
         return unless order_json
 
         action = @event["action"].presence || "CREATE"

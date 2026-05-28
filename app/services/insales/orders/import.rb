@@ -21,24 +21,42 @@ module Insales
         return Result.new(skipped: true, error: "missing_insales_order_id") if insales_order_id.blank?
 
         order = Order.find_or_initialize_by(insale_id: @insale.id, insales_order_id: insales_order_id)
+        if OrdersIntegration::Cutover.skip?(
+             known_in_app: order.persisted?,
+             source_created_at: @payload["created_at"]
+           )
+          OrdersIntegration::Cutover.log_skip(source: "insales", identifier: insales_order_id)
+          return Result.new(skipped: true)
+        end
+
         created = order.new_record?
 
         order.source = "insales"
         order.insale = @insale
         order.number = extract_number(order)
+        order.tracking_number = extract_tracking_number if extract_tracking_number.present?
         order.total_sum = extract_total_sum
         order.currency = extract_currency
-        order.comment = build_comment(order)
         apply_status(order)
         order.client ||= find_or_create_client
         order.synced_at = Time.current
 
-        items = build_order_items
-        return Result.new(order: order, skipped: true, error: "no_matched_items") if items.empty?
+        rows = order_line_rows
+        return Result.new(order: order, skipped: true, error: "empty_order_lines") if rows.empty?
+
+        items = build_order_items(rows)
+        if items.empty?
+          return Result.new(
+            order: order,
+            skipped: true,
+            error: "no_matched_items: #{unmatched_lines_summary(rows)}"
+          )
+        end
 
         order.save!
         order.order_items.destroy_all
         items.each { |attrs| order.order_items.create!(attrs) }
+        attach_import_note(order)
 
         Result.new(order: order, created: created)
       rescue StandardError => e
@@ -56,6 +74,13 @@ module Insales
         @payload["number"].presence&.to_s || order.number
       end
 
+      def extract_tracking_number
+        @payload["delivery_tracking_number"].presence ||
+          @payload["track_number"].presence ||
+          @payload.dig("delivery_info", "tracking_number").presence ||
+          @payload.dig("delivery_info", "track_number").presence
+      end
+
       def extract_total_sum
         val = @payload["total_price"] || @payload["items_price"]
         val.nil? ? nil : val.to_f
@@ -67,8 +92,7 @@ module Insales
       end
 
       def apply_status(order)
-        key = status_key
-        mapping = key.present? ? find_status_mapping(key) : nil
+        mapping = find_status_mapping
         order.order_status_id = mapping.order_status_id if mapping
         order.order_status_id ||= default_order_status_id
       end
@@ -77,20 +101,19 @@ module Insales
         OrderStatus.find_by(code: "new")&.id || OrderStatus.order(:position).first&.id
       end
 
-      def status_key
-        @payload.dig("custom_status", "permalink").presence ||
-          @payload["fulfillment_status"].presence
+      def find_status_mapping
+        permalink = @payload.dig("custom_status", "permalink").presence
+        financial_status = @payload["financial_status"].presence
+        return nil if permalink.blank? || financial_status.blank?
+
+        InsalesOrderStatusMapping.find_by(
+          insale_id: @insale.id,
+          insales_custom_status_permalink: permalink,
+          insales_financial_status: financial_status
+        )
       end
 
-      def find_status_mapping(key)
-        InsalesOrderStatusMapping
-          .where(insales_status_key: key)
-          .where(insale_id: [@insale.id, nil])
-          .order(Arel.sql("CASE WHEN insale_id IS NULL THEN 1 ELSE 0 END"))
-          .first
-      end
-
-      def build_comment(order)
+      def build_import_note_body(order)
         parts = []
         parts << "InSales: #{@insale.api_link}"
         parts << "Заказ ##{extract_number(order)} (id #{extract_insales_order_id})"
@@ -98,14 +121,30 @@ module Insales
         parts << @payload["delivery_title"] if @payload["delivery_title"].present?
         addr = @payload.dig("shipping_address", "full_delivery_address")
         parts << addr if addr.present?
-        parts << order.comment if order.comment.present?
         parts.compact.join("\n")
       end
 
-      def build_order_items
-        rows = @payload["order_lines"] || []
+      def attach_import_note(order)
+        body = build_import_note_body(order)
+        prefix = "InSales: #{@insale.api_link}\n"
+        order.upsert_prefixed_note(body, prefix: prefix)
+      end
+
+      def order_line_rows
+        (@payload["order_lines"] || []).filter_map { |line| normalize_order_line(line) }
+      end
+
+      def normalize_order_line(line)
+        return nil unless line.is_a?(Hash)
+
+        line = line.stringify_keys
+        nested = line["order_line"]
+        line = nested.stringify_keys if nested.is_a?(Hash)
+        line.presence
+      end
+
+      def build_order_items(rows)
         rows.filter_map do |line|
-          line = line.stringify_keys if line.is_a?(Hash)
           variant = variant_for_line(line)
           next unless variant
 
@@ -121,6 +160,16 @@ module Insales
         end
       end
 
+      def unmatched_lines_summary(rows)
+        rows.map do |line|
+          parts = []
+          parts << "variant_id=#{line['variant_id']}" if line["variant_id"].present?
+          parts << "sku=#{line['sku']}" if line["sku"].present?
+          parts << "barcode=#{line['barcode']}" if line["barcode"].present?
+          parts.join(", ").presence || "line"
+        end.join("; ")
+      end
+
       def variant_for_line(line)
         variant_id = line["variant_id"]
         if variant_id.present?
@@ -130,9 +179,12 @@ module Insales
         end
 
         sku = line["sku"].presence
-        return nil if sku.blank?
+        variant = Variant.find_by(sku: sku) if sku.present?
+        return variant if variant
 
-        Variant.find_by(sku: sku)
+        # InSales часто кладёт штрихкод в sku; varbind-sync тоже матчит по barcode
+        barcode = line["barcode"].presence || sku
+        Variant.find_by(barcode: barcode) if barcode.present?
       end
 
       def find_or_create_client

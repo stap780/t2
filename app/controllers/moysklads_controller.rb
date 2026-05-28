@@ -1,23 +1,23 @@
 class MoyskladsController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_moysklad, only: %i[ show edit update destroy check add_order_webhook ]
+  before_action :set_moysklad, only: %i[ show edit update destroy check add_order_webhook order_settings ]
 
-  # GET /moysklads
   def index
     @moysklads = Moysklad.all.order(created_at: :desc)
   end
 
-  # GET /moysklads/1
   def show
+    load_reference_data
+    @status_mappings = MoyskladOrderStatusMapping.includes(:order_status).order(:id)
+    @field_mappings = @moysklad.moysklad_order_field_mappings.order(:id)
+    @order_statuses = OrderStatus.order(:position)
   end
 
-  # GET /moysklads/new
   def new
     @moysklad = Moysklad.new
   end
 
-  # GET /moysklads/1/edit
   def edit
   end
 
@@ -26,7 +26,7 @@ class MoyskladsController < ApplicationController
 
     respond_to do |format|
       if @moysklad.save
-        format.html { redirect_to moysklads_path, notice: t('.created') }
+        format.html { redirect_to moysklad_path(@moysklad), notice: t('.created') }
         format.turbo_stream do
           flash[:notice] = t('.created')
           render turbo_stream: turbo_close_offcanvas_flash + [
@@ -43,7 +43,7 @@ class MoyskladsController < ApplicationController
   def update
     respond_to do |format|
       if @moysklad.update(moysklad_params)
-        format.html { redirect_to moysklads_path, notice: t('.updated') }
+        format.html { redirect_to moysklad_path(@moysklad), notice: t('.updated') }
         format.turbo_stream do
           flash[:notice] = t('.updated')
           render turbo_stream: turbo_close_offcanvas_flash + [
@@ -72,7 +72,6 @@ class MoyskladsController < ApplicationController
     end
   end
 
-  # POST /moysklads/:id/add_order_webhook
   def add_order_webhook
     success, messages = MoyskladApi::Webhook.add_order_webhooks(moysklad: @moysklad)
 
@@ -83,12 +82,26 @@ class MoyskladsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to moysklads_path }
+      format.html { redirect_to moysklad_path(@moysklad) }
       format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
 
-  # GET /moysklads/1/check
+  def order_settings
+    load_reference_data
+    attrs = order_settings_params.to_h
+    apply_default_ad_source_name!(attrs)
+
+    if @moysklad.update(attrs)
+      redirect_to moysklad_path(@moysklad), notice: t("moysklads.order_settings.updated")
+    else
+      @status_mappings = MoyskladOrderStatusMapping.includes(:order_status).order(:id)
+      @field_mappings = @moysklad.moysklad_order_field_mappings.order(:id)
+      @order_statuses = OrderStatus.order(:position)
+      render :show, status: :unprocessable_entity
+    end
+  end
+
   def check
     success, messages = @moysklad.api_work?
     
@@ -99,7 +112,7 @@ class MoyskladsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to moysklads_path }
+      # format.html { redirect_to moysklad_path(@moysklad) }
       format.turbo_stream do
         render turbo_stream: [render_turbo_flash]
       end
@@ -108,15 +121,61 @@ class MoyskladsController < ApplicationController
 
   private
 
+  def load_reference_data
+    @api_ok, @api_errors = @moysklad.api_work?
+    return unless @api_ok
+
+    @organizations = MoyskladApi::ReferenceData.organizations(@moysklad)
+    @stores = MoyskladApi::ReferenceData.stores(@moysklad)
+    metadata = MoyskladApi::ReferenceData.customerorder_metadata(@moysklad)
+    @ms_states = MoyskladApi::ReferenceData.states_from_metadata(metadata)
+    @ms_attributes = MoyskladApi::ReferenceData.customerorder_attributes(@moysklad)
+    @ad_source_attribute = @ms_attributes.find do |row|
+      row[:type] == "customentity" && row[:name] == Moysklad::AD_SOURCE_ATTRIBUTE_NAME
+    end
+    @ms_ad_source_entities =
+      if @ad_source_attribute&.dig(:custom_entity_meta_href).present?
+        MoyskladApi::ReferenceData.custom_entity_values(
+          @moysklad,
+          @ad_source_attribute[:custom_entity_meta_href]
+        )
+      else
+        []
+      end
+  rescue StandardError => e
+    Rails.logger.warn "[MoyskladsController] load_reference_data: #{e.message}"
+    @organizations ||= []
+    @stores ||= []
+    @ms_states ||= []
+    @ms_attributes ||= []
+    @ms_ad_source_entities ||= []
+  end
+
+  def apply_default_ad_source_name!(attrs)
+    href = attrs["default_ad_source_href"]
+    if href.present?
+      entity = @ms_ad_source_entities&.find { |row| row[:href] == href }
+      attrs["default_ad_source_name"] = entity[:name] if entity
+    else
+      attrs["default_ad_source_name"] = nil
+    end
+  end
+
   def set_moysklad
     @moysklad = Moysklad.find(params[:id])
   end
 
   def moysklad_params
+    params.require(:moysklad).permit(:api_key, :api_password)
+  end
+
+  def order_settings_params
     params.require(:moysklad).permit(
-      :api_key, :api_password,
-      :organization_href, :agent_href, :store_href
+      :organization_href,
+      :store_href,
+      :order_number_prefix,
+      :default_ad_source_href,
+      :orders_integration_start_at
     )
   end
 end
-

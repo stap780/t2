@@ -3,13 +3,17 @@
 class AvitosController < ApplicationController
   include ActionView::RecordIdentifier
 
-  before_action :set_avito, only: %i[show edit update destroy fetch_orders]
+  before_action :set_avito, only: %i[show edit update destroy fetch_orders sync_catalog]
 
   def index
     @avitos = Avito.all.order(created_at: :desc)
   end
 
-  def show; end
+  def show
+    @api_ok = AvitoApi::Auth.access_token(@avito).present?
+    @status_mappings = @avito.avito_order_status_mappings.includes(:order_status).order(:id)
+    @catalog_synced_count = @avito.catalog_product_bindings_count
+  end
 
   def new
     @avito = Avito.new
@@ -80,7 +84,7 @@ class AvitosController < ApplicationController
         ".fetch_partial",
         imported: stats.imported,
         moysklad_created: stats.moysklad_created,
-        errors: stats.errors.first(3).join("; ")
+        errors: AvitoApi::ErrorMessage.translate_list(stats.errors)
       )
     else
       flash[:notice] = t(
@@ -93,7 +97,38 @@ class AvitosController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to avitos_path }
+      format.html { redirect_to avito_path(@avito) }
+      format.turbo_stream { render turbo_stream: [render_turbo_flash] }
+    end
+  end
+
+  # GET /avitos/:id/sync_catalog — Varbind Product ↔ avitoId из отчёта автозагрузки
+  def sync_catalog
+    stats = AvitoApi::Autoload::SyncCatalog.call(avito: @avito)
+
+    if stats.errors.include?("no_avito_token")
+      flash[:alert] = t(".sync_error", message: t(".sync_no_token"))
+    elsif stats.errors.any?
+      flash[:alert] = t(
+        ".sync_partial",
+        linked: stats.linked,
+        existing: stats.existing,
+        not_found: stats.not_found,
+        conflicts: stats.conflicts,
+        errors: AvitoApi::ErrorMessage.translate_list(stats.errors)
+      )
+    else
+      flash[:notice] = t(
+        ".sync_success",
+        linked: stats.linked,
+        existing: stats.existing,
+        not_found: stats.not_found,
+        skipped: stats.skipped
+      )
+    end
+
+    respond_to do |format|
+      format.html { redirect_to avito_path(@avito, anchor: "avitos_catalog") }
       format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end

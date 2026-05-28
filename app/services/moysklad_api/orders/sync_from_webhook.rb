@@ -16,12 +16,23 @@ module MoyskladApi
 
       def call
         order = find_or_initialize_order
+        if skip_before_cutover?(order)
+          OrdersIntegration::Cutover.log_skip(
+            source: "moysklad",
+            identifier: moysklad_order_uuid || external_code
+          )
+          return nil
+        end
+
         assign_order_attributes(order)
         order.save!
 
+        sync_moysklad_description(order)
         sync_order_items(order)
+        ApplyFieldMappingsFromMoysklad.call(order:, moysklad: @moysklad, order_json: @order_json)
         status_changed = apply_status(order)
         push_avito_status(order) if status_changed
+        push_insales_status(order) if order.insales_channel?
 
         ReserveStock.call(@order_json, @moysklad) if @action == "CREATE"
 
@@ -39,19 +50,27 @@ module MoyskladApi
       end
 
       def find_or_initialize_order
-        order = Order.find_by(moysklad_order_id: moysklad_order_uuid) if moysklad_order_uuid.present?
-        order ||= Order.find_by(moysklad_external_code: external_code) if external_code.present?
-        order ||= Order.find_by(id: external_code) if external_code.to_s.match?(/\A\d+\z/)
-        order ||= Order.new(source: "moysklad")
+        uuid = moysklad_order_uuid
+        order = find_order_by_moysklad_uuid(uuid) if uuid.present?
+        order ||= ::Order.find_by(moysklad_external_code: external_code) if external_code.present?
+        order ||= ::Order.find_by(id: external_code) if external_code.to_s.match?(/\A\d+\z/)
+        order ||= ::Order.new(source: "moysklad")
 
-        order.moysklad_order_id = moysklad_order_uuid if moysklad_order_uuid.present?
+        order.moysklad_order_id = uuid if uuid.present?
         order
       end
 
+      def find_order_by_moysklad_uuid(uuid)
+        ::Order.find_by(moysklad_order_id: uuid) ||
+          ::Order.where("moysklad_order_id LIKE ?", "#{uuid}?%").first
+      end
+
       def assign_order_attributes(order)
-        order.number = @order_json["name"].presence || order.number
+        ms_name = @order_json["name"].presence
+        if ms_name.present? && !order.insales_channel? && !order.avito_channel?
+          order.number = ms_name
+        end
         order.moysklad_external_code = external_code if external_code.present?
-        order.comment = @order_json["description"].presence || order.comment
         order.total_sum = parse_sum(@order_json["sum"]) if @order_json.key?("sum")
         order.currency = "RUB"
         order.synced_at = Time.current
@@ -101,6 +120,18 @@ module MoyskladApi
         true
       end
 
+      def push_insales_status(order)
+        return unless order.insales_channel?
+
+        result = Insales::Orders::PushFromOrder.call(order: order)
+        return if result[:success] || result[:skipped]
+
+        Rails.logger.warn(
+          "[MoyskladApi::Orders::SyncFromWebhook] InSales push failed " \
+          "order=#{order.id}: #{result[:error]}"
+        )
+      end
+
       def push_avito_status(order)
         result = AvitoApi::Orders::PushStatusFromOrder.call(order: order)
         return if result[:success] || result[:skipped]
@@ -117,10 +148,24 @@ module MoyskladApi
         (value.to_f / 100).round(2)
       end
 
+      def sync_moysklad_description(order)
+        description = @order_json["description"].presence
+        return if description.blank?
+
+        order.upsert_prefixed_note(description, prefix: "МойСклад:\n")
+      end
+
       def extract_uuid(href)
         return nil if href.blank?
 
-        href.to_s.split("/").last.presence
+        href.to_s.split("/").last.to_s.split("?").first.presence
+      end
+
+      def skip_before_cutover?(order)
+        OrdersIntegration::Cutover.skip?(
+          known_in_app: order.persisted?,
+          source_created_at: OrdersIntegration::Cutover.parse_moysklad_time(@order_json["created"])
+        )
       end
     end
   end

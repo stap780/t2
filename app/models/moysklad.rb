@@ -1,4 +1,8 @@
 class Moysklad < ApplicationRecord
+  AD_SOURCE_ATTRIBUTE_NAME = "Источник рекламы"
+
+  has_many :moysklad_order_field_mappings, dependent: :destroy
+
   validates :api_key, presence: true
   validates :api_password, presence: true
 

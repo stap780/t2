@@ -1,0 +1,27 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="flex items-center justify-between p-4 border-b border-gray-200">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900"><%= t("avitos.show.status_mappings_heading") %></h2>
+    </div>
+    <% if api_ok %>
+      <%= link_to t("avito_order_status_mappings.index.new"),
+          new_avito_avito_order_status_mapping_path(avito),
+          class: "inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700",
+          data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-[2fr_1fr_120px] gap-4 p-4 font-medium text-gray-700 border-b">
+    <div><%= t("activerecord.attributes.avito_order_status_mapping.order_status") %></div>
+    <div><%= t("activerecord.attributes.avito_order_status_mapping.avito_status") %></div>
+    <div></div>
+  </div>
+
+  <%= turbo_frame_tag dom_id(avito, :avito_order_status_mappings) do %>
+    <% if mappings.any? %>
+      <%= render partial: "avito_order_status_mappings/mapping", collection: mappings, as: :mapping, locals: { avito: avito } %>
+    <% else %>
+      <p class="p-4 text-sm text-gray-500"><%= t("avitos.show.no_status_mappings") %></p>
+    <% end %>
+  <% end %>
+</div>

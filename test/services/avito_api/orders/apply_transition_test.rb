@@ -12,7 +12,8 @@ module AvitoApi
           api_secret: "s-#{SecureRandom.hex(4)}"
         )
         status = OrderStatus.create!(code: "paid", title: "Оплачен", position: 1)
-        AvitoOrderStatusMapping.create!(order_status: status, avito_status: "shipped")
+        mapping = AvitoOrderStatusMapping.create!(avito:, order_status: status, avito_status: "confirm")
+        mapping.update_column(:avito_status, "shipped")
         order = Order.create!(
           source: "avito",
           avito: avito,

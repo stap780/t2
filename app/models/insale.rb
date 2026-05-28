@@ -1,6 +1,7 @@
 class Insale < ApplicationRecord
   has_many :orders, dependent: :nullify
   has_many :insales_order_status_mappings, dependent: :destroy
+  has_many :insales_order_field_mappings, dependent: :destroy
   has_one_attached :swatch_file
 
   validates :api_link, presence: true

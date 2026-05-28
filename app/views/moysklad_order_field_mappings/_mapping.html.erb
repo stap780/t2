@@ -1,0 +1,9 @@
+<%= turbo_frame_tag dom_id(mapping), class: "grid grid-cols-[50px_1fr_1fr_120px] gap-4 p-4 border-t hover:bg-gray-50 items-center" do %>
+  <div><%= mapping.id %></div>
+  <div><%= OrderFieldSourceKeys::SOURCE_KEYS[mapping.source_key] || mapping.source_key %></div>
+  <div><%= mapping.ms_attribute_name.presence || mapping.ms_attribute_href %></div>
+  <div class="flex justify-end space-x-2">
+    <%= link_to_edit edit_moysklad_moysklad_order_field_mapping_path(mapping.moysklad, mapping), data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+    <%= link_to_delete moysklad_moysklad_order_field_mapping_path(mapping.moysklad, mapping), data: { turbo_method: :delete, turbo_confirm: t("actions.delete") } %>
+  </div>
+<% end %>

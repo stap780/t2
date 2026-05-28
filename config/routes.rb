@@ -113,6 +113,12 @@ Rails.application.routes.draw do
   end
   resources :departments, except: [:show]
   resources :shift_codes, except: [:show]
+
+  get "documentation", to: "documentation#index", as: :documentation
+  get "documentation/avito", to: "documentation#avito", as: :documentation_avito
+  get "documentation/insales", to: "documentation#insales", as: :documentation_insales
+  get "documentation/moysklad", to: "documentation#moysklad", as: :documentation_moysklad
+
   post "dashboard/fullsearch", to: "dashboard#fullsearch", as: :fullsearch_dashboard_index
   
   # Routes with modern RESTful patterns
@@ -158,22 +164,29 @@ Rails.application.routes.draw do
   resources :insales do
     member do
       get :check
+      get :fetch_orders
       post :add_order_webhook
       post :add_order_update_webhook
     end
+    resources :insales_order_status_mappings, except: [:show]
+    resources :insales_order_field_mappings, except: %i[show index]
   end
 
   resources :moysklads do
     member do
       get :check
       post :add_order_webhook
+      patch :order_settings
     end
+    resources :moysklad_order_field_mappings, except: %i[show index]
   end
 
-  resources :avitos, only: %i[index new create edit update destroy] do
+  resources :avitos do
     member do
       get :fetch_orders
+      get :sync_catalog
     end
+    resources :avito_order_status_mappings, except: [:show]
   end
 
   resources :users
@@ -220,6 +233,9 @@ Rails.application.routes.draw do
   resources :orders, only: %i[index show] do
     member do
       post :export_to_moysklad
+      post :sync_from_moysklad
+      post :push_to_insales
+      post :download_avito_label
     end
   end
   resources :order_statuses do
@@ -228,8 +244,6 @@ Rails.application.routes.draw do
     end
   end
   resources :moysklad_order_status_mappings, except: [:show]
-  resources :avito_order_status_mappings, except: [:show]
-  resources :insales_order_status_mappings, except: [:show]
 
   resources :okrugs do
     member do

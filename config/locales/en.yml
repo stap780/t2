@@ -174,6 +174,88 @@ en:
     settings: "Settings"
     insales: "InSales"
     moysklads: "Moysklad"
+    documentation: "Documentation"
+    documentation_avito: "Avito"
+    documentation_insales: "InSales"
+    documentation_moysklad: "MoySklad"
+  documentation:
+    index:
+      title: "Integration documentation"
+      lead: "Guide for staff: how products and orders connect to Avito, InSales, and MoySklad."
+      cards:
+        avito:
+          title: "Avito"
+          summary: "Accounts, listing bindings, orders, and catalog sync."
+        insales:
+          title: "InSales"
+          summary: "Variant bindings, prices, stock, and orders."
+        moysklad:
+          title: "MoySklad"
+          summary: "Products, stock, export, and order intake."
+      sections:
+        overview:
+          title: "Overview"
+          paragraphs:
+            - "The app is a single registry for products and orders. External systems are configured under Settings."
+            - "Orders do not flow directly between channels — they always pass through the app's order registry first."
+            - "Status mapping must be configured in every integration, or status updates may not propagate correctly."
+      diagrams:
+        orders:
+          title: "Orders: registry as hub"
+          caption: "Sales channels do not exchange orders directly."
+          note: "Avito and InSales are not linked to each other."
+          nodes:
+            avito: "Avito"
+            insales: "InSales"
+            moysklad: "MoySklad"
+            registry: "Order registry"
+          arrows:
+            import: "import / webhook"
+            webhook: "webhook"
+            export: "order export"
+            status: "status"
+        products:
+          title: "Products: separate from orders"
+          caption: "Stock, prices, and bindings sync via the product catalog."
+          note: "Catalog sync uses separate scheduled jobs, not orders."
+          nodes:
+            catalog: "Product catalog"
+            avito: "Avito"
+            insales: "InSales"
+            moysklad: "MoySklad"
+          links:
+            moysklad: "varbind, stock"
+            insales: "varbind, prices, images"
+            avito: "varbind, catalog"
+        products:
+          title: "Products and badges"
+          items:
+            - "MoySklad and InSales bindings are at variant level; a barcode is required for external links."
+            - "Avito bindings are at product level; barcode is optional for the badge."
+    avito:
+      title: "Avito integration"
+      lead: "Multiple accounts, product-to-listing bindings, and automated order sync."
+      sections:
+        setup:
+          title: "Setup"
+          paragraphs:
+            - "Add Avito accounts under Settings → Avito."
+    insales:
+      title: "InSales integration"
+      lead: "Variant sync, prices, stock, and orders."
+      sections:
+        setup:
+          title: "Setup"
+          paragraphs:
+            - "Configure under Settings → InSales."
+    moysklad:
+      title: "MoySklad integration"
+      lead: "Stock, product creation, and order intake."
+      sections:
+        setup:
+          title: "Setup"
+          paragraphs:
+            - "Configure under Settings → Moysklad."
   enums:
     import:
       status:
@@ -551,6 +633,9 @@ en:
           variants_have_items:
             one: "Cannot delete product. 1 loss position references this product's variants."
             other: "Cannot delete product. %{count} loss positions reference this product's variants."
+          variants_have_order_items:
+            one: "Cannot delete product. 1 order line references this product's variants."
+            other: "Cannot delete product. %{count} order lines reference this product's variants."
   acts:
     index:
       acts_search: "Search by number, item title, barcode or car number"

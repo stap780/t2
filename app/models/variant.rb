@@ -13,6 +13,7 @@ class Variant < ApplicationRecord
   
   audited associated_with: :product
   has_many :items
+  has_many :order_items
   has_one_attached :etiketka
   
   after_initialize :set_default_new, if: :new_record?

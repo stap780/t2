@@ -1,0 +1,29 @@
+<div class="bg-white rounded-lg shadow border border-gray-200">
+  <div class="flex items-center justify-between p-4 border-b border-gray-200">
+    <div>
+      <h2 class="text-lg font-semibold text-gray-900"><%= t("insales.show.field_mappings_heading") %></h2>
+      <p class="text-sm text-gray-500 mt-1"><%= t("insales.show.field_mappings_hint") %></p>
+    </div>
+    <% if api_ok %>
+      <%= link_to t("insales_order_field_mappings.index.new"),
+          new_insale_insales_order_field_mapping_path(insale),
+          class: "inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700",
+          data: { turbo_frame: "offcanvas", turbo_prefetch: false } %>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-[50px_1fr_1fr_120px] gap-4 p-4 font-medium text-gray-700 border-b">
+    <div>#</div>
+    <div><%= t("activerecord.attributes.insales_order_field_mapping.source_key") %></div>
+    <div><%= t("activerecord.attributes.insales_order_field_mapping.insales_field_title") %></div>
+    <div></div>
+  </div>
+
+  <%= turbo_frame_tag dom_id(insale, :insales_order_field_mappings) do %>
+    <% if mappings.any? %>
+      <%= render partial: "insales_order_field_mappings/mapping", collection: mappings, as: :mapping, locals: { insale: insale } %>
+    <% else %>
+      <p class="p-4 text-sm text-gray-500"><%= t("insales.show.no_field_mappings") %></p>
+    <% end %>
+  <% end %>
+</div>

@@ -1,26 +1,38 @@
-<%= form_with model: mapping, local: true, class: 'space-y-4' do |f| %>
-  <%= render 'shared/errors', object: mapping %>
-  <fieldset>
-    <%= f.label :insale_id, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-    <%= f.select :insale_id,
-        options_for_select([[t('insales_order_status_mappings.form.any_shop'), '']] + Insale.order(:id).map { |i| ["##{i.id} #{i.api_link}", i.id] }, mapping.insale_id),
-        {}, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
-  </fieldset>
-  <fieldset>
-    <%= f.label :insales_status_key, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-    <%= f.text_field :insales_status_key, class: 'w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm' %>
-    <p class="text-xs text-gray-500 mt-1"><%= t('insales_order_status_mappings.form.insales_status_hint') %></p>
-  </fieldset>
-  <fieldset>
-    <%= f.label :insales_status_title, class: 'block text-sm font-medium text-gray-700 mb-1' %>
-    <%= f.text_field :insales_status_title, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
-  </fieldset>
-  <fieldset>
-    <%= f.label :order_status_id, class: 'block text-sm font-medium text-gray-700 mb-1' %>
+<%= form_with model: [@insale, mapping], class: "space-y-4" do |f| %>
+  <%= render "shared/errors", object: mapping %>
+
+  <div>
+    <%= f.label :insales_custom_status_permalink, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <% if @custom_statuses.present? %>
+      <%= f.collection_select :insales_custom_status_permalink, @custom_statuses, :permalink, :title,
+          { include_blank: true },
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+    <% else %>
+      <%= f.text_field :insales_custom_status_permalink,
+          class: "w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm",
+          placeholder: "new" %>
+      <p class="text-xs text-amber-600 mt-1"><%= t("insales_order_status_mappings.form.custom_status_api_unavailable") %></p>
+    <% end %>
+    <p class="text-xs text-gray-500 mt-1"><%= t("insales_order_status_mappings.form.custom_status_hint") %></p>
+  </div>
+
+  <div>
+    <%= f.label :insales_financial_status, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.select :insales_financial_status,
+        InsalesOrderStatusMapping::FINANCIAL_STATUSES.map { |s|
+          [t("insales_order_status_mappings.financial_statuses.#{s}", default: s), s]
+        },
+        { include_blank: true },
+        class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+  </div>
+
+  <div>
+    <%= f.label :order_status_id, class: "block text-sm font-medium text-gray-700 mb-1" %>
     <%= f.select :order_status_id, order_status_options_for_select(mapping.order_status_id),
-        {}, class: 'w-full px-3 py-2 border border-gray-300 rounded-md' %>
-  </fieldset>
+        {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+  </div>
+
   <div class="flex justify-end">
-    <%= f.submit t('actions.save'), class: 'px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700' %>
+    <%= f.submit t("actions.save"), class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700" %>
   </div>
 <% end %>

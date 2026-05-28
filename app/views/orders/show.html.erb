@@ -1,26 +1,43 @@
-<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-  <div>
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div class="flex items-center mb-4 space-x-4">
+    <%= link_to_back orders_path %>
     <h1 class="text-xl font-semibold flex items-center gap-2 flex-wrap">
       <%= t(".heading", number: order_display_number(@order)) %>
-      <%= order_source_badge(@order) %>
-      <%= order_status_badge(@order) %>
     </h1>
-    <p class="text-sm text-gray-500 mt-1">
-      <%= t(".created_at", time: l(@order.created_at)) %>
-      <% if @order.synced_at.present? %>
-        · <%= t(".synced_at", time: l(@order.synced_at)) %>
-      <% end %>
-    </p>
   </div>
-  <div class="flex flex-wrap gap-2">
-    <%= link_to t("actions.back"), orders_path, class: "px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm" %>
+  <div class="ml-auto flex flex-wrap gap-2">
     <% if !@order.moysklad_linked? && @order.source != "moysklad" %>
-      <%= button_to t(".export_to_moysklad"), export_to_moysklad_order_path(@order),
-          method: :post,
-          class: "px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm",
+      <%= button_to t(".export_to_moysklad"), export_to_moysklad_order_path(@order), method: :post,
+          class: "px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 text-sm cursor-pointer",
           data: { turbo_confirm: t(".export_confirm") } %>
     <% end %>
+    <% if @order.moysklad_linked? %>
+      <%= button_to t(".sync_from_moysklad"), sync_from_moysklad_order_path(@order), method: :post,
+          class: "px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 text-sm cursor-pointer",
+          data: { turbo_confirm: t(".sync_from_moysklad_confirm") } %>
+    <% end %>
+    <% if @order.insales_channel? && @order.insales_order_id.present? %>
+      <%= button_to t(".push_to_insales"), push_to_insales_order_path(@order), method: :post,
+          class: "px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 text-sm cursor-pointer",
+          data: { turbo_confirm: t(".push_to_insales_confirm") } %>
+    <% end %>
+    <% if @order.avito? %>
+      <%= button_to t(".refresh_avito_label"), download_avito_label_order_path(@order, force: true), method: :post,
+          class: "px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 text-sm cursor-pointer",
+          data: { turbo_confirm: t(".refresh_avito_label_confirm") } %>
+    <% end %>
   </div>
+</div>
+
+<div class="flex items-center mb-4 space-x-4">
+  <%= order_source_badge(@order) %>
+  <%= order_status_badge(@order) %>
+  <p class="text-sm text-gray-500 mt-1">
+    <%= t(".created_at", time: l(@order.created_at)) %>
+    <% if @order.synced_at.present? %>
+      · <%= t(".synced_at", time: l(@order.synced_at)) %>
+    <% end %>
+  </p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -70,10 +87,14 @@
       <% end %>
     </div>
 
-    <% if @order.comment.present? %>
+    <% if @order.comments.any? %>
       <div class="bg-white rounded-lg shadow p-5">
-        <h2 class="text-sm font-semibold text-gray-700 mb-2"><%= t("activerecord.attributes.order.comment") %></h2>
-        <p class="text-sm text-gray-800 whitespace-pre-wrap"><%= @order.comment %></p>
+        <h2 class="text-sm font-semibold text-gray-700 mb-2"><%= t(".notes_heading") %></h2>
+        <ul class="space-y-2 text-sm text-gray-800">
+          <% @order.comments.order(created_at: :asc).each do |comment| %>
+            <li class="whitespace-pre-wrap"><%= comment.body %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
   </div>
@@ -110,6 +131,27 @@
     </div>
 
     <div class="bg-white rounded-lg shadow p-5">
+      <h2 class="text-sm font-semibold text-gray-700 mb-3"><%= t(".order_details_heading") %></h2>
+      <dl class="space-y-2 text-sm">
+        <% if @order.avito_marketplace_id.present? %>
+          <div>
+            <dt class="text-gray-500"><%= t("activerecord.attributes.order.avito_marketplace_id") %></dt>
+            <dd class="font-mono text-xs"><%= @order.avito_marketplace_id %></dd>
+          </div>
+        <% end %>
+        <div class="flex my-2">
+          <%= link_to t(".open_avito_label"), rails_blob_path(@order.avito_label, disposition: "inline"),
+            target: "_blank", rel: "noopener",
+            class: "px-4 py-2 bg-slate-100 text-slate-800 rounded-md hover:bg-slate-200 text-sm cursor-pointer" if @order.avito_label.attached?  %>
+        </div>
+        <div>
+          <dt class="text-gray-500"><%= t("activerecord.attributes.order.tracking_number") %></dt>
+          <dd class="font-mono text-xs"><%= @order.tracking_number.presence || "—" %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-5">
       <h2 class="text-sm font-semibold text-gray-700 mb-3"><%= t(".integrations_heading") %></h2>
       <dl class="space-y-3 text-sm">
         <% if @order.moysklad_linked? %>
@@ -131,11 +173,6 @@
           <div>
             <dt class="text-gray-500"><%= t("activerecord.attributes.order.avito_order_id") %></dt>
             <dd class="font-mono text-xs"><%= @order.avito_order_id %></dd>
-            <% if @order.avito_marketplace_id.present? %>
-              <dd class="text-xs text-gray-500 mt-1">
-                marketplaceId: <%= @order.avito_marketplace_id %>
-              </dd>
-            <% end %>
             <% if @order.avito_status_sent.present? %>
               <dd class="text-xs text-gray-500 mt-1">
                 Avito transition: <%= @order.avito_status_sent %>

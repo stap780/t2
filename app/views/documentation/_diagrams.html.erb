@@ -1,0 +1,89 @@
+<div class="mt-6 space-y-8">
+  <div>
+    <h3 class="text-base font-semibold text-gray-900"><%= t("documentation.index.diagrams.orders.title") %></h3>
+    <p class="mt-2 text-sm text-gray-600"><%= t("documentation.index.diagrams.orders.caption") %></p>
+
+    <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4 overflow-x-auto">
+      <div class="min-w-[520px] flex flex-col items-center gap-3">
+        <div class="flex flex-wrap justify-center gap-3 w-full">
+          <div class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-900">
+            <%= t("documentation.index.diagrams.orders.nodes.avito") %>
+          </div>
+          <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-900">
+            <%= t("documentation.index.diagrams.orders.nodes.insales") %>
+          </div>
+          <div class="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-900">
+            <%= t("documentation.index.diagrams.orders.nodes.moysklad") %>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 text-xs text-gray-500">
+          <span>↓ <%= t("documentation.index.diagrams.orders.arrows.import") %></span>
+          <span>↓ <%= t("documentation.index.diagrams.orders.arrows.webhook") %></span>
+        </div>
+
+        <div class="w-full max-w-md rounded-lg border-2 border-violet-400 bg-violet-100 px-6 py-3 text-center text-sm font-semibold text-violet-900">
+          <%= t("documentation.index.diagrams.orders.nodes.registry") %>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 text-xs text-gray-500">
+          <span>↓ <%= t("documentation.index.diagrams.orders.arrows.export") %></span>
+          <span>↓ <%= t("documentation.index.diagrams.orders.arrows.status") %></span>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 w-full">
+          <div class="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-900">
+            <%= t("documentation.index.diagrams.orders.nodes.moysklad") %>
+          </div>
+          <div class="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-900">
+            <%= t("documentation.index.diagrams.orders.nodes.avito") %>
+          </div>
+          <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-900">
+            <%= t("documentation.index.diagrams.orders.nodes.insales") %>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 text-center max-w-lg"><%= t("documentation.index.diagrams.orders.note") %></p>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="text-base font-semibold text-gray-900"><%= t("documentation.index.diagrams.products.title") %></h3>
+    <p class="mt-2 text-sm text-gray-600"><%= t("documentation.index.diagrams.products.caption") %></p>
+
+    <div class="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4 overflow-x-auto">
+      <div class="min-w-[480px] flex flex-col items-center gap-4">
+        <div class="w-full max-w-sm rounded-lg border-2 border-violet-400 bg-violet-100 px-6 py-3 text-center text-sm font-semibold text-violet-900">
+          <%= t("documentation.index.diagrams.products.nodes.catalog") %>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 w-full max-w-lg text-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-gray-400 text-lg leading-none">↕</span>
+            <div class="rounded-lg border border-blue-300 bg-blue-50 px-3 py-2 text-xs font-medium text-blue-900 w-full">
+              <%= t("documentation.index.diagrams.products.nodes.moysklad") %>
+            </div>
+            <span class="text-[11px] text-gray-500"><%= t("documentation.index.diagrams.products.links.moysklad") %></span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-gray-400 text-lg leading-none">↕</span>
+            <div class="rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-xs font-medium text-green-900 w-full">
+              <%= t("documentation.index.diagrams.products.nodes.insales") %>
+            </div>
+            <span class="text-[11px] text-gray-500"><%= t("documentation.index.diagrams.products.links.insales") %></span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-gray-400 text-lg leading-none">↕</span>
+            <div class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900 w-full">
+              <%= t("documentation.index.diagrams.products.nodes.avito") %>
+            </div>
+            <span class="text-[11px] text-gray-500"><%= t("documentation.index.diagrams.products.links.avito") %></span>
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 text-center max-w-lg"><%= t("documentation.index.diagrams.products.note") %></p>
+      </div>
+    </div>
+  </div>
+</div>

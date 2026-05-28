@@ -3,7 +3,7 @@
 require "rest-client"
 
 module MoyskladApi
-  class Order
+  class CustomerOrder
     # Fetch customerorder with positions by href
     # Returns order JSON or nil
     def self.fetch(moysklad, href)

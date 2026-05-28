@@ -12,7 +12,7 @@ class OrderStatus < ApplicationRecord
 
   has_many :orders, dependent: :restrict_with_error
   has_many :moysklad_order_status_mappings, dependent: :destroy
-  has_one :avito_order_status_mapping, dependent: :destroy
+  has_many :avito_order_status_mappings, dependent: :destroy
   has_many :insales_order_status_mappings, dependent: :destroy
 
   before_validation :generate_code_from_title, if: -> { code.blank? && title.present? }

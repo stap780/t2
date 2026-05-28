@@ -1,16 +1,67 @@
-<% content_for :title, "Showing moysklad" %>
+<% content_for :title, t("moysklads.show.title") %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+<div class="container mx-auto px-0 max-w-5xl">
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center space-x-4">
+      <%= link_to_back moysklads_path %>
+      <h1 class="text-2xl font-bold text-gray-900"><%= t("moysklads.show.heading") %></h1>
+    </div>
+    <p class="text-sm text-gray-500 mt-1"><%= t("moysklads.show.subtitle") %></p>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to_check check_moysklad_path(@moysklad), label: t("moysklads.moysklad.check") %>
+      <%= link_to edit_moysklad_path(@moysklad),
+          class: "inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm rounded-md text-gray-700 bg-white hover:bg-gray-50",
+          data: { turbo_frame: :offcanvas } do %>
+        <%= t("moysklads.show.edit_credentials") %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @api_ok %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-50 text-green-700">
+      <%= t("moysklads.show.api_ok") %>
+    </p>
+  <% else %>
+    <p class="mb-4 inline-flex items-center px-3 py-1 rounded-full text-sm bg-red-50 text-red-700">
+      <%= t("moysklads.show.api_error", messages: Array(@api_errors).join(", ")) %>
+    </p>
   <% end %>
 
-  <h1 class="font-bold text-4xl">Showing moysklad</h1>
+  <% if @api_ok && @ms_ad_source_entities.present? && @moysklad.default_ad_source_href.blank? %>
+    <p class="mb-4 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md p-3">
+      <%= t("moysklads.show.default_ad_source_missing") %>
+    </p>
+  <% end %>
 
-  <%= render @moysklad %>
+  <%= render "moysklads/order_settings",
+      moysklad: @moysklad,
+      organizations: @organizations,
+      stores: @stores,
+      ms_ad_source_entities: @ms_ad_source_entities,
+      api_ok: @api_ok %>
 
-  <%= link_to "Edit this moysklad", edit_moysklad_path(@moysklad), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to moysklads", moysklads_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this moysklad", @moysklad, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+  <section class="mt-8 bg-white rounded-lg shadow border border-gray-200 p-6">
+    <h2 class="text-lg font-semibold text-gray-900"><%= t("moysklads.show.webhooks_heading") %></h2>
+    <p class="text-sm text-gray-500 mt-1 mb-4"><%= t("moysklads.show.webhooks_hint") %></p>
+    <%= button_to add_order_webhook_moysklad_path(@moysklad),
+          method: :post,
+          class: "inline-flex items-center px-4 py-2 bg-violet-600 text-white text-sm rounded-md hover:bg-violet-700 cursor-pointer" do %>
+      <%= t("moysklads.moysklad.add_webhook") %>
+    <% end %>
+  </section>
+
+  <section id="moysklads_statuses" class="mt-8 scroll-mt-4">
+    <%= render "moysklads/status_mappings_section",
+        mappings: @status_mappings,
+        ms_states: @ms_states,
+        api_ok: @api_ok %>
+  </section>
+
+  <section id="field_mappings" class="mt-8 mb-12 scroll-mt-4">
+    <%= render "moysklads/field_mappings_section",
+        moysklad: @moysklad,
+        mappings: @field_mappings,
+        ms_attributes: @ms_attributes,
+        api_ok: @api_ok %>
+  </section>
 </div>
-
