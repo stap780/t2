@@ -2,7 +2,7 @@
 
 module Insales
   class VarbindSyncService
-    include Insales::Concerns::EmailNotification
+    include Insales::EmailNotification
 
     def initialize(insale = nil)
       @insale = insale || Insale.first

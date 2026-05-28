@@ -47,6 +47,8 @@ class EmailDeliveriesController < ApplicationController
     when 'InsaleNotificationMailer'
       # Повторная отправка уведомления InSales
       InsaleNotificationJob.perform_later(@email_delivery.id)
+    when 'AvitoNotificationMailer'
+      AvitoNotificationJob.perform_later(@email_delivery.id)
     when 'XlsxNotificationMailer'
       unless @email_delivery.attachment.attached?
         redirect_to @email_delivery, alert: 'Файл не найден. Необходимо сгенерировать файл заново.'

@@ -104,28 +104,8 @@ class AvitosController < ApplicationController
 
   # GET /avitos/:id/sync_catalog — Varbind Product ↔ avitoId из отчёта автозагрузки
   def sync_catalog
-    stats = AvitoApi::Autoload::SyncCatalog.call(avito: @avito)
-
-    if stats.errors.include?("no_avito_token")
-      flash[:alert] = t(".sync_error", message: t(".sync_no_token"))
-    elsif stats.errors.any?
-      flash[:alert] = t(
-        ".sync_partial",
-        linked: stats.linked,
-        existing: stats.existing,
-        not_found: stats.not_found,
-        conflicts: stats.conflicts,
-        errors: AvitoApi::ErrorMessage.translate_list(stats.errors)
-      )
-    else
-      flash[:notice] = t(
-        ".sync_success",
-        linked: stats.linked,
-        existing: stats.existing,
-        not_found: stats.not_found,
-        skipped: stats.skipped
-      )
-    end
+    AvitoCatalogSyncJob.perform_later(@avito.id)
+    flash[:notice] = t(".sync_started")
 
     respond_to do |format|
       format.html { redirect_to avito_path(@avito, anchor: "avitos_catalog") }

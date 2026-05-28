@@ -43,6 +43,10 @@
       </span>
     <% elsif email_delivery.mailer_class == 'InsaleNotificationMailer' %>
       <span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">InSales</span>
+    <% elsif email_delivery.avito_notification? %>
+      <span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800">
+        <%= email_delivery.operation_type_name %>
+      </span>
     <% elsif email_delivery.xlsx_notification? %>
       <span class="px-2 py-1 text-xs rounded bg-amber-100 text-amber-800">
         <%= email_delivery.operation_type_name %>

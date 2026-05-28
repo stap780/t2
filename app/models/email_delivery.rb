@@ -11,6 +11,7 @@ class EmailDelivery < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :moysklad_notifications, -> { where(mailer_class: 'MoyskladNotificationMailer') }
   scope :insale_notifications, -> { where(mailer_class: 'InsaleNotificationMailer') }
+  scope :avito_notifications, -> { where(mailer_class: 'AvitoNotificationMailer') }
   scope :xlsx_notifications, -> { where(mailer_class: 'XlsxNotificationMailer') }
   
   def self.ransackable_attributes(auth_object = nil)
@@ -37,6 +38,10 @@ class EmailDelivery < ApplicationRecord
 
   def insale_notification?
     mailer_class == 'InsaleNotificationMailer'
+  end
+
+  def avito_notification?
+    mailer_class == 'AvitoNotificationMailer'
   end
 
   def xlsx_notification?
@@ -66,6 +71,8 @@ class EmailDelivery < ApplicationRecord
       'Обновление цен InSales'
     when 'images_sync_result'
       'Синхронизация изображений InSales'
+    when 'catalog_sync_result'
+      'Синхронизация каталога Avito'
     when 'xlsx_zip_result'
       'Экспорт Excel (ZIP)'
     when 'incase_item_prices_result'

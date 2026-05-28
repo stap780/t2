@@ -871,6 +871,7 @@ ru:
       fetch_error: "Ошибка запроса: %{message}"
       fetch_no_token: "не удалось получить access_token (см. лог)"
     sync_catalog:
+      sync_started: "Синхронизация каталога запущена. Результат придёт на email и появится в разделе «Отправка писем»."
       sync_success: "Каталог: новых связей %{linked}, уже было %{existing}, товар не найден %{not_found}, пропущено %{skipped}."
       sync_partial: "Частично: связей %{linked}, конфликтов %{conflicts}, не найдено %{not_found}. Ошибки: %{errors}"
       sync_error: "Ошибка синхронизации каталога: %{message}"
@@ -882,7 +883,7 @@ ru:
     avito:
       client_id_label: "client_id"
       fetch_orders: "Получить заказы"
-      sync_catalog: "Синхронизировать каталог"
+      sync_catalog: "Запустить"
       delete_confirm: "Вы уверены, что хотите удалить эту конфигурацию?"
     show:
       title: "Avito"
@@ -893,8 +894,8 @@ ru:
       status_mappings_heading: "Маппинг статусов"
       status_mappings_hint: "Внутренний статус t2 → transition applyTransition (confirm, reject, perform, receive)."
       no_status_mappings: "Маппинги статусов пока не заданы."
-      catalog_sync_heading: "Синх каталог"
-      catalog_sync_hint: "Связь товаров t2 с объявлениями Avito (Varbind по avitoId) из отчёта автозагрузки."
+      catalog_sync_heading: "Синхронизация каталога"
+      catalog_sync_hint: "Связь товаров t2 с объявлениями Avito (Varbind по avitoId) из отчёта автозагрузки. Синхронизация выполняется в фоне; результат — на email."
       catalog_synced_count:
         zero: "Синхронизировано товаров: %{count}"
         one: "Синхронизировано товаров: %{count}"

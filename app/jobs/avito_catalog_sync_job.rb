@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AvitoCatalogSyncJob < ApplicationJob
+  include Avito::EmailNotification
+
   queue_as :avito_catalog_sync
 
   def perform(avito_id = nil)
@@ -12,6 +14,7 @@ class AvitoCatalogSyncJob < ApplicationJob
         "existing=#{stats.existing} not_found=#{stats.not_found} " \
         "conflicts=#{stats.conflicts} skipped=#{stats.skipped} errors=#{stats.errors.size}"
       )
+      create_catalog_sync_email_delivery(avito, stats)
     end
   end
 end

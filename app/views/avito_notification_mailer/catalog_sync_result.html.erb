@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h2><%= @success ? '✅ Синхронизация каталога Avito успешно завершена' : '⚠️ Синхронизация каталога Avito — завершено с ошибками' %></h2>
+
+    <% if @avito.respond_to?(:title) && @avito.title.present? %>
+      <p><strong>Кабинет:</strong> <%= @avito.title %></p>
+    <% end %>
+
+    <% if @details["linked"].present? %>
+      <p><strong>Новых связей:</strong> <%= @details["linked"] %></p>
+    <% end %>
+    <% if @details["existing"].present? %>
+      <p><strong>Уже было связей:</strong> <%= @details["existing"] %></p>
+    <% end %>
+    <% if @details["not_found"].present? %>
+      <p><strong>Товар не найден:</strong> <%= @details["not_found"] %></p>
+    <% end %>
+    <% if @details["skipped"].present? %>
+      <p><strong>Пропущено:</strong> <%= @details["skipped"] %></p>
+    <% end %>
+    <% if @details["conflicts"].present? && @details["conflicts"].to_i > 0 %>
+      <p><strong>Конфликтов:</strong> <%= @details["conflicts"] %></p>
+    <% end %>
+    <% if @details["errors"].present? && @details["errors"].to_i > 0 %>
+      <p><strong>Ошибок:</strong> <%= @details["errors"] %></p>
+    <% end %>
+    <% if Array(@details["error_messages"]).any? %>
+      <p><strong>Сообщения:</strong> <%= Array(@details["error_messages"]).join("; ") %></p>
+    <% end %>
+    <% if @details["completed_at"].present? %>
+      <p><strong>Дата завершения:</strong> <%= @details["completed_at"] %></p>
+    <% end %>
+  </body>
+</html>
