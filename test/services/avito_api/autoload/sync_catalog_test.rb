@@ -14,7 +14,7 @@ module AvitoApi
           api_id: "client-id-#{SecureRandom.hex(4)}",
           api_secret: "secret-#{SecureRandom.hex(4)}"
         )
-        @product = Product.create!(title: "Товар")
+        @product = Product.create!(title: "Товар", status: "active")
         @product.variants.create!(quantity: 1, price: 100)
       end
 
@@ -57,6 +57,22 @@ module AvitoApi
 
         assert_equal 2, items_requests.size
         assert_equal [1], sleeps
+      end
+
+      test "skips non-active products" do
+        @product.update!(status: "pending")
+        product_id = @product.id.to_s
+        fake_client = build_fake_client(product_id)
+        sync = SyncCatalog.new(avito: @avito)
+        sync.instance_variable_set(:@client, fake_client)
+
+        with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
+          stats = sync.call
+          assert_equal 0, stats.linked
+          assert_equal 1, stats.skipped
+        end
+
+        refute Varbind.exists?(record: @product, bindable: @avito)
       end
 
       test "skips items without avito_id" do

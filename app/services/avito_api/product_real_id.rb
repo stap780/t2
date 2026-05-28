@@ -14,13 +14,18 @@ module AvitoApi
       real_id = real_id.to_s.strip
       return nil if real_id.blank?
 
-      product = Product.find_by(id: real_id)
+      product = find_by_old_id(real_id)
       return product if product
 
+      Product.find_by(id: real_id)
+    end
+
+    def self.find_by_old_id(real_id)
       Product.joins(features: %i[property characteristic])
         .where(properties: { title: OLD_ID_PROPERTY })
         .where(characteristics: { title: real_id })
         .first
     end
+    private_class_method :find_by_old_id
   end
 end

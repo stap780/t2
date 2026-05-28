@@ -80,6 +80,11 @@ module AvitoApi
           return
         end
 
+        unless product.status == "active"
+          @stats.skipped += 1
+          return
+        end
+
         result = ProductLink.link!(avito: @avito, product: product, avito_id: avito_id)
         case result.status
         when :linked
