@@ -702,6 +702,8 @@ en:
     edit:
       title: "Edit Product"
       heading: "Edit Product"
+    bindings:
+      title: "Product bindings"
     refill: "Fill from Detal"
     show:
       status: "Status"

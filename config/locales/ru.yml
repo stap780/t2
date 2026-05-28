@@ -1032,6 +1032,8 @@ ru:
     edit:
       title: "Редактировать товар"
       heading: "Редактировать товар"
+    bindings:
+      title: "Привязки товара"
     refill: "Заполнить"
     show:
       status: "Статус"

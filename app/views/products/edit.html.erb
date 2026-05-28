@@ -13,6 +13,8 @@
       } %>
     <%= link_to_history(auditable_type: "product", auditable_id: @product.id) unless @product.new_record? %>
     <%= render "products/integration_links", product: @product, wrapper_class: "ml-1 flex gap-1" %>
+    <%= link_to_varbind bindings_product_path(@product), title: t("actions.binds"),
+        data: { turbo_frame: "offcanvas", turbo_prefetch: false } unless @product.new_record? %>
   </div>
   <%= render "form", product: @product %>
 </div>

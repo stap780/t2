@@ -75,6 +75,25 @@ module AvitoApi
         refute Varbind.exists?(record: @product, bindable: @avito)
       end
 
+      test "collects not_found samples up to limit" do
+        product_id = @product.id.to_s
+        missing_items = (1..3).map do |i|
+          { "ad_id" => "missing-#{i}", "avito_id" => 7_000_000_000 + i }
+        end
+        fake_client = build_fake_client(product_id, extra_items: missing_items)
+        sync = SyncCatalog.new(avito: @avito)
+        sync.instance_variable_set(:@client, fake_client)
+
+        with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
+          stats = sync.call
+          assert_equal 1, stats.linked
+          assert_equal 3, stats.not_found
+          assert_equal 3, stats.not_found_samples.size
+          assert_equal "missing-1", stats.not_found_samples.first["ad_id"]
+          assert_equal "7000000001", stats.not_found_samples.first["avito_id"]
+        end
+      end
+
       test "skips items without avito_id" do
         product_id = @product.id.to_s
         fake_client = build_fake_client(

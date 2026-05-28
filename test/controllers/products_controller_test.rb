@@ -33,6 +33,11 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "should get bindings" do
+    get bindings_product_url(@product)
+    assert_response :success
+  end
+
   test "should update product" do
     patch product_url(@product), params: { product: { description: @product.description, status: @product.status, tip: @product.tip, title: @product.title } }
     assert_redirected_to product_url(@product)

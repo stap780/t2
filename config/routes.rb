@@ -59,6 +59,7 @@ Rails.application.routes.draw do
       get :edit_status_inline
       patch :update_status_inline
       get :download_images
+      get :bindings
     end
     resources :variants do
       member do

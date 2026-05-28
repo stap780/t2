@@ -22,6 +22,7 @@ module AvitoApi
           "linked" => stats.linked,
           "existing" => stats.existing,
           "not_found" => stats.not_found,
+          "not_found_samples" => Array(stats.not_found_samples),
           "skipped" => stats.skipped,
           "conflicts" => stats.conflicts,
           "errors" => stats.errors.size,

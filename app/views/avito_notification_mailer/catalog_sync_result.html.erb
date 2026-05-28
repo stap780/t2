@@ -19,6 +19,15 @@
     <% if @details["not_found"].present? %>
       <p><strong>Товар не найден:</strong> <%= @details["not_found"] %></p>
     <% end %>
+    <% not_found_samples = Array(@details["not_found_samples"]) %>
+    <% if not_found_samples.any? %>
+      <p><strong>Примеры (ad_id → avito_id):</strong></p>
+      <ul>
+        <% not_found_samples.each do |sample| %>
+          <li><%= sample["ad_id"] %> → <%= sample["avito_id"] %></li>
+        <% end %>
+      </ul>
+    <% end %>
     <% if @details["skipped"].present? %>
       <p><strong>Пропущено:</strong> <%= @details["skipped"] %></p>
     <% end %>

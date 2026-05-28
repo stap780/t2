@@ -5,8 +5,12 @@ module AvitoApi
     # Синхронизация Varbind Product ↔ avitoId из отчёта автозагрузки.
     # GET /autoload/v2/reports → GET /autoload/v2/reports/{report_id}/items
     class SyncCatalog
-      Stats = Struct.new(:linked, :existing, :not_found, :skipped, :conflicts, :errors, keyword_init: true)
+      Stats = Struct.new(
+        :linked, :existing, :not_found, :skipped, :conflicts, :errors, :not_found_samples,
+        keyword_init: true
+      )
       PER_PAGE = 200
+      NOT_FOUND_SAMPLES_LIMIT = 20
 
       def self.call(avito:)
         new(avito:).call
@@ -15,7 +19,10 @@ module AvitoApi
       def initialize(avito:)
         @avito = avito
         @client = Client.new(avito:)
-        @stats = Stats.new(linked: 0, existing: 0, not_found: 0, skipped: 0, conflicts: 0, errors: [])
+        @stats = Stats.new(
+          linked: 0, existing: 0, not_found: 0, skipped: 0, conflicts: 0,
+          errors: [], not_found_samples: []
+        )
       end
 
       def call
@@ -77,6 +84,7 @@ module AvitoApi
         product = ProductRealId.find_product(ad_id)
         unless product
           @stats.not_found += 1
+          record_not_found_sample(ad_id, avito_id)
           return
         end
 
@@ -98,6 +106,12 @@ module AvitoApi
           @stats.skipped += 1
           @stats.errors << result.error if result.error.present?
         end
+      end
+
+      def record_not_found_sample(ad_id, avito_id)
+        return if @stats.not_found_samples.size >= NOT_FOUND_SAMPLES_LIMIT
+
+        @stats.not_found_samples << { "ad_id" => ad_id, "avito_id" => avito_id }
       end
     end
   end

@@ -1,5 +1,5 @@
 class ProductsController < ApplicationController
-  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline download_images ]
+  before_action :set_product, only: %i[ show edit copy update destroy sort_image refill sync_with_moysklad edit_status_inline update_status_inline download_images bindings ]
   after_action :clear_preloaded_detals, only: [:index, :edit, :update, :open_filter, :filter_history]
   include ActionView::RecordIdentifier
   include SearchQueryRansack
@@ -100,6 +100,8 @@ class ProductsController < ApplicationController
     detals_by_sku = Detal.where(sku: skus).pluck(:sku, :oszz_price).to_h if skus.any?
     Variant.preload_detals(detals_by_sku || {})
   end
+
+  def bindings; end
 
   def create
     check_positions(params[:product][:images_attributes]) if params[:product][:images_attributes]
