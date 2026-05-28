@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Avito
+module AvitoApi
   module EmailNotification
     NOTIFICATION_EMAIL = (Rails.application.credentials.dig(:avito_notification_email) ||
                          Rails.application.credentials.dig(:insales_notification_email) ||
@@ -43,7 +43,7 @@ module Avito
 
       AvitoNotificationJob.perform_later(email_delivery.id)
     rescue StandardError => e
-      Rails.logger.error "Avito::EmailNotification: #{e.class}: #{e.message}"
+      Rails.logger.error "AvitoApi::EmailNotification: #{e.class}: #{e.message}"
     end
   end
 end

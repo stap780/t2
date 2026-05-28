@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AvitoCatalogSyncJob < ApplicationJob
-  include Avito::EmailNotification
+  include AvitoApi::EmailNotification
 
   queue_as :avito_catalog_sync
 
