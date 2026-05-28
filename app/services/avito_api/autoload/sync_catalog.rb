@@ -6,8 +6,7 @@ module AvitoApi
     # GET /autoload/v2/reports → GET /autoload/v2/reports/{report_id}/items
     class SyncCatalog
       Stats = Struct.new(:linked, :existing, :not_found, :skipped, :conflicts, :errors, keyword_init: true)
-
-      PER_PAGE = 50
+      PER_PAGE = 200
 
       def self.call(avito:)
         new(avito:).call
@@ -62,6 +61,8 @@ module AvitoApi
           pages = body.dig("meta", "pages").to_i
           page += 1
           break if items.empty? || page >= pages
+
+          sleep(1)
         end
       end
 
