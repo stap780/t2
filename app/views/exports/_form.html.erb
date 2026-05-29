@@ -222,7 +222,7 @@
               <p class="text-xs text-gray-600 mb-2">
                 Здесь задаётся общий XML, например Avito или YML: заголовок, корневые теги, &lt;shop&gt;, &lt;offers&gt; и т.п.
                 Внутрь нужного места вставьте
-                <code class="bg-gray-100 px-1 py-0.5 rounded">{"{{ items_xml }}"}</code>.
+                <code class="bg-gray-100 px-1 py-0.5 rounded">{"{{ items_xml }}"}</code> отвечающий за вывод списка товаров.
               </p>
               <div
                 data-controller="codemirror"
@@ -239,20 +239,15 @@
 
             <!-- Item template -->
             <div>
-              <%= form.label(
-                :item_template,
-                "XML item (один товар)",
-                class: "block text-sm font-semibold text-gray-800 mb-2"
-              ) %>
+              <%= form.label( :item_template, "XML item (один товар)",
+                class: "block text-sm font-semibold text-gray-800 mb-2" ) %>
               <p class="text-xs text-gray-600 mb-2">
                 Item-шаблон одного товара. Внутри доступен объект
                 <code class="bg-gray-100 px-1 py-0.5 rounded">product</code>
                 и его поля (id, title, variants, features, images и т.д.).
               </p>
-              <div
-                data-controller="codemirror"
-                data-codemirror-doc-value="<%= form.object.item_template %>"
-              >
+              <div data-controller="codemirror"
+                data-codemirror-doc-value="<%= form.object.item_template %>" >
                 <div data-codemirror-target="editor">
                   <%= form.hidden_field(
                     :item_template,
@@ -282,6 +277,10 @@
             <p class="mt-1">
               <code class="bg-gray-100 px-2 py-1 rounded">product.features</code>
               - массив свойств [{property, characteristic}]
+            </p>
+            <p class="mt-1">
+              <code class="bg-gray-100 px-2 py-1 rounded">product.bindings</code>
+              - привязки товара [{bindable_type, bindable_id, value}]
             </p>
           </div>
           <div>
@@ -325,14 +324,26 @@
             <%# Features - итерация по всем свойствам %>
             <div class="flex items-center">
               <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
-                {% for feature in product.features %}{{ feature.property }}: {{ feature.characteristic }}{% endfor %}
+                {% for f in product.features %}</br> {{ f.property }}: {{ f.characteristic }}</br>{% endfor %}
+              </code>
+            </div>
+
+            <%# Bindings - product (Avito) и variant (MoySklad, InSales) %>
+            <div class="flex items-center col-span-full">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
+                {% for b in product.bindings %}</br> {{ b.bindable_type }} #{{ b.bindable_id }}: {{ b.value }}</br>{% endfor %}
+              </code>
+            </div>
+            <div class="flex items-center col-span-full">
+              <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
+                {% assign v = product.variants.first %}{% for b in v.bindings %}</br> {{ b.bindable_type }}: {{ b.value }}</br>{% endfor %}
               </code>
             </div>
 
             <%# Image iteration %>
             <div class="flex items-center">
               <code class="bg-white border border-gray-200 px-2 py-1 rounded w-full truncate">
-                {% for image in product.images_with_ext %}{{ image }}{% endfor %}
+                {% for image in product.images_with_ext %}</br> {{ image }}</br>{% endfor %}
               </code>
             </div>
           </div>

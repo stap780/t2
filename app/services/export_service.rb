@@ -160,7 +160,10 @@ class ExportService
       
       # Копируем базовые поля Product
       product_hash.each do |key, value|
-        next if %w[variants features images images_zap images_second images_thumb].include?(key)
+        next if %w[
+          variants features features_hash bindings
+          images images_zap images_second images_thumb
+        ].include?(key)
         flattened[key] = value.to_s
       end
       
@@ -169,52 +172,23 @@ class ExportService
         product_hash['variants'].each_with_index do |variant, index|
           if variant.is_a?(Hash)
             variant.each do |vk, vv|
-              next if %w[id product_id created_at updated_at].include?(vk.to_s)
+              next if %w[id product_id created_at updated_at bindings].include?(vk.to_s)
               flattened["variant_#{index + 1}_#{vk}"] = vv
             end
           end
         end
       end
       
-      # Разворачиваем features
-      # Предпочитаем заранее подготовленный хеш features_hash (product.features_to_h),
-      # но поддерживаем и старый формат — массив { 'property', 'characteristic' }
-      features_data = product_hash['features_hash'] || product_hash[:features_hash] ||
-                      product_hash['features']      || product_hash[:features]
-      if features_data.present?
-        features_hash =
-          if features_data.is_a?(Hash)
-            # Современный формат: {"Марка"=>"Audi", "Цвет"=>"Серый"}
-            features_data
-          elsif features_data.is_a?(Array)
-            # Старый формат: [{ 'property' => 'Марка', 'characteristic' => 'Audi' }, ...]
-            features_data.each_with_object({}) do |f, acc|
-              next unless f.respond_to?(:[]) # защитимся от неожиданных объектов
-              property       = (f['property'] || f[:property]).to_s
-              characteristic = (f['characteristic'] || f[:characteristic]).to_s
-              next if property.blank?
-              acc[property] = characteristic
-            end
-          else
-            {}
-          end
-
-        if features_hash.any?
-          Rails.logger.debug "📤 ExportService: Product #{product_hash['id']} has features: #{features_hash.keys.join(', ')}"
-          features_hash.each do |property, characteristic|
-            # Используем to_s для гарантии строкового ключа
-            # property может быть на русском (например, "Марка" вместо "Brand")
-            property_key = property.to_s
-            characteristic_value = characteristic.to_s
-            # Используем точное название свойства как ключ
-            flattened["feature_#{property_key}"] = characteristic_value
-            Rails.logger.debug "📤 ExportService: Added feature_#{property_key} = #{characteristic_value}"
-          end
-        else
-          Rails.logger.debug "📤 ExportService: Product #{product_hash['id']} has empty features hash"
+      # Разворачиваем features (features_hash всегда из Export#product_to_hash)
+      features_hash = product_hash['features_hash'] || product_hash[:features_hash] || {}
+      if features_hash.is_a?(Hash) && features_hash.any?
+        Rails.logger.debug "📤 ExportService: Product #{product_hash['id']} has features: #{features_hash.keys.join(', ')}"
+        features_hash.each do |property, characteristic|
+          property_key = property.to_s
+          characteristic_value = characteristic.to_s
+          flattened["feature_#{property_key}"] = characteristic_value
+          Rails.logger.debug "📤 ExportService: Added feature_#{property_key} = #{characteristic_value}"
         end
-      else
-        Rails.logger.debug "📤 ExportService: Product #{product_hash['id']} has no features data"
       end
       
       # Объединяем images через разделитель (запятая)

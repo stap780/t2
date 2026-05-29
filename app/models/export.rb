@@ -172,6 +172,7 @@ class Export < ApplicationRecord
       product_fields: %w[id status tip title description created_at updated_at],
       variant_fields: %w[variants.first.barcode variants.first.sku variants.first.price variants.first.sprice variants.first.quantity variants.first.cost_price],
       feature_fields: ['features (for iteration)'],
+      binding_fields: ['bindings (for iteration)'],
       image_fields: %w[images images_with_ext] #images_zap images_second images_thumb
     }
   end
@@ -301,7 +302,12 @@ class Export < ApplicationRecord
 
     # Оптимизированная загрузка с includes для избежания N+1 запросов
     products_scope = base_scope
-      .includes(:variants, features: [:property, :characteristic], images: [:file_attachment, :file_blob])
+      .includes(
+        :bindings,
+        variants: :bindings,
+        features: [:property, :characteristic],
+        images: [:file_attachment, :file_blob]
+      )
 
     # Применение тестового режима
     if test_mode?
@@ -330,9 +336,13 @@ class Export < ApplicationRecord
     # Добавляем описание как plain text
     hash['description'] = product.file_description
     
+    hash['bindings'] = bindings_to_array(product.bindings)
+
     # Добавляем варианты - преобразуем в массив хешей со строковыми ключами
     hash['variants'] = product.variants.map do |variant|
-      variant.attributes.with_indifferent_access
+      v = variant.attributes.with_indifferent_access
+      v['bindings'] = bindings_to_array(variant.bindings)
+      v
     end
     
     # Добавляем features:
@@ -392,6 +402,16 @@ class Export < ApplicationRecord
   end
 
   private
+
+  def bindings_to_array(bindings)
+    bindings.map do |varbind|
+      {
+        'bindable_type' => varbind.bindable_type.to_s,
+        'bindable_id' => varbind.bindable_id,
+        'value' => varbind.value.to_s
+      }
+    end
+  end
 
   def property_filters_for_export
     export_filter_rules

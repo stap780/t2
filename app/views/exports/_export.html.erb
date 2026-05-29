@@ -90,20 +90,18 @@
     <!-- Row 1: File actions -->
     <% if export.completed? && export.export_file.attached? %>
       <div class="flex items-center space-x-2">
-        <%= link_to download_export_path(export),
+        <%= link_to download_export_path(export), data: { turbo: false },
             class: "inline-flex items-center px-3 py-1 border border-green-300 shadow-sm text-xs font-medium rounded text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out cursor-pointer",
-            data: { turbo: false } , title: "#{t("actions.download")} #{export.export_file.filename}" do %>
+            title: "#{t("actions.download")} #{export.export_file.filename}" do %>
           <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m5-8H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2z" />
           </svg>
           <%= t("actions.download") %>
         <% end %>
 
-        <%= link_to export_file_stable_path(id: export.id, ext: export.export_file.filename.extension),
-              class: "inline-flex items-center px-3 py-1 border border-violet-300 shadow-sm text-xs font-medium rounded text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
-          data: { turbo: false },
-          target: "_blank",
-              title: "#{t("actions.open")} #{export.export_file.filename}" do %>
+        <%= link_to export_file_stable_path(id: export.id, ext: export.export_file.filename.extension), data: { turbo: false },
+          class: "inline-flex items-center px-3 py-1 border border-violet-300 shadow-sm text-xs font-medium rounded text-violet-700 bg-violet-50 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition duration-150 ease-in-out",
+          target: "_blank", title: "#{t("actions.open")} #{export.export_file.filename}" do %>
             <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 015.657 5.656l-3.536 3.536a4 4 0 01-5.657-5.656m-4.95-4.95a4 4 0 015.657 0l1.414 1.414m-7.071 7.07l3.536 3.536" />
             </svg>
@@ -114,6 +112,7 @@
 
     <!-- Row 2: Run/Edit/Delete or Processing -->
     <div class="flex items-center space-x-2">
+
       <% if export.processing? %>
         <span class="inline-flex items-center px-3 py-1 border border-yellow-300 shadow-sm text-xs font-medium rounded text-yellow-700 bg-yellow-50">
           <svg class="h-4 w-4 mr-1 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,6 +147,7 @@
           </svg>
         <%= t("exports.export.cancel.label") %>
       <% end %>
+
     </div>
   </div>
 <% end %>

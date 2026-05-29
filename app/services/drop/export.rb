@@ -1,4 +1,6 @@
 # Liquid Drop for Export template rendering (inspired by Dizauto Drop::Export)
+# we can use this drop to render some export data in layout_template in export_service.rb
+# the product data we take from item_template in export_service.rb
 class Drop::Export < Liquid::Drop
   def initialize(export)
     @export = export
@@ -17,14 +19,14 @@ class Drop::Export < Liquid::Drop
   end
 
   # Main data access for Liquid templates
-  def data
-    @export.data
-  end
+  # def data
+  #   @export.data
+  # end
 
   # Provide products access for Liquid templates (alias for data)
-  def products
-    @export.data
-  end
+  # def products
+  #   @export.data
+  # end
 
   # Provide record count for template use
   def record_count

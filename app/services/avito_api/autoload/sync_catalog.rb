@@ -81,7 +81,7 @@ module AvitoApi
           return
         end
 
-        product = ProductRealId.find_product(ad_id)
+        product = AvitoApi::ProductRealId.find_product(ad_id)
         unless product
           @stats.not_found += 1
           record_not_found_sample(ad_id, avito_id)
