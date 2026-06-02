@@ -141,6 +141,7 @@ Rails.application.routes.draw do
         get :characteristics
       end
     end
+    resources :export_columns, only: %i[new destroy]
     member do
       get :download
       get :file

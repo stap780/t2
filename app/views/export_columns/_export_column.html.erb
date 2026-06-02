@@ -1,0 +1,21 @@
+<% row_key = export_column.persisted? ? export_column.id : turbo_id_for(export_column) %>
+<% row_id = export_column.persisted? ? dom_id(export_column) : "export_column_#{row_key}" %>
+<div id="<%= row_id %>"
+  class="grid gap-2 p-1 border-t border-gray-200 hover:bg-gray-50 w-full"
+  style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
+  <%= fields_for "export[export_columns_attributes][#{row_key}]", export_column do |ff| %>
+    <%= ff.hidden_field :id if export_column.persisted? %>
+    <%= ff.collection_select :field_key,
+      Export.available_fields.map { |f| [Export.field_label(f), f] },
+      :last, :first,
+      { prompt: t("export_columns.form.select_field") },
+      class: "w-full min-w-0 px-2 py-1 border rounded-md text-sm" %>
+    <%= ff.text_field :label,
+      placeholder: t("export_columns.form.label_placeholder"),
+      class: "w-full min-w-0 px-2 py-1 border rounded-md text-sm" %>
+    <div class="flex items-center justify-center">
+      <%= link_to_delete export_export_column_path(export, row_key),
+        data: { turbo_method: :delete, turbo_confirm: t("export_columns.destroy.confirm") } %>
+    </div>
+  <% end %>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_27_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_28_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -267,6 +267,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_27_120000) do
     t.index ["manager_id"], name: "index_employees_on_manager_id"
     t.index ["position"], name: "index_employees_on_position", unique: true
     t.index ["user_id"], name: "index_employees_on_user_id"
+  end
+
+  create_table "export_columns", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "export_id", null: false
+    t.string "field_key", null: false
+    t.string "label"
+    t.datetime "updated_at", null: false
+    t.index ["export_id", "field_key"], name: "index_export_columns_on_export_id_and_field_key", unique: true
+    t.index ["export_id"], name: "index_export_columns_on_export_id"
   end
 
   create_table "export_filter_rules", force: :cascade do |t|
@@ -714,6 +724,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_27_120000) do
   add_foreign_key "employees", "departments"
   add_foreign_key "employees", "employees", column: "manager_id"
   add_foreign_key "employees", "users"
+  add_foreign_key "export_columns", "exports"
   add_foreign_key "export_filter_rules", "exports"
   add_foreign_key "exports", "users"
   add_foreign_key "features", "characteristics"

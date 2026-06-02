@@ -346,6 +346,11 @@ en:
       export_format_hint: "Choose your preferred export format"
       fields_to_export: "Fields to Export"
       fields_hint: "Select which fields to include in your CSV/Excel export"
+      columns_heading: "CSV / Excel columns"
+      columns_hint: "Field is the data key; label is the column title in the file (optional). Saved with the export."
+      columns_required: "Add at least one column for this format."
+      columns_after_save: "Save the export, then add columns for CSV/Excel."
+      add_column: "Add column"
       select_all: "Select All"
       deselect_all: "Deselect All"
       no_item_fields: "No item fields available yet. Complete an import first to populate available fields."
@@ -361,6 +366,17 @@ en:
       item_fields: "item fields"
       use_as_html: "use as <code class=\"bg-gray-100 px-1 py-0.5 rounded\">{{ item.FIELD }}</code>"
       footer_hint: "Save your export configuration. Run it from the exports list."
+    errors:
+      columns_required: "CSV and Excel exports require at least one column."
+  export_columns:
+    destroy:
+      success: "Column removed."
+      confirm: "Remove this column?"
+    form:
+      field_header: "Field"
+      label_header: "Column title"
+      select_field: "— Field —"
+      label_placeholder: "Optional"
   export_filter_rules:
     destroy:
       success: "Filter rule removed."

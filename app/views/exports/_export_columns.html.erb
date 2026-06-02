@@ -1,0 +1,30 @@
+<div class="space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg"
+  id="field-selection"
+  data-export-form-target="fieldSelection"
+  style="display: none;">
+  <div class="space-y-2">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h3 class="text-sm font-semibold text-gray-800"><%= t("exports.form.columns_heading") %></h3>
+      <%= link_to t("exports.form.add_column"), new_export_export_column_path(export),
+        class: "px-3 py-1 rounded-md bg-blue-300 hover:bg-blue-400 text-sm",
+        data: { turbo_stream: true } %>
+    </div>
+    <p class="text-xs text-gray-600"><%= t("exports.form.columns_hint") %></p>
+
+    <% if export.requires_export_columns? && export.export_columns.empty? %>
+      <p class="text-xs text-amber-700"><%= t("exports.form.columns_required") %></p>
+    <% end %>
+
+    <div id="<%= dom_id(export, :export_columns) %>" class="w-full border border-gray-200 rounded-md overflow-hidden bg-white">
+      <div class="grid gap-2 px-2 py-1 bg-gray-100 border-b text-xs font-medium text-gray-600"
+        style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
+        <div><%= t("export_columns.form.field_header") %></div>
+        <div><%= t("export_columns.form.label_header") %></div>
+        <div></div>
+      </div>
+      <% export.export_columns.each do |column| %>
+        <%= render "export_columns/export_column", export: export, export_column: column %>
+      <% end %>
+    </div>
+  </div>
+</div>

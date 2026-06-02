@@ -110,7 +110,7 @@ class ExportsController < ApplicationController
 
   def set_export
     # @export = Current.user.exports.find(params[:id])
-    @export = Export.includes(:export_filter_rules).find(params[:id])
+    @export = Export.includes(:export_filter_rules, :export_columns).find(params[:id])
   end
 
   # Public finder for unauthenticated file access
@@ -127,8 +127,8 @@ class ExportsController < ApplicationController
       :test,
       :time,
       :interval_hours,
-      file_headers: [],
-      export_filter_rules_attributes: [:id, :rule_key, :rule_condition, :rule_value, :property_id, :characteristic_id, :position, :_destroy]
+      export_filter_rules_attributes: [:id, :rule_key, :rule_condition, :rule_value, :property_id, :characteristic_id, :position, :_destroy],
+      export_columns_attributes: [:id, :field_key, :label, :_destroy]
     )
     base
   end

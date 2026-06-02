@@ -1,13 +1,12 @@
-<%# Как properties/_nested: ключ вложенности — turbo_id_for(rule), при ответе characteristics — nested_key из URL. %>
-<% key = turbo_id_for(rule).to_s %>
+<% key = turbo_id_for(export_filter_rule).to_s %>
 <%= turbo_frame_tag "export_filter_rule_#{key}", class: "w-full block" do %>
-  <%= fields_for "export[export_filter_rules_attributes][#{key}]", rule do |ff| %>
+  <%= fields_for "export[export_filter_rules_attributes][#{key}]", export_filter_rule do |ff| %>
     <div class="grid gap-2 p-1 border-t hover:bg-gray-50"
       style="grid-template-columns: minmax(140px, 1fr) 110px minmax(140px, 1fr) 60px;">
-      <%= ff.hidden_field :id if rule.persisted? %>
+      <%= ff.hidden_field :id if export_filter_rule.persisted? %>
       <%= ff.hidden_field :rule_key, value: ExportFilterRule::RULE_KEY_FEATURE %>
       <%= ff.collection_select :property_id, Property.ordered, :id, :title,
-        { prompt: t("features.select_property"), selected: rule.property_id },
+        { prompt: t("features.select_property"), selected: export_filter_rule.property_id },
         {
           class: "w-full min-w-0 px-2 py-1 border rounded-md",
           data: {
@@ -23,27 +22,28 @@
             [t("exports.form.predicate_eq"), "eq"],
             [t("exports.form.predicate_not_eq"), "not_eq"]
           ],
-          rule.rule_condition
+          export_filter_rule.rule_condition
         ),
         {},
         class: "w-full min-w-0 px-2 py-1 border rounded-md text-sm" %>
       <%= turbo_frame_tag "export_filter_rule_#{key}_characteristic" do %>
         <%= ff.collection_select :characteristic_id,
-          (rule.property&.characteristics&.order(:title) || Characteristic.none),
+          (export_filter_rule.property&.characteristics&.order(:title) || Characteristic.none),
           :id,
           :title,
-          { prompt: t("features.select_characteristic"), selected: rule.characteristic_id },
+          { prompt: t("features.select_characteristic"), selected: export_filter_rule.characteristic_id },
           {
             class: "w-full min-w-0 px-2 py-1 border rounded-md",
             id: "export_filter_rule_#{key}_characteristic_id",
             data: {
               controller: "slimselect",
               search_url: search_characteristics_path,
-              property_id: rule.property_id
+              property_id: export_filter_rule.property_id
             }
           } %>
       <% end %>
-      <%= link_to_delete export_export_filter_rule_path(export, turbo_id_for(rule)), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+      <%= link_to_delete export_export_filter_rule_path(export, key),
+        data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
     </div>
   <% end %>
 <% end %>

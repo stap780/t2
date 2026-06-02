@@ -14,15 +14,21 @@ class ExportService
   def call
     started_at = Time.current
     Rails.logger.info "📤 ExportService: Starting export for Export ##{@export.id} (#{@export.test_mode? ? 'TEST' : 'PRODUCTION'} mode)"
-    @export.update!(status: "processing")
+    @export.update_export_run_status!("processing")
 
     begin
+      ensure_flat_export_columns! if @export.flat_export_format?
+
       source_data = @export.data
       if source_data.empty?
         raise "No data available for export. Products may be missing or incomplete."
       end
 
-      selected_headers_info = @export.file_headers&.any? ? " (#{@export.file_headers.length} selected fields)" : " (all fields)"
+      selected_headers_info = if @export.flat_export_format?
+        " (#{@export.export_columns.size} columns)"
+      else
+        ""
+      end
       if @export.test_mode?
         Rails.logger.info "📤 ExportService: TEST MODE - Processing #{source_data.length} records#{selected_headers_info} (limited to #{Export::TEST_LIMIT})"
       else
@@ -42,11 +48,11 @@ class ExportService
       end
 
       if result
-        @export.update!(status: "completed", exported_at: Time.current)
+        @export.update_export_run_status!("completed", exported_at: Time.current)
         Rails.logger.info "📤 ExportService: Export completed successfully in #{(Time.current - started_at).round(2)}s"
         [true, @export]
       else
-        @export.update!(status: "failed", error_message: "Failed to create export file")
+        @export.update_export_run_status!("failed", error_message: "Failed to create export file")
         [false, "Export creation failed"]
       end
     rescue => e
@@ -54,8 +60,8 @@ class ExportService
       Rails.logger.error "📤 ExportService ERROR: #{e.backtrace.join("\n")}"
 
       # Save error message to the export record
-      @export.update!(
-        status: "failed",
+      @export.update_export_run_status!(
+        "failed",
         error_message: "#{e.class.name}: #{e.message}"
       )
 
@@ -65,16 +71,24 @@ class ExportService
 
   private
 
-  # Returns [filtered_data, headers] — filters flattened records by file_headers when selected
-  def filter_flattened_by_headers(flattened_data)
-    return flattened_data, (flattened_data.first&.keys || []) unless @export.file_headers&.any?
+  def ensure_flat_export_columns!
+    return if @export.export_columns.any?
 
-    Rails.logger.info "📤 ExportService: Filtering flattened data to include only selected headers: #{@export.file_headers.join(', ')}"
+    raise I18n.t("exports.errors.columns_required")
+  end
+
+  # Returns [filtered_data, field_keys, header_titles]
+  def filter_flattened_by_columns(flattened_data)
+    columns = @export.export_columns.order(:id).to_a
+    field_keys = columns.map(&:field_key)
+    titles = columns.map(&:header_title)
+
+    Rails.logger.info "📤 ExportService: Export columns: #{field_keys.join(', ')}"
     filtered = flattened_data.map do |record|
-      @export.file_headers.to_h { |h| [h, record[h]] }
+      field_keys.index_with { |key| record[key] }
     end
-    Rails.logger.info "📤 ExportService: Filtered #{filtered.length} records to #{@export.file_headers.length} selected fields"
-    [filtered, @export.file_headers]
+    Rails.logger.info "📤 ExportService: Filtered #{filtered.length} records to #{field_keys.length} columns"
+    [filtered, field_keys, titles]
   end
 
   def create_csv
@@ -82,13 +96,13 @@ class ExportService
     return false if source_data.empty?
 
     flattened_data = flatten_data_for_csv(source_data)
-    filtered_data, headers = filter_flattened_by_headers(flattened_data)
+    filtered_data, field_keys, titles = filter_flattened_by_columns(flattened_data)
 
     csv_content = CSV.generate do |csv|
-      csv << headers.map { |h| Export.field_label(h) }
+      csv << titles
 
       filtered_data.each do |record|
-        csv << headers.map { |header| record[header] }
+        csv << field_keys.map { |key| record[key] }
       end
     end
 
@@ -100,17 +114,17 @@ class ExportService
     return false if source_data.empty?
 
     flattened_data = flatten_data_for_csv(source_data)
-    filtered_data, headers = filter_flattened_by_headers(flattened_data)
+    filtered_data, field_keys, titles = filter_flattened_by_columns(flattened_data)
 
     # Create XLSX using Axlsx
     p = Axlsx::Package.new
     wb = p.workbook
 
     wb.add_worksheet(name: "Sheet 1") do |sheet|
-      sheet.add_row headers.map { |h| Export.field_label(h) }
+      sheet.add_row titles
 
       filtered_data.each do |record|
-        sheet.add_row headers.map { |header| record[header] }
+        sheet.add_row field_keys.map { |key| record[key] }
       end
     end
 

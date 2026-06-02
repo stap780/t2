@@ -35,7 +35,7 @@ class ExportFilterRulesController < ApplicationController
   end
 
   def destroy
-    @export_filter_rule.destroy
+    @export_filter_rule.destroy if @export_filter_rule.persisted?
     respond_to do |format|
       format.turbo_stream do
         flash.now[:success] = t('.success')
@@ -57,9 +57,9 @@ class ExportFilterRulesController < ApplicationController
         flash.now[:success] = t('.success')
         render turbo_stream: [
           turbo_stream.replace(
-            dom_id(@export_filter_rule), 
-            partial: "export_filter_rules/nested", 
-            locals: { export: @export, rule: @export_filter_rule }
+            dom_id(@export_filter_rule),
+            partial: "export_filter_rules/export_filter_rule",
+            locals: { export: @export, export_filter_rule: @export_filter_rule }
           ),
           render_turbo_flash
         ]
@@ -82,7 +82,7 @@ class ExportFilterRulesController < ApplicationController
   def set_export_filter_rule
     @export_filter_rule = @export.export_filter_rules.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    @export_filter_rule = ExportFilterRule.new(id: params[:id])
+    @export_filter_rule = @export.export_filter_rules.build(id: params[:id])
   end
 
 end

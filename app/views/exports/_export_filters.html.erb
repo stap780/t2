@@ -10,7 +10,7 @@
 
     <%= turbo_frame_tag dom_id(export, :export_filter_rules), class: "space-y-2 w-full block" do %>
       <% export.export_filter_rules.each do |rule| %>
-        <%= render "export_filter_rules/nested", export: export, rule: rule %>
+        <%= render "export_filter_rules/export_filter_rule", export: export, export_filter_rule: rule %>
       <% end %>
     <% end %>
   </div>

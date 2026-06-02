@@ -517,6 +517,11 @@ ru:
       export_format_hint: "Выберите предпочитаемый формат экспорта"
       fields_to_export: "Поля для экспорта"
       fields_hint: "Выберите поля для включения в CSV/Excel экспорт"
+      columns_heading: "Столбцы CSV / Excel"
+      columns_hint: "Поле — ключ данных; название — подпись в файле (если пусто — стандартная). Сохраняется вместе с экспортом."
+      columns_required: "Добавьте хотя бы один столбец для этого формата."
+      columns_after_save: "Сохраните экспорт, затем добавьте столбцы для CSV/Excel."
+      add_column: "Добавить столбец"
       select_all: "Выбрать все"
       deselect_all: "Снять выбор"
       no_item_fields: "Поля ещё недоступны. Сначала завершите импорт, чтобы появились поля."
@@ -580,6 +585,17 @@ ru:
       feature_RimBoltsDiameter: "Диаметр отверстий"
       feature_RimOffset: "Вылет"
       feature_RimDIA: "Ступица (DIA)"
+    errors:
+      columns_required: "Для CSV и Excel нужен хотя бы один столбец."
+  export_columns:
+    destroy:
+      success: "Столбец удалён."
+      confirm: "Удалить столбец?"
+    form:
+      field_header: "Поле"
+      label_header: "Название в файле"
+      select_field: "— Поле —"
+      label_placeholder: "Необязательно"
   export_filter_rules:
     destroy:
       success: "Правило отбора удалено."

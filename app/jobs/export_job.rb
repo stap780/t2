@@ -45,8 +45,8 @@ class ExportJob < ApplicationJob
     Rails.logger.error "🎯 ExportJob: Unexpected error for Export ##{export.id}: #{e.message}"
     Rails.logger.error "🎯 ExportJob: #{e.backtrace.join('\n')}"
 
-    export.update!(
-      status: 'failed',
+    export.update_export_run_status!(
+      "failed",
       error_message: "Job failed: #{e.message}"
     )
 

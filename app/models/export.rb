@@ -2,6 +2,7 @@ class Export < ApplicationRecord
   # Use Rails 8 associations
   belongs_to :user
   has_many :export_filter_rules, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :export
+  has_many :export_columns, -> { order(:id) }, dependent: :destroy, inverse_of: :export
   accepts_nested_attributes_for :export_filter_rules,
     allow_destroy: true,
     reject_if: proc { |attrs|
@@ -10,6 +11,14 @@ class Export < ApplicationRecord
       next false unless attrs["rule_key"].to_s == "feature"
 
       attrs["id"].blank? && attrs["property_id"].blank? && attrs["characteristic_id"].blank?
+    }
+  accepts_nested_attributes_for :export_columns,
+    allow_destroy: true,
+    reject_if: proc { |attrs|
+      attrs = attrs.stringify_keys
+      next false if attrs["_destroy"] == "1" || attrs["_destroy"] == true || attrs["_destroy"] == "true"
+
+      attrs["id"].blank? && attrs["field_key"].blank?
     }
 
   # Active Storage attachment for the exported file
@@ -40,6 +49,10 @@ class Export < ApplicationRecord
     validates :layout_template, presence: true
     validates :item_template, presence: true
   end
+
+  validates :export_columns,
+    length: { minimum: 1, message: ->(*) { I18n.t("exports.errors.columns_required") } },
+    if: :requires_export_columns?
 
   # Serialize file_headers as array to store selected field headers
   serialize :file_headers, coder: JSON
@@ -154,6 +167,22 @@ class Export < ApplicationRecord
     
     # Combine all fields
     product_fields + variant_fields_flat + image_fields + feature_fields_flat
+  end
+
+  def requires_export_columns?
+    persisted? && %w[csv xlsx].include?(format)
+  end
+
+  def flat_export_format?
+    %w[csv xlsx].include?(format)
+  end
+
+  # Status updates during ExportJob must not fail when column validation applies to the form only.
+  def update_export_run_status!(status, exported_at: nil, error_message: nil)
+    attrs = { status: status, updated_at: Time.current }
+    attrs[:exported_at] = exported_at if exported_at
+    attrs[:error_message] = error_message unless error_message.nil?
+    update_columns(attrs)
   end
 
   # Get translated field name for display
@@ -366,9 +395,9 @@ class Export < ApplicationRecord
   end
 
   def needs_images_for_export?
-    return true if format == 'xml'
-    return true if file_headers.blank?
-    file_headers.include?('images')
+    return true if format == "xml"
+
+    export_columns.any? { |c| c.field_key == "images" }
   end
 
   # Get image variant for export (can be extended with image_variant field)

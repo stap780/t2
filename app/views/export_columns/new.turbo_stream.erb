@@ -1,0 +1,3 @@
+<%= turbo_stream.append dom_id(@export, :export_columns) do %>
+  <%= render partial: "export_columns/export_column", locals: { export: @export, export_column: @export_column } %>
+<% end %>
