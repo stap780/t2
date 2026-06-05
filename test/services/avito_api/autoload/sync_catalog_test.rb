@@ -77,7 +77,7 @@ module AvitoApi
 
       test "collects not_found samples up to limit" do
         product_id = @product.id.to_s
-        missing_items = (1..55).map do |i|
+        missing_items = (1..105).map do |i|
           { "ad_id" => "missing-#{i}", "avito_id" => 7_000_000_000 + i }
         end
         fake_client = build_fake_client(product_id, extra_items: missing_items)
@@ -87,7 +87,7 @@ module AvitoApi
         with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
           stats = sync.call
           assert_equal 1, stats.linked
-          assert_equal 55, stats.not_found
+          assert_equal 105, stats.not_found
           assert_equal SyncCatalog::NOT_FOUND_SAMPLES_LIMIT, stats.not_found_samples.size
           assert_equal "missing-1", stats.not_found_samples.first["ad_id"]
           assert_equal "7000000001", stats.not_found_samples.first["avito_id"]
