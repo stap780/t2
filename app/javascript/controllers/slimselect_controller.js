@@ -103,7 +103,10 @@ export default class extends Controller {
               
               // Определяем тип параметра по имени поля
               const fieldName = this.element.name
-              if (fieldName && fieldName.includes('property_id')) {
+              if (fieldName && fieldName.includes('field_selector')) {
+                urlObj.searchParams.append("field", newVal[0].value)
+                urlObj.searchParams.append("turbo_frame_id", turboFrameId)
+              } else if (fieldName && fieldName.includes('property_id')) {
                 urlObj.searchParams.append("property_id", newVal[0].value)
                 urlObj.searchParams.append("turbo_frame_id", turboFrameId)
                 

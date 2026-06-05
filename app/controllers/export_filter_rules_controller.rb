@@ -49,8 +49,11 @@ class ExportFilterRulesController < ApplicationController
   end
 
   def characteristics
-    property_id = params[:property_id]
-    @export_filter_rule.property_id = property_id.to_i
+    if params[:field].present?
+      @export_filter_rule.assign_from_field_selector!(params[:field])
+    elsif params[:property_id].present?
+      @export_filter_rule.assign_from_field_selector!("property:#{params[:property_id]}")
+    end
 
     respond_to do |format|
       format.turbo_stream do

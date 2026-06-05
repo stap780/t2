@@ -15,7 +15,7 @@
       <p class="text-xs text-amber-700"><%= t("exports.form.columns_required") %></p>
     <% end %>
 
-    <div id="<%= dom_id(export, :export_columns) %>" class="w-full border border-gray-200 rounded-md overflow-hidden bg-white">
+    <%= turbo_frame_tag dom_id(export, :export_columns), class: "w-full border border-gray-200 rounded-md overflow-hidden bg-white" do %>
       <div class="grid gap-2 px-2 py-1 bg-gray-100 border-b text-xs font-medium text-gray-600"
         style="grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) 60px;">
         <div><%= t("export_columns.form.field_header") %></div>
@@ -25,6 +25,6 @@
       <% export.export_columns.each do |column| %>
         <%= render "export_columns/export_column", export: export, export_column: column %>
       <% end %>
-    </div>
+    <% end %>
   </div>
 </div>

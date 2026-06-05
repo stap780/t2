@@ -8,7 +8,12 @@ class Export < ApplicationRecord
     reject_if: proc { |attrs|
       attrs = attrs.stringify_keys
       next false if attrs["_destroy"] == "1" || attrs["_destroy"] == true || attrs["_destroy"] == "true"
-      next false unless attrs["rule_key"].to_s == "feature"
+
+      rule_key = attrs["rule_key"].to_s
+      if ExportFilterRule::INTEGRATION_RULE_KEYS.include?(rule_key)
+        next attrs["id"].blank? && attrs["rule_value"].blank?
+      end
+      next false unless rule_key == ExportFilterRule::RULE_KEY_FEATURE
 
       attrs["id"].blank? && attrs["property_id"].blank? && attrs["characteristic_id"].blank?
     }
@@ -326,7 +331,7 @@ class Export < ApplicationRecord
     Rails.logger.info "🎯 Export ##{id}: Extracting data from Product model"
 
     base_scope = Product.active.yes_quantity.yes_price.with_images
-
+    base_scope = apply_integration_filters(base_scope)
     base_scope = apply_property_filters(base_scope, property_filters_for_export)
 
     # Оптимизированная загрузка с includes для избежания N+1 запросов
@@ -440,6 +445,25 @@ class Export < ApplicationRecord
         'value' => varbind.value.to_s
       }
     end
+  end
+
+  def integration_filters_for_export
+    export_filter_rules.where(rule_key: ExportFilterRule::INTEGRATION_RULE_KEYS)
+  end
+
+  def apply_integration_filters(scope)
+    integration_filters_for_export.each do |rule|
+      with_binding = rule.integration_binding_present?
+
+      case rule.rule_key
+      when ExportFilterRule::RULE_KEY_INSALE
+        scope = with_binding ? scope.with_insale : scope.without_insale
+      when ExportFilterRule::RULE_KEY_MOYSKLAD
+        scope = with_binding ? scope.with_moysklad : scope.without_moysklad
+      end
+    end
+
+    scope.distinct
   end
 
   def property_filters_for_export
