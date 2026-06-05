@@ -9,8 +9,8 @@ module AvitoApi
       new(avito:).resolve_variant(line)
     end
 
-    def self.link!(avito:, product:, avito_id:)
-      new(avito:).link!(product, avito_id)
+    def self.link!(avito:, product:, avito_id:, ad_id: nil)
+      new(avito:).link!(product, avito_id, ad_id: ad_id)
     end
 
     def initialize(avito:)
@@ -25,7 +25,7 @@ module AvitoApi
         product = product_by_avito_id(avito_id)
         if product.nil? && real_id.present?
           product = ProductRealId.find_product(real_id)
-          link!(product, avito_id) if product
+          link!(product, avito_id, ad_id: real_id) if product
         end
         return variant_for(product) if product
       end
@@ -33,7 +33,7 @@ module AvitoApi
       legacy_variant(real_id) if real_id.present?
     end
 
-    def link!(product, avito_id)
+    def link!(product, avito_id, ad_id: nil)
       avito_id = avito_id.to_s.strip
       return Result.new(status: :invalid, error: "blank_avito_id") if avito_id.blank?
       return Result.new(status: :invalid, error: "blank_product") if product.blank?
@@ -47,17 +47,56 @@ module AvitoApi
         return Result.new(
           status: :conflict,
           product: product,
-          error: "avito_id #{avito_id} already linked to #{existing.record_type}##{existing.record_id}"
+          error: contextual_error(
+            "avito_id #{avito_id} already linked to #{existing.record_type}##{existing.record_id}",
+            product: product,
+            avito_id: avito_id,
+            ad_id: ad_id
+          )
+        )
+      end
+
+      existing_on_product = product.bindings.find_by(bindable: @avito)
+      if existing_on_product && existing_on_product.value != avito_id
+        return Result.new(
+          status: :error,
+          product: product,
+          error: contextual_error(
+            "product already linked to avito_id #{existing_on_product.value}",
+            product: product,
+            avito_id: avito_id,
+            ad_id: ad_id
+          )
         )
       end
 
       product.bindings.create!(bindable: @avito, value: avito_id)
       Result.new(status: :linked, product: product)
     rescue ActiveRecord::RecordInvalid => e
-      Result.new(status: :error, product: product, error: e.record.errors.full_messages.join(", "))
+      Result.new(
+        status: :error,
+        product: product,
+        error: contextual_error(
+          e.record.errors.full_messages.join(", "),
+          product: product,
+          avito_id: avito_id,
+          ad_id: ad_id
+        )
+      )
+    end
+
+    def self.contextual_error(message, product:, avito_id:, ad_id: nil)
+      parts = ["Product##{product.id}", "avito_id=#{avito_id}"]
+      parts << "ad_id=#{ad_id}" if ad_id.present?
+      parts << message
+      parts.join(", ")
     end
 
     private
+
+    def contextual_error(message, product:, avito_id:, ad_id: nil)
+      self.class.contextual_error(message, product: product, avito_id: avito_id, ad_id: ad_id)
+    end
 
     def extract_avito_id(line)
       line["avitoId"].presence || line["avito_id"].presence

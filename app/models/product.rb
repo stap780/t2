@@ -242,9 +242,9 @@ class Product < ApplicationRecord
     hash
   end
 
-  def to_liquid
-    @drop ||= Drop::Product.new(self) if defined?(Drop::Product)
-  end
+  # def to_liquid
+  #   @drop ||= Drop::Product.new(self) if defined?(Drop::Product)
+  # end
 
   # Работа с изображениями
   def image_first
@@ -358,62 +358,62 @@ class Product < ApplicationRecord
   # end
 
   # Синхронизация с InSales API
-  def insale_api_update
-    return [false, ["No Insale model"]] unless defined?(Insale)
+  # def insale_api_update
+  #   return [false, ["No Insale model"]] unless defined?(Insale)
     
-    insale = Insale.first
-    return [false, ["No Insale configuration"]] unless insale
+  #   insale = Insale.first
+  #   return [false, ["No Insale configuration"]] unless insale
 
-    ok, msg = insale.api_work?
-    return [false, Array(msg)] unless ok
+  #   ok, msg = insale.api_work?
+  #   return [false, Array(msg)] unless ok
 
-    # External id for this product in Insale stored in Varbind
-    external_id = bindings.find_by(bindable: insale)&.value
-    return [false, ["No Insale binding value for product"]] if external_id.to_s.strip.blank?
+  #   # External id for this product in Insale stored in Varbind
+  #   external_id = bindings.find_by(bindable: insale)&.value
+  #   return [false, ["No Insale binding value for product"]] if external_id.to_s.strip.blank?
 
-    begin
-      insale.api_init
-      # Try to fetch product by id from Insales API
-      ins_product = InsalesApi::Product.find(external_id)
-    rescue StandardError => e
-      Rails.logger.error("Product#insale_api_update fetch error: #{e.class} #{e.message}")
-      return [false, ["Fetch error: #{e.message}"]]
-    end
+  #   begin
+  #     insale.api_init
+  #     # Try to fetch product by id from Insales API
+  #     ins_product = InsalesApi::Product.find(external_id)
+  #   rescue StandardError => e
+  #     Rails.logger.error("Product#insale_api_update fetch error: #{e.class} #{e.message}")
+  #     return [false, ["Fetch error: #{e.message}"]]
+  #   end
 
-    # Map product fields defensively
-    new_title = ins_product.try(:title)
-    images = Array(ins_product.try(:images))
-    first_image_url = images&.first.try(:large_url) rescue nil
+  #   # Map product fields defensively
+  #   new_title = ins_product.try(:title)
+  #   images = Array(ins_product.try(:images))
+  #   first_image_url = images&.first.try(:large_url) rescue nil
 
-    self.title = new_title.presence || title
-    save! if changed?
+  #   self.title = new_title.presence || title
+  #   save! if changed?
 
-    # Extract first variant payload from Insales and resolve local Variant by binding
-    ins_variant = Array(ins_product.try(:variants)).first
-    ext_variant_id = ins_variant.try(:id).to_s.presence
+  #   # Extract first variant payload from Insales and resolve local Variant by binding
+  #   ins_variant = Array(ins_product.try(:variants)).first
+  #   ext_variant_id = ins_variant.try(:id).to_s.presence
 
-    # Find or create variant via binding (scoped to integration)
-    variant = nil
-    if ext_variant_id
-      # First try to find existing variant by binding
-      bnd = Varbind.find_by(bindable: insale, record_type: "Variant", value: ext_variant_id)
-      variant = bnd&.record
+  #   # Find or create variant via binding (scoped to integration)
+  #   variant = nil
+  #   if ext_variant_id
+  #     # First try to find existing variant by binding
+  #     bnd = Varbind.find_by(bindable: insale, record_type: "Variant", value: ext_variant_id)
+  #     variant = bnd&.record
 
-      # If no variant found, create one and then create the binding
-      unless variant
-        variant = variants.create!
-        Varbind.create!(record: variant, bindable: insale, value: ext_variant_id)
-      end
-    end
+  #     # If no variant found, create one and then create the binding
+  #     unless variant
+  #       variant = variants.create!
+  #       Varbind.create!(record: variant, bindable: insale, value: ext_variant_id)
+  #     end
+  #   end
 
-    update_attrs = {}
-    update_attrs[:barcode]   = ins_variant.try(:barcode)
-    update_attrs[:sku]       = ins_variant.try(:sku)
-    update_attrs[:price]     = ins_variant.try(:price)
-    variant.update!(update_attrs) if variant
+  #   update_attrs = {}
+  #   update_attrs[:barcode]   = ins_variant.try(:barcode)
+  #   update_attrs[:sku]       = ins_variant.try(:sku)
+  #   update_attrs[:price]     = ins_variant.try(:price)
+  #   variant.update!(update_attrs) if variant
 
-    [true, { product: self, variant: variant }]
-  end
+  #   [true, { product: self, variant: variant }]
+  # end
 
   def pull_product_from_detals
     sku = variants.where.not(sku: [nil, '']).pick(:sku)

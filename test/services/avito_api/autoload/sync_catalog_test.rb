@@ -77,7 +77,7 @@ module AvitoApi
 
       test "collects not_found samples up to limit" do
         product_id = @product.id.to_s
-        missing_items = (1..3).map do |i|
+        missing_items = (1..55).map do |i|
           { "ad_id" => "missing-#{i}", "avito_id" => 7_000_000_000 + i }
         end
         fake_client = build_fake_client(product_id, extra_items: missing_items)
@@ -87,10 +87,32 @@ module AvitoApi
         with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
           stats = sync.call
           assert_equal 1, stats.linked
-          assert_equal 3, stats.not_found
-          assert_equal 3, stats.not_found_samples.size
+          assert_equal 55, stats.not_found
+          assert_equal SyncCatalog::NOT_FOUND_SAMPLES_LIMIT, stats.not_found_samples.size
           assert_equal "missing-1", stats.not_found_samples.first["ad_id"]
           assert_equal "7000000001", stats.not_found_samples.first["avito_id"]
+        end
+      end
+
+      test "records contextual error when product already linked to another avito_id" do
+        product_id = @product.id.to_s
+        Varbind.create!(record: @product, bindable: @avito, value: "7890403963")
+        fake_client = build_fake_client(
+          product_id,
+          extra_items: [{ "ad_id" => product_id, "avito_id" => "2222222222" }]
+        )
+        sync = SyncCatalog.new(avito: @avito)
+        sync.instance_variable_set(:@client, fake_client)
+
+        with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
+          stats = sync.call
+          assert_equal 1, stats.existing
+          assert_equal 1, stats.skipped
+          assert_equal 1, stats.errors.size
+          assert_includes stats.errors.first, "Product##{@product.id}"
+          assert_includes stats.errors.first, "avito_id=2222222222"
+          assert_includes stats.errors.first, "ad_id=#{product_id}"
+          assert_includes stats.errors.first, "product already linked to avito_id 7890403963"
         end
       end
 

@@ -10,7 +10,7 @@ module AvitoApi
         keyword_init: true
       )
       PER_PAGE = 200
-      NOT_FOUND_SAMPLES_LIMIT = 20
+      NOT_FOUND_SAMPLES_LIMIT = 50
 
       def self.call(avito:)
         new(avito:).call
@@ -93,7 +93,7 @@ module AvitoApi
           return
         end
 
-        result = ProductLink.link!(avito: @avito, product: product, avito_id: avito_id)
+        result = ProductLink.link!(avito: @avito, product: product, avito_id: avito_id, ad_id: ad_id)
         case result.status
         when :linked
           @stats.linked += 1

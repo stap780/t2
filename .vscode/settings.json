@@ -1,0 +1,10 @@
+{
+  "rubyLsp.bundleGemfile": "${workspaceFolder}/Gemfile",
+  "rubyLsp.customCommand": {
+    "command": "ruby-lsp",
+    "env": {
+      "BUNDLE_GEMFILE": "${workspaceFolder}/Gemfile",
+      "RUBY_LSP_DISABLE_ADDONS": "rubocop"
+    }
+  }
+}
