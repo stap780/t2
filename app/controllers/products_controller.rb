@@ -430,7 +430,7 @@ class ProductsController < ApplicationController
   def check_positions(images)
     if images.present?
       images.values.each.with_index do |image, index|
-        if image["id"]
+        if image["id"].present?
           image = Image.find(image["id"])
           image.set_list_position(100 + index)
         end

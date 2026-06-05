@@ -1670,6 +1670,11 @@ ru:
         few: "Товара"
         many: "Товаров"
         other: "Товаров"
+      feature:
+        one: "Параметр"
+        few: "Параметра"
+        many: "Параметров"
+        other: "Параметров"
       item:
         one: "Позиция"
         few: "Позиции"
@@ -1823,11 +1828,19 @@ ru:
         updated_at: "Дата обновления"
       feature:
         property_id: "Параметр"
+        property: "Параметр"
         characteristic_id: "Значение"
+        characteristic: "Значение"
         featureable_type: "Тип объекта"
         featureable_id: "ID объекта"
         created_at: "Дата создания"
         updated_at: "Дата обновления"
+      product/features:
+        property: "Параметр"
+        characteristic: "Значение"
+      features:
+        property: "Параметр"
+        characteristic: "Значение"
       detal:
         sku: "Артикул"
         title: "Название"
@@ -1968,6 +1981,13 @@ ru:
         moysklad: {}
         detal: {}
         product:
+          attributes:
+            "features.property":
+              blank: "обязательно для заполнения"
+              required: "обязательно для заполнения"
+            "features.characteristic":
+              blank: "обязательно для заполнения"
+              required: "обязательно для заполнения"
           variants_have_items:
             one: "Невозможно удалить товар. 1 позиция убытка ссылается на варианты этого товара."
             few: "Невозможно удалить товар. %{count} позиции убытка ссылаются на варианты этого товара."
@@ -1980,7 +2000,18 @@ ru:
             other: "Невозможно удалить товар. %{count} позиций заказа ссылаются на варианты этого товара."
         property: {}
         characteristic: {}
-        feature: {}
+        feature:
+          attributes:
+            characteristic:
+              required: "обязательно для заполнения"
+              blank: "должно быть заполнено"
+            property:
+              required: "обязательно для заполнения"
+              blank: "должно быть заполнено"
+            characteristic_id:
+              blank: "должно быть заполнено"
+            property_id:
+              blank: "должно быть заполнено"
         image: {}
         varbind: {}
         insale: {}
