@@ -10,7 +10,7 @@ module AvitoApi
         keyword_init: true
       )
       PER_PAGE = 200
-      NOT_FOUND_SAMPLES_LIMIT = 200
+      NOT_FOUND_SAMPLES_LIMIT = 500
 
       def self.call(avito:)
         new(avito:).call
