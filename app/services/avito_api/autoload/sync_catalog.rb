@@ -83,9 +83,17 @@ module AvitoApi
 
         product = AvitoApi::ProductRealId.find_product(ad_id)
         unless product
-          @stats.not_found += 1
-          record_not_found_sample(ad_id, avito_id)
-          return
+          product = Varbind.find_by(
+            bindable: @avito,
+            value: avito_id,
+            record_type: "Product"
+          )&.record
+
+          unless product
+            @stats.not_found += 1
+            record_not_found_sample(ad_id, avito_id)
+            return
+          end
         end
 
         unless product.status == "active"

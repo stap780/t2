@@ -77,7 +77,8 @@ module AvitoApi
 
       test "collects not_found samples up to limit" do
         product_id = @product.id.to_s
-        missing_items = (1..105).map do |i|
+        limit = SyncCatalog::NOT_FOUND_SAMPLES_LIMIT
+        missing_items = (1..(limit + 5)).map do |i|
           { "ad_id" => "missing-#{i}", "avito_id" => 7_000_000_000 + i }
         end
         fake_client = build_fake_client(product_id, extra_items: missing_items)
@@ -87,10 +88,37 @@ module AvitoApi
         with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
           stats = sync.call
           assert_equal 1, stats.linked
-          assert_equal 105, stats.not_found
-          assert_equal SyncCatalog::NOT_FOUND_SAMPLES_LIMIT, stats.not_found_samples.size
+          assert_equal limit + 5, stats.not_found
+          assert_equal limit, stats.not_found_samples.size
           assert_equal "missing-1", stats.not_found_samples.first["ad_id"]
           assert_equal "7000000001", stats.not_found_samples.first["avito_id"]
+        end
+      end
+
+      test "counts existing when ad_id not found but varbind exists" do
+        Varbind.create!(record: @product, bindable: @avito, value: "9999999999")
+        fake_client = Class.new do
+          define_method(:get) do |path, params: {}|
+            case path
+            when "/autoload/v2/reports"
+              { "reports" => [{ "id" => 1, "finished_at" => "2026-01-01", "status" => "success" }] }
+            when "/autoload/v2/reports/1/items"
+              {
+                "items" => [{ "ad_id" => "unknown-new-id", "avito_id" => "9999999999" }],
+                "meta" => { "pages" => 1, "page" => 0, "per_page" => SyncCatalog::PER_PAGE }
+              }
+            end
+          end
+        end.new
+        sync = SyncCatalog.new(avito: @avito)
+        sync.instance_variable_set(:@client, fake_client)
+
+        with_singleton_stub(AvitoApi::Auth, :access_token, "token") do
+          stats = sync.call
+          assert_equal 1, stats.existing
+          assert_equal 0, stats.not_found
+          assert_equal 0, stats.linked
+          assert_empty stats.not_found_samples
         end
       end
 
