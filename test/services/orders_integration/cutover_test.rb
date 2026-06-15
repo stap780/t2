@@ -56,8 +56,8 @@ class OrdersIntegration::CutoverTest < ActiveSupport::TestCase
     )
   end
 
-  test "avito_date_from_param returns iso8601 utc" do
-    assert_equal @moysklad.orders_integration_start_at.utc.iso8601,
+  test "avito_date_from_param returns unix timestamp" do
+    assert_equal @moysklad.orders_integration_start_at.to_i,
                  OrdersIntegration::Cutover.avito_date_from_param
   end
 

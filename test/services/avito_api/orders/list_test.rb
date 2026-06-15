@@ -16,7 +16,7 @@ module AvitoApi
             ids: %w[123 456],
             page: 2,
             limit: 20,
-            dateFrom: "2026-05-01"
+            dateFrom: 1_767_148_800
           }
         )
 
@@ -26,7 +26,7 @@ module AvitoApi
             page: 2,
             limit: 20,
             ids: %w[123 456],
-            dateFrom: "2026-05-01"
+            dateFrom: 1_767_148_800
           },
           query
         )

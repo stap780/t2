@@ -34,7 +34,7 @@ module AvitoApi
           end
         end
 
-        assert_equal @cutover.utc.iso8601, captured_params[:dateFrom]
+        assert_equal @cutover.to_i, captured_params[:dateFrom]
       end
     end
   end

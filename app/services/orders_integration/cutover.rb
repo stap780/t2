@@ -28,7 +28,7 @@ module OrdersIntegration
       def avito_date_from_param
         return nil unless enabled?
 
-        at.utc.iso8601
+        at.to_i
       end
 
       def parse_time(value)
