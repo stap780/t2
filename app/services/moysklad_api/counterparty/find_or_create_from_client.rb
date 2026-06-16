@@ -19,15 +19,18 @@ module MoyskladApi
 
         varbind = Varbind.find_by(record: @client, bindable: @moysklad)
         if varbind&.value.present?
-          return { success: true, href: EntityHref.counterparty(varbind.value) }
+          return success_result(EntityHref.counterparty(varbind.value), client: @client)
         end
 
         href = find_by_email || create_counterparty
         return { success: false, error: "counterparty_not_created" } if href.blank?
 
         uuid = EntityHref.extract_id(href, entity: "counterparty")
+        canonical = ::Client.find_by_external_id(bindable: @moysklad, value: uuid)
+        return success_result(EntityHref.counterparty(uuid), client: canonical) if canonical
+
         save_varbind!(uuid)
-        { success: true, href: href }
+        success_result(href, client: @client)
       rescue RestClient::ExceptionWithResponse => e
         body = e.response&.body
         Rails.logger.error "[MoyskladApi::Counterparty::FindOrCreateFromClient] #{e.response&.code}: #{body}"
@@ -39,8 +42,13 @@ module MoyskladApi
 
       private
 
+      def success_result(href, client:)
+        { success: true, href: href, client: client }
+      end
+
       def find_by_email
         return nil if @client.email.blank?
+        return nil if ClientIdentity.avito_placeholder_email?(@client.email)
 
         filter = CGI.escape("email=#{@client.email}")
         data = Client.get_json(
@@ -53,7 +61,7 @@ module MoyskladApi
       def create_counterparty
         name = @client.name.presence || @client.email.presence || "Клиент ##{@client.id}"
         payload = { "name" => name }
-        payload["email"] = @client.email if @client.email.present?
+        payload["email"] = @client.email unless ClientIdentity.avito_placeholder_email?(@client.email)
         payload["phone"] = @client.phone if @client.phone.present?
 
         data = Client.post_json(@moysklad, "#{Api::API_BASE}/entity/counterparty", payload)
@@ -63,9 +71,9 @@ module MoyskladApi
       def save_varbind!(uuid)
         return if uuid.blank?
 
-        Varbind.find_or_create_by!(record: @client, bindable: @moysklad) do |varbind|
-          varbind.value = uuid
-        end
+        varbind = Varbind.find_or_initialize_by(record: @client, bindable: @moysklad)
+        varbind.value = uuid
+        varbind.save!
       end
     end
   end

@@ -20,8 +20,8 @@ module MoyskladApi
         return nil unless data
 
         client = find_client(data) || create_client(data)
+        client = attach_varbind!(client, data[:uuid])
         update_client!(client, data)
-        ensure_varbind!(client, data[:uuid])
         client
       rescue StandardError => e
         Rails.logger.error "[MoyskladApi::Counterparty::SyncToClient] #{e.class}: #{e.message}"
@@ -64,7 +64,8 @@ module MoyskladApi
 
       def find_client(data)
         ::Client.find_by_external_id(bindable: @moysklad, value: data[:uuid]) ||
-          (data[:email].present? ? ::Client.find_by(email: data[:email]) : nil)
+          (data[:email].present? ? ::Client.find_by(email: data[:email]) : nil) ||
+          ClientIdentity.find_by_phone(data[:phone])
       end
 
       def create_client(data)
@@ -75,18 +76,24 @@ module MoyskladApi
         )
       end
 
+      def attach_varbind!(client, uuid)
+        return client if uuid.blank?
+
+        existing = Varbind.find_by(bindable: @moysklad, value: uuid, record_type: "Client")
+        return existing.record if existing && existing.record_id != client.id
+
+        varbind = Varbind.find_or_initialize_by(record: client, bindable: @moysklad)
+        varbind.value = uuid
+        varbind.save!
+        client
+      end
+
       def update_client!(client, data)
         attrs = {}
         attrs[:name] = data[:name] if data[:name].present?
         attrs[:phone] = normalize_phone(data[:phone]) if data[:phone].present?
         attrs[:email] = data[:email] if data[:email].present? && email_available?(data[:email], client)
         client.update!(attrs) if attrs.any?
-      end
-
-      def ensure_varbind!(client, uuid)
-        varbind = Varbind.find_or_initialize_by(record: client, bindable: @moysklad)
-        varbind.value = uuid
-        varbind.save!
       end
 
       def email_available?(email, client)
@@ -99,7 +106,7 @@ module MoyskladApi
       end
 
       def normalize_phone(phone)
-        phone.to_s.gsub(/\D/, "")
+        ClientIdentity.normalize_phone(phone)
       end
     end
   end

@@ -91,6 +91,29 @@ module MoyskladApi
       test "returns nil when agent missing" do
         assert_nil SyncToClient.call(moysklad: @moysklad, order_json: {})
       end
+
+      test "finds client by phone when counterparty varbind missing" do
+        existing = ::Client.create!(
+          name: "Avito импорт",
+          email: "avito-79001112233@avito.local",
+          phone: "79001112233"
+        )
+
+        order_json = {
+          "agent" => {
+            "meta" => { "href" => @agent_href },
+            "name" => "Иван Петров",
+            "phone" => "+7 (900) 111-22-33"
+          }
+        }
+
+        client = SyncToClient.call(moysklad: @moysklad, order_json: order_json)
+
+        assert_equal existing.id, client.id
+        assert_equal "Иван Петров", client.reload.name
+        assert Varbind.exists?(record: existing, bindable: @moysklad, value: @uuid)
+        assert_equal 1, ::Client.count
+      end
     end
   end
 end

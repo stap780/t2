@@ -156,8 +156,8 @@ module AvitoApi
       def find_or_create_client
         buyer = buyer_attributes_for_client
         if buyer.present?
-          email = buyer[:email].presence || placeholder_email(buyer[:phone])
-          phone = buyer[:phone].to_s.gsub(/\D/, "")
+          email = buyer[:email].presence || placeholder_email(buyer)
+          phone = ClientIdentity.normalize_phone(buyer[:phone])
           name = buyer[:name].presence || @avito.title
 
           client = find_client_for_buyer(buyer, email: email, phone: phone)
@@ -171,7 +171,7 @@ module AvitoApi
           return client
         end
 
-        Client.find_or_create_by!(email: "avito-#{@avito.id}@#{@avito.api_id}.local") do |c|
+        Client.find_or_create_by!(email: "avito-shop-#{@avito.id}@#{ClientIdentity::AVITO_PLACEHOLDER_DOMAIN}") do |c|
           c.name = @avito.title
           c.phone = "0"
         end
@@ -184,7 +184,7 @@ module AvitoApi
         end
 
         client = Client.find_by(email: email)
-        client ||= Client.find_by(phone: phone) if phone.present?
+        client ||= ClientIdentity.find_by_phone(phone) if phone.present?
         client
       end
 
@@ -247,16 +247,16 @@ module AvitoApi
       end
 
       def avito_user_email(user_id)
-        "avito-#{user_id}@placeholder.local"
+        "avito-#{user_id}@#{ClientIdentity::AVITO_PLACEHOLDER_DOMAIN}"
       end
 
-      def placeholder_email(phone)
-        normalized_phone = phone.to_s.gsub(/\D/, "")
-        if normalized_phone.present?
-          "avito-#{normalized_phone}@placeholder.local"
-        else
-          "avito-#{extract_avito_order_id}@placeholder.local"
-        end
+      def placeholder_email(buyer)
+        return avito_user_email(buyer[:avito_user_id]) if buyer[:avito_user_id].present?
+
+        phone = ClientIdentity.normalize_phone(buyer[:phone])
+        return "avito-#{phone}@#{ClientIdentity::AVITO_PLACEHOLDER_DOMAIN}" if phone.present?
+
+        "avito-order-#{extract_avito_order_id}@#{ClientIdentity::AVITO_PLACEHOLDER_DOMAIN}"
       end
     end
   end

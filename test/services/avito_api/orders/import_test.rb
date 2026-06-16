@@ -144,7 +144,7 @@ module AvitoApi
 
           assert result.order.present?
           assert_equal "Алексей Мазин", result.order.client.name
-          assert_equal "avito-88203907@placeholder.local", result.order.client.email
+          assert_equal "avito-88203907@avito.local", result.order.client.email
           assert Varbind.exists?(record: result.order.client, bindable: @avito, value: "88203907")
           assert_equal 1, result.order.comments.count
           assert_includes result.order.comments.first.body, "Avito профиль: #{profile_url}"
@@ -155,7 +155,7 @@ module AvitoApi
         @avito.update!(profileid: "71941621")
         existing = Client.create!(
           name: "Алексей Мазин",
-          email: "avito-88203907@placeholder.local",
+          email: "avito-88203907@avito.local",
           phone: "0"
         )
         Varbind.create!(record: existing, bindable: @avito, value: "88203907")
@@ -201,7 +201,7 @@ module AvitoApi
 
           assert result.order.present?
           assert_equal @avito.title, result.order.client.name
-          assert_equal "avito-#{@avito.id}@#{@avito.api_id}.local", result.order.client.email
+          assert_equal "avito-shop-#{@avito.id}@avito.local", result.order.client.email
         end
       end
 

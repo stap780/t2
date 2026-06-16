@@ -33,7 +33,36 @@ module MoyskladApi
 
             assert result[:success]
             assert_equal href, result[:href]
+            assert_equal @client.id, result[:client].id
             assert Varbind.exists?(record: @client, bindable: @moysklad, value: "new-uuid-123")
+          end
+        end
+      end
+
+      test "reuses client that already owns counterparty varbind" do
+        uuid = "b7df7f61-689b-11f1-0a80-0099009df912"
+        href = EntityHref.counterparty(uuid)
+        canonical = ::Client.create!(
+          name: "Канонический",
+          email: "canonical-#{SecureRandom.hex(4)}@example.com",
+          phone: "79001112233"
+        )
+        Varbind.create!(record: canonical, bindable: @moysklad, value: uuid)
+
+        duplicate = ::Client.create!(
+          name: "Дубликат Avito",
+          email: "avito-79001112233@avito.local",
+          phone: "79001112233"
+        )
+
+        with_singleton_stub(MoyskladApi::Client, :get_json, ->(*) { { "rows" => [] } }) do
+          with_singleton_stub(MoyskladApi::Client, :post_json, ->(*) { { "meta" => { "href" => href } } }) do
+            result = FindOrCreateFromClient.call(moysklad: @moysklad, client: duplicate)
+
+            assert result[:success]
+            assert_equal href, result[:href]
+            assert_equal canonical.id, result[:client].id
+            assert_not Varbind.exists?(record: duplicate, bindable: @moysklad)
           end
         end
       end

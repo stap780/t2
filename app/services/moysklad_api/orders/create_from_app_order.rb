@@ -29,6 +29,11 @@ module MoyskladApi
         agent_result = Counterparty::FindOrCreateFromClient.call(moysklad: @moysklad, client: @order.client)
         return agent_result unless agent_result[:success]
 
+        canonical_client = agent_result[:client]
+        if canonical_client && canonical_client.id != @order.client_id
+          @order.update!(client_id: canonical_client.id)
+        end
+
         if @moysklad.default_ad_source_href.blank?
           return { success: false, error: "default_ad_source_not_configured" }
         end
