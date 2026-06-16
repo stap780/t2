@@ -5,8 +5,12 @@ require "test_helper"
 module MoyskladApi
   module Orders
     class BuildCustomAttributesTest < ActiveSupport::TestCase
+      self.fixture_table_names = []
+
       def attribute_metadata(*rows)
-        rows.map do |href, type, **extra|
+        rows.map do |row|
+          href, type = row[0], row[1]
+          extra = row[2..]&.grep(Hash)&.reduce({}, :merge) || {}
           { href:, name: href, type:, required: false, custom_entity_meta_href: nil, **extra }
         end
       end
@@ -51,6 +55,59 @@ module MoyskladApi
 
         assert_equal 1, attrs.size
         assert_equal attr_href, attrs.first.dig("meta", "href")
+        assert_equal moysklad.default_ad_source_href, attrs.first.dig("value", "meta", "href")
+      end
+
+      test "uses integration name mapping for ad source when entity matches" do
+        moysklad = Moysklad.create!(api_key: "k", api_password: "p", title: "МойСклад")
+        avito = Avito.create!(title: "Dizauto Avito", api_id: "id-#{SecureRandom.hex(4)}", api_secret: "sec")
+        ad_attr_href = "https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/ad"
+        catalog_href = "https://api.moysklad.ru/api/remap/1.2/entity/customentity/cat/ad-sources"
+        entity_href = "https://api.moysklad.ru/api/remap/1.2/entity/customentity/cat/ad-sources/entity-avito"
+        moysklad.moysklad_order_field_mappings.create!(
+          source_key: "integration.name",
+          ms_attribute_href: ad_attr_href,
+          ms_attribute_name: Moysklad::AD_SOURCE_ATTRIBUTE_NAME
+        )
+        order = Order.new(source: "avito", avito: avito)
+
+        with_singleton_stub(
+          ReferenceData,
+          :custom_entity_values,
+          ->(*) { [{ href: entity_href, name: "Dizauto Avito" }] }
+        ) do
+          attrs = BuildCustomAttributes.call(
+            order: order,
+            moysklad: moysklad,
+            attribute_metadata: attribute_metadata(
+              [ad_attr_href, "customentity", name: Moysklad::AD_SOURCE_ATTRIBUTE_NAME, custom_entity_meta_href: catalog_href]
+            )
+          )
+
+          assert_equal 1, attrs.size
+          assert_equal entity_href, attrs.first.dig("value", "meta", "href")
+        end
+      end
+
+      test "falls back to default ad source when integration mapping missing" do
+        moysklad = Moysklad.create!(
+          api_key: "k",
+          api_password: "p",
+          title: "МойСклад",
+          default_ad_source_href: "https://api.moysklad.ru/api/remap/1.2/entity/customentity/cat/entity-default"
+        )
+        ad_attr_href = "https://api.moysklad.ru/api/remap/1.2/entity/customerorder/metadata/attributes/ad"
+        avito = Avito.create!(title: "Dizauto Avito", api_id: "id-#{SecureRandom.hex(4)}", api_secret: "sec")
+        order = Order.new(source: "avito", avito: avito)
+
+        attrs = BuildCustomAttributes.call(
+          order: order,
+          moysklad: moysklad,
+          attribute_metadata: attribute_metadata(
+            [ad_attr_href, "customentity", name: Moysklad::AD_SOURCE_ATTRIBUTE_NAME]
+          )
+        )
+
         assert_equal moysklad.default_ad_source_href, attrs.first.dig("value", "meta", "href")
       end
 

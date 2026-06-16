@@ -8,7 +8,8 @@ module OrdersHelper
   }.freeze
 
   def order_source_badge(order)
-    label = t("orders.sources.#{order.source}", default: order.source)
+    label = OrderIntegrationName.call(order).presence ||
+            t("orders.sources.#{order.source}", default: order.source)
     css = SOURCE_STYLES[order.source] || "bg-gray-100 text-gray-800"
     tag.span(label, class: "inline-flex px-2 py-0.5 text-xs font-medium rounded-full #{css}")
   end

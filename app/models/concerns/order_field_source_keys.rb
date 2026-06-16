@@ -11,6 +11,7 @@ module OrderFieldSourceKeys
     "order.total_sum" => "Сумма заказа",
     "client.name" => "Имя клиента",
     "client.email" => "Email клиента",
-    "client.phone" => "Телефон клиента"
+    "client.phone" => "Телефон клиента",
+    "integration.name" => "Название интеграции"
   }.freeze
 end

@@ -166,7 +166,7 @@ class MoyskladsController < ApplicationController
   end
 
   def moysklad_params
-    params.require(:moysklad).permit(:api_key, :api_password)
+    params.require(:moysklad).permit(:title, :api_key, :api_password)
   end
 
   def order_settings_params
@@ -174,6 +174,7 @@ class MoyskladsController < ApplicationController
       :organization_href,
       :store_href,
       :order_number_prefix,
+      :title,
       :default_ad_source_href,
       :orders_integration_start_at
     )

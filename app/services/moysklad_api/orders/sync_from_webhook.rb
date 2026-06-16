@@ -25,6 +25,8 @@ module MoyskladApi
         end
 
         assign_order_attributes(order)
+        client = Counterparty::SyncToClient.call(moysklad: @moysklad, order_json: @order_json)
+        order.client = client if client
         order.save!
 
         sync_moysklad_description(order)

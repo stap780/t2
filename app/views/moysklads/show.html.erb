@@ -4,7 +4,7 @@
   <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center space-x-4">
       <%= link_to_back moysklads_path %>
-      <h1 class="text-2xl font-bold text-gray-900"><%= t("moysklads.show.heading") %></h1>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @moysklad.title %></h1>
     </div>
     <p class="text-sm text-gray-500 mt-1"><%= t("moysklads.show.subtitle") %></p>
     <div class="flex flex-wrap gap-2">

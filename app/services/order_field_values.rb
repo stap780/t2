@@ -21,6 +21,7 @@ class OrderFieldValues
     when "client.name" then @order.client&.name
     when "client.email" then @order.client&.email
     when "client.phone" then @order.client&.phone
+    when "integration.name" then OrderIntegrationName.call(@order)
     end
   end
 end

@@ -29,20 +29,30 @@ module MoyskladApi
         assert_equal 100.0, order.total_sum
         assert_equal @order_status.id, order.order_status_id
         assert_equal @state_href, order.last_moysklad_state_href
+        assert order.client.present?
+        assert_equal "Покупатель МС", order.client.name
       end
 
-      test "links existing order by externalCode id" do
+      test "links existing avito client when agent varbind exists" do
+        uuid = "agent-uuid-avito"
+        existing_client = ::Client.create!(
+          name: "Avito buyer",
+          email: "avito-buyer-#{SecureRandom.hex(4)}@example.com",
+          phone: "79001112233"
+        )
+        Varbind.create!(record: existing_client, bindable: @moysklad, value: uuid)
         existing = Order.create!(source: "avito", avito_order_id: "av-1")
         order_json = sample_order_json(
           external_code: existing.id.to_s,
-          state_href: @state_href
+          state_href: @state_href,
+          agent_uuid: uuid,
+          agent_name: "Avito buyer"
         )
 
         order = SyncFromWebhook.call(moysklad: @moysklad, order_json: order_json, action: "UPDATE")
 
         assert_equal existing.id, order.id
-        assert_equal "avito", order.source
-        assert_equal "ms-uuid-1", order.moysklad_order_id
+        assert_equal existing_client.id, order.reload.client_id
       end
 
       test "skips status update when state unchanged" do
@@ -140,7 +150,18 @@ module MoyskladApi
 
       private
 
-      def sample_order_json(state_href:, external_code: nil, name: "00042", created: nil)
+      def sample_order_json(state_href:, external_code: nil, name: "00042", created: nil,
+                            agent_uuid: "cp-uuid-1", agent_name: "Покупатель МС",
+                            agent_email: nil)
+        agent = {
+          "meta" => {
+            "href" => "https://api.moysklad.ru/api/remap/1.2/entity/counterparty/#{agent_uuid}",
+            "type" => "counterparty"
+          },
+          "name" => agent_name
+        }
+        agent["email"] = agent_email if agent_email.present?
+
         {
           "meta" => { "href" => "https://api.moysklad.ru/api/remap/1.2/entity/customerorder/ms-uuid-1" },
           "name" => name,
@@ -149,7 +170,8 @@ module MoyskladApi
           "created" => created,
           "description" => "Комментарий",
           "state" => { "meta" => { "href" => state_href } },
-          "positions" => { "rows" => [] }
+          "positions" => { "rows" => [] },
+          "agent" => agent
         }
       end
     end

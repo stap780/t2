@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -459,6 +459,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_120000) do
     t.string "api_link"
     t.string "api_password"
     t.datetime "created_at", null: false
+    t.string "title"
     t.datetime "updated_at", null: false
   end
 
@@ -545,6 +546,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_28_120000) do
     t.datetime "orders_integration_start_at"
     t.string "organization_href"
     t.string "store_href"
+    t.string "title"
     t.datetime "updated_at", null: false
   end
 

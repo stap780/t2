@@ -5,7 +5,7 @@
     <div class="flex items-center space-x-4">
       <%= link_to_back insales_path %>
       <div>
-        <h1 class="text-2xl font-bold text-gray-900"><%= t("insales.show.heading") %></h1>
+        <h1 class="text-2xl font-bold text-gray-900"><%= @insale.title %></h1>
         <p class="text-sm text-gray-500 mt-1"><%= @insale.api_link %></p>
       </div>
     </div>

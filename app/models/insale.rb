@@ -7,6 +7,9 @@ class Insale < ApplicationRecord
   validates :api_link, presence: true
   validates :api_key, presence: true
   validates :api_password, presence: true
+  validates :title, presence: true
+
+  before_validation :ensure_title
 
   def api_init
     InsalesApi::App.api_key = api_key
@@ -98,5 +101,11 @@ class Insale < ApplicationRecord
     url_opts[:port] = port if port.present? && !host.include?(":")
 
     Rails.application.routes.url_helpers.api_insale_order_url(id, **url_opts)
+  end
+
+  private
+
+  def ensure_title
+    self.title = api_link if title.blank? && api_link.present?
   end
 end

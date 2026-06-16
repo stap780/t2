@@ -1916,6 +1916,7 @@ ru:
         quantity: "Кол-во"
         price: "Цена"
       moysklad:
+        title: "Название"
         organization_href: "Организация"
         store_href: "Склад"
         order_number_prefix: "Префикс номера заказа"
@@ -1942,6 +1943,9 @@ ru:
         insales_financial_status: "Статус оплаты"
         order_status: "Внутренний статус"
         order_status_id: "Внутренний статус"
+      insale:
+        title: "Название"
+        api_link: "Домен магазина"
       insales_order_field_mapping:
         source_key: "Поле в t2"
         insales_field_id: "ID поля InSales"

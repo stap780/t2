@@ -158,6 +158,6 @@ class InsalesController < ApplicationController
   end
 
   def insale_params
-    params.require(:insale).permit(:api_key, :api_password, :api_link)
+    params.require(:insale).permit(:title, :api_key, :api_password, :api_link)
   end
 end

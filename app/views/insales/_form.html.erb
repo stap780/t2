@@ -2,6 +2,13 @@
   <%= render 'shared/errors', object: insale %>
 
   <div class="grid grid-cols-1 gap-6">
+    <div class="space-y-2">
+      <%= form.label :title, class: "block text-sm font-semibold text-gray-800" %>
+      <%= form.text_field :title,
+          class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition duration-200 ease-in-out text-gray-900 placeholder-gray-400"
+      %>
+    </div>
+
     <!-- API Key -->
     <div class="space-y-2">
       <%= form.label :api_key, class: "block text-sm font-semibold text-gray-800" %>

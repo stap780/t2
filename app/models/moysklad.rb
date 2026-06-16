@@ -5,6 +5,9 @@ class Moysklad < ApplicationRecord
 
   validates :api_key, presence: true
   validates :api_password, presence: true
+  validates :title, presence: true
+
+  before_validation :ensure_title
 
   # Check API works
   # Returns [true, ""] or [false, messages]
@@ -21,5 +24,11 @@ class Moysklad < ApplicationRecord
       message << "StandardError #{e}"
     end
     message.size.positive? ? [false, message] : [true, ""]
+  end
+
+  private
+
+  def ensure_title
+    self.title = "МойСклад" if title.blank?
   end
 end
