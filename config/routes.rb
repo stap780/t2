@@ -323,6 +323,7 @@ Rails.application.routes.draw do
   namespace :api do
     post "insales/:id/order", to: "insales#order", as: :insale_order
     post "moysklads/order", to: "moysklads#order"
+    post "avito/catalog_links", to: "avito_catalog_links#create", as: :avito_catalog_links
   end
   
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)

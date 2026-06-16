@@ -59,6 +59,17 @@
         %>
       </div>
     <% end %>
+
+    <% if user.persisted? && user.api_token.present? %>
+      <div class="space-y-2">
+        <%= form.label :api_token, t("users.form.api_token"), class: "block text-sm font-semibold text-gray-800" %>
+        <%= form.text_field :api_token,
+            readonly: true,
+            class: "block w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm bg-gray-50 text-gray-900 font-mono text-sm"
+        %>
+        <p class="text-xs text-gray-500 mt-1"><%= t("users.form.api_token_hint") %></p>
+      </div>
+    <% end %>
   </div>
 
   <!-- Action Buttons -->

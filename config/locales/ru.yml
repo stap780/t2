@@ -749,6 +749,8 @@ ru:
       delete_confirm: "Вы уверены, что хотите удалить этого пользователя?"
     form:
       password_hint: "Оставьте пустым, чтобы сохранить текущий пароль"
+      api_token: "API-токен"
+      api_token_hint: "Используйте в заголовке Authorization: Bearer для POST /api/avito/catalog_links"
   insales:
     index:
       title: "InSales"

@@ -12,7 +12,8 @@ module AvitoApi
         @avito = Avito.create!(
           title: "Test Avito",
           api_id: "client-id-#{SecureRandom.hex(4)}",
-          api_secret: "secret-#{SecureRandom.hex(4)}"
+          api_secret: "secret-#{SecureRandom.hex(4)}",
+          profileid: 71_941_621
         )
         @product = Product.create!(title: "Товар", status: "active")
         @product.variants.create!(quantity: 1, price: 100)
@@ -77,7 +78,7 @@ module AvitoApi
 
       test "collects not_found samples up to limit" do
         product_id = @product.id.to_s
-        limit = SyncCatalog::NOT_FOUND_SAMPLES_LIMIT
+        limit = CatalogLinks::NOT_FOUND_SAMPLES_LIMIT
         missing_items = (1..(limit + 5)).map do |i|
           { "ad_id" => "missing-#{i}", "avito_id" => 7_000_000_000 + i }
         end

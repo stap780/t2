@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -112,6 +112,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "avito_catalog_link_digests", force: :cascade do |t|
+    t.bigint "avito_id", null: false
+    t.integer "conflicts", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.date "digest_date", null: false
+    t.jsonb "errors_list", default: [], null: false
+    t.integer "existing", default: 0, null: false
+    t.integer "linked", default: 0, null: false
+    t.integer "not_found", default: 0, null: false
+    t.jsonb "not_found_samples", default: [], null: false
+    t.integer "skipped", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["avito_id", "digest_date"], name: "index_avito_catalog_link_digests_on_avito_and_date", unique: true
+    t.index ["avito_id"], name: "index_avito_catalog_link_digests_on_avito_id"
+    t.index ["user_id"], name: "index_avito_catalog_link_digests_on_user_id"
+  end
+
   create_table "avito_order_status_mappings", force: :cascade do |t|
     t.bigint "avito_id", null: false
     t.string "avito_status", null: false
@@ -126,11 +144,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
     t.string "api_id"
     t.string "api_secret"
     t.datetime "created_at", null: false
-    t.integer "profileid"
+    t.integer "profileid", null: false
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["api_id"], name: "index_avitos_on_api_id", unique: true
     t.index ["api_secret"], name: "index_avitos_on_api_secret", unique: true
+    t.index ["profileid"], name: "index_avitos_on_profileid", unique: true
   end
 
   create_table "barcode_counters", force: :cascade do |t|
@@ -670,6 +689,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "api_token", null: false
     t.datetime "created_at", null: false
     t.string "email_address", null: false
     t.string "name"
@@ -677,6 +697,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
     t.string "role"
     t.string "surname"
     t.datetime "updated_at", null: false
+    t.index ["api_token"], name: "index_users_on_api_token", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
@@ -717,6 +738,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_120000) do
   add_foreign_key "acts", "companies", column: "strah_id"
   add_foreign_key "acts", "okrugs"
   add_foreign_key "acts", "users", column: "driver_id"
+  add_foreign_key "avito_catalog_link_digests", "avitos"
+  add_foreign_key "avito_catalog_link_digests", "users"
   add_foreign_key "avito_order_status_mappings", "avitos"
   add_foreign_key "avito_order_status_mappings", "order_statuses"
   add_foreign_key "characteristics", "properties"

@@ -21,10 +21,10 @@
     <% end %>
     <% not_found_samples = Array(@details["not_found_samples"]) %>
     <% if not_found_samples.any? %>
-      <p><strong>Примеры (ad_id → avito_id):</strong></p>
+      <p><strong>Примеры (real_id/ad_id → avito_id):</strong></p>
       <ul>
         <% not_found_samples.each do |sample| %>
-          <li><%= sample["ad_id"] %> → <%= sample["avito_id"] %></li>
+          <li><%= sample["real_id"].presence || sample["ad_id"] %> → <%= sample["avito_id"] %></li>
         <% end %>
       </ul>
     <% end %>
