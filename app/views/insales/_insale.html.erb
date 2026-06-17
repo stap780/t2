@@ -19,8 +19,7 @@
   
   <div class="flex items-center space-x-2">
 
-    <%= link_to t("insales.show.settings"),
-          insale_path(insale),
+    <%= link_to t("insales.show.settings"), insale_path(insale),
           class: "inline-flex items-center px-1 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-150 ease-in-out",
           data: { turbo: false } %>
     <%= link_to_check check_insale_path(insale), label: t("insales.insale.check") %>

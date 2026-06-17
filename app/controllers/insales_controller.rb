@@ -3,12 +3,10 @@ class InsalesController < ApplicationController
 
   before_action :set_insale, only: %i[ show edit update destroy check fetch_orders add_order_webhook add_order_update_webhook ]
 
-  # GET /insales
   def index
     @insales = Insale.all.order(created_at: :desc)
   end
 
-  # GET /insales/1
   def show
     @api_ok, @api_errors = @insale.api_work?
     @status_mappings = @insale.insales_order_status_mappings
@@ -18,12 +16,10 @@ class InsalesController < ApplicationController
     @insales_fields = @api_ok ? Insales::ReferenceData.order_fields(@insale) : []
   end
 
-  # GET /insales/new
   def new
     @insale = Insale.new
   end
 
-  # GET /insales/1/edit
   def edit
   end
 
@@ -79,7 +75,6 @@ class InsalesController < ApplicationController
     end
   end
 
-  # GET /insales/1/check
   def check
     success, messages = @insale.api_work?
     
@@ -138,6 +133,7 @@ class InsalesController < ApplicationController
       format.turbo_stream { render turbo_stream: [render_turbo_flash] }
     end
   end
+  
   def add_order_update_webhook
     success, messages = @insale.add_order_update_webhook
     message_text = Array(messages).join(", ")

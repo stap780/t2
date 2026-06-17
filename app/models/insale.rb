@@ -93,14 +93,11 @@ class Insale < ApplicationRecord
   end
 
   def webhook_order_url
-    opts = Rails.application.config.action_mailer.default_url_options || {}
-    host = ENV.fetch("APP_PUBLIC_HOST", opts[:host] || "localhost")
-    protocol = ENV.fetch("APP_PUBLIC_PROTOCOL", opts[:protocol] || "http")
-    port = opts[:port]
-    url_opts = { host: host, protocol: protocol }
-    url_opts[:port] = port if port.present? && !host.include?(":")
-
-    Rails.application.routes.url_helpers.api_insale_order_url(id, **url_opts)
+    Rails.application.routes.url_helpers.api_insale_order_url(
+      id,
+      host: "cpt.dizauto.ru",
+      protocol: "https"
+    )
   end
 
   private
