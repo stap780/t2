@@ -1,6 +1,14 @@
 @import "tailwindcss" source("../../");
 
 @layer components {
+  /* SlimSelect скрывает нативный select через position:absolute в исходной точке
+     документа — на длинных формах это раздувает scrollHeight страницы */
+  select[aria-hidden="true"] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
   /* Аккуратный тонкий скроллбар для левого меню */
   .sidebar-nav-scroll {
     overflow-y: auto;

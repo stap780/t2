@@ -25,7 +25,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="<%= Current.user ? 'bg-gray-50 h-screen flex' : 'bg-gray-50' %>">
+  <body class="<%= Current.user ? 'bg-gray-50 h-screen flex overflow-hidden' : 'bg-gray-50' %>">
     <% if Current.user %>
       <%= render "shared/flash" %>
       <!-- Sidebar -->
@@ -279,7 +279,7 @@
       </div>
 
       <!-- Main content area -->
-      <div class="flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col min-h-0">
         <!-- Top navigation -->
         <div class="bg-white border-b border-gray-200 flex-shrink-0">
           <div class="px-4 sm:px-6 lg:px-8">
@@ -325,7 +325,7 @@
         </div>
 
         <!-- Page content -->
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 min-h-0 overflow-y-auto">
           <div class="py-6">
             <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-4">
               <%= yield %>

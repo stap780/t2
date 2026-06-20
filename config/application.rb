@@ -21,17 +21,17 @@ module T2
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-  # Set application time zone (used by Time.zone and view formatting)
-  config.time_zone = "Europe/Moscow"
-  # Keep database timestamps in UTC for consistency
-  config.active_record.default_timezone = :utc
-  # Localization
-  config.i18n.available_locales = [:ru, :en]
-  config.i18n.default_locale = :ru
+    # Set application time zone (used by Time.zone and view formatting)
+    config.time_zone = "Europe/Moscow"
+    # Keep database timestamps in UTC for consistency
+    config.active_record.default_timezone = :utc
+    # Localization
+    config.i18n.available_locales = [:ru, :en]
+    config.i18n.default_locale = :ru
 
-  # Сессия в БД (таблица ar_sessions), чтобы не упираться в лимит cookie 4 KB
-  config.session_store :active_record_store, key: "_t2_session"
+    # Сессия в БД (таблица ar_sessions), чтобы не упираться в лимит cookie 4 KB
+    config.session_store :active_record_store, key: "_t2_session"
 
-  # config.eager_load_paths << Rails.root.join("extras")
+    # config.eager_load_paths << Rails.root.join("extras")
   end
 end

@@ -24,31 +24,33 @@
            data-sortable-target="hposition">
   <% end %>
   
-  <!-- Иконка сортировки и позиция (Tailwind) -->
-  <div class="flex items-center justify-between mb-2">
-    <button type="button" class="js-sort-handle flex items-center justify-center text-blue-400 hover:text-blue-600 rounded p-1 focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-move" title="Перетащить">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 9h14M5 15h14" />
-      </svg>
-    </button>
-    <span class="ml-auto bg-blue-200 text-blue-800 text-xs font-semibold px-2 py-1 rounded" data-sortable-target="position">
-      <%= image_position %>
-    </span>
-  </div>
-  
-  <!-- Изображение -->
-  <div class="w-full flex items-center justify-center bg-gray-50 rounded aspect-square mb-2 overflow-hidden" data-original-image-url="<%= img_def_url %>">
-    <% if blob_exists %>
-      <% img = url_for(blob) %>
-      <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
-        <div class="img-ratio__inner w-full h-full">
-          <%= picture_tag(class: "block w-full h-full") do %>
-            <%= tag(:source, srcset: img) %>
-            <%= image_tag(img, alt: "", class: "w-full h-full object-contain rounded-md", loading: "lazy") %>
-          <% end %>
-        </div>
+  <!-- Сортировка + изображение (общий handle, без наложения на фото) -->
+  <div class="js-sort-handle flex flex-col w-full mb-2 rounded overflow-hidden cursor-move group"
+       title="Перетащить">
+    <div class="flex items-center justify-between px-2 py-1.5 bg-gray-100 shrink-0">
+      <span class="flex items-center justify-center text-blue-500" aria-hidden="true">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 9h14M5 15h14" />
+        </svg>
+      </span>
+      <span class="bg-blue-200 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded tabular-nums" data-sortable-target="position">
+        <%= image_position %>
+      </span>
+    </div>
+    <div class="w-full aspect-square flex items-center justify-center bg-gray-50 overflow-hidden"
+         data-original-image-url="<%= img_def_url %>">
+      <% if blob_exists %>
+        <% img = url_for(blob) %>
+        <%= tag.div(class: "w-full h-full flex justify-center items-center img-ratio img-fit") do %>
+          <div class="img-ratio__inner w-full h-full">
+            <%= picture_tag(class: "block w-full h-full") do %>
+              <%= tag(:source, srcset: img) %>
+              <%= image_tag(img, alt: "", class: "w-full h-full object-contain pointer-events-none select-none", loading: "lazy", draggable: "false") %>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
-    <% end %>
+    </div>
   </div>
   
   <!-- Чекбокс для массового удаления -->
@@ -67,12 +69,8 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.92 3.053-3.858 6.002-9.542 7-5.685-.999-8.623-3.947-9.542-7z" />
       </svg>
     </a>
-    <%= link_to delete_images_path(blob_signed_ids: [signed_id]), 
-        data: { turbo_method: :post, turbo_confirm: "Are you sure?" },
-        class: "text-red-400 hover:text-red-600" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    <% end %>
+    <%= link_to_delete delete_images_path(blob_signed_ids: [signed_id]),
+          class: "text-red-400 hover:text-red-600",
+          data: { turbo_method: :post, turbo_confirm: t("actions.delete") } %>
   </div>
 </div>
